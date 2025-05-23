@@ -21,7 +21,7 @@ export class Venue {
   countryId: string;
 
   @Column({ type: 'jsonb' })
-  openingHours: { day: string; open: string; close: string }[];
+  openingHours: { day: number; open: number; close: number }[];
 
   @Column()
   address: string;

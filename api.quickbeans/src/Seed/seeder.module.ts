@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Checkout } from '@controllers/checkout/Checkout.entity';
 import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
 import { Modifier, ModifierOption } from '@controllers/modifier/Modifier.entity';
@@ -9,7 +8,6 @@ import { User } from '@controllers/user/User.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -22,22 +20,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'api_quickbeans',
       url: process.env.DATABASE_URL || process.env.PG_URL,
       entities: [Checkout, CheckoutCategory, Modifier, ModifierOption, Order, OrderItem, Product, User, Venue],
-      logging: ['error', 'warn'],
-      poolSize: 5,
-      maxQueryExecutionTime: 5000,
       migrations: [],
-      synchronize: false
-    }),
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60,
-          limit: 10
-        }
-      ]
+      synchronize: true
     })
   ],
-  controllers: [],
   providers: []
 })
-export class AppModule {}
+export class SeederModule {}
