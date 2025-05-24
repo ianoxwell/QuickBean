@@ -1,15 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Venue } from '@controllers/venue/Venue.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Modifier {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: false })
   name: string;
 
   @OneToMany(() => ModifierOption, (option) => option.modifier, { cascade: true })
   options: ModifierOption[];
+
+  @ManyToOne(() => Venue, { nullable: false })
+  venue!: Venue;
 }
 
 @Entity()

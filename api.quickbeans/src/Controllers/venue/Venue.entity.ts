@@ -5,8 +5,8 @@ export class Venue {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+  @Column({ unique: true, length: 255 })
+  name!: string;
 
   @Column()
   websiteUrl: string;

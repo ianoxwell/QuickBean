@@ -8,10 +8,7 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Venue, { nullable: false })
-  venue: Venue;
-
-  @Column()
+  @Column({ unique: false })
   name: string;
 
   @Column()
@@ -28,6 +25,9 @@ export class Product {
 
   @Column({ type: 'enum', enum: ProductType })
   productType: ProductType;
+
+  @ManyToOne(() => Venue, { nullable: false })
+  venue!: Venue;
 
   @ManyToMany(() => Modifier, { cascade: true })
   @JoinTable()

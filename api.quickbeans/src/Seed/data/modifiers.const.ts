@@ -1,8 +1,10 @@
-import { Modifier, ModifierOption } from '@controllers/modifier/Modifier.entity';
+import { ModifierOption } from '@controllers/modifier/Modifier.entity';
+import venues from './venues.const';
 
-const modifiers: Partial<Modifier>[] = [
+const modifiers = [
   {
     name: 'Size',
+    venue: venues[0],
     options: [
       { label: 'Small', priceAdjustment: 0 },
       { label: 'Medium', priceAdjustment: 0.5 },
@@ -11,6 +13,7 @@ const modifiers: Partial<Modifier>[] = [
   },
   {
     name: 'Milk',
+    venue: venues[0],
     options: [
       { label: 'Whole', priceAdjustment: 0 },
       { label: 'Almond', priceAdjustment: 0.5 },

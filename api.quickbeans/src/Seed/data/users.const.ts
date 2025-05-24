@@ -1,29 +1,32 @@
 import { User } from '@controllers/user/User.entity';
+import { Venue } from '@controllers/venue/Venue.entity';
 import { Role } from '@models/base.dto';
-import * as bcrypt from 'bcrypt';
+import venues from './venues.const';
 
-const hash = (password: string) => bcrypt.hashSync(password, 10);
-
-const users: Partial<User>[] = [
+const users: User[] = [
   {
     name: 'Alice Admin',
     email: 'admin@coffee.com',
     phone: '0400000001',
-    passwordHash: hash('admin123'),
+    passwordHash: 'admin123', // This gets hashed in the seed script
     isActive: true,
+    verified: new Date(),
     loginProvider: 'local',
     roles: [Role.ADMIN],
-    venues: []
+    timesLoggedIn: 0,
+    venues: venues as Venue[]
   },
   {
     name: 'Bob Barista',
     email: 'bob@coffee.com',
     phone: '0400000002',
-    passwordHash: hash('kitchen123'),
+    passwordHash: 'kitchen123',
     isActive: true,
+    verified: new Date(),
     loginProvider: 'local',
     roles: [Role.KITCHEN],
-    venues: []
+    venues: venues as Venue[],
+    timesLoggedIn: 0
   }
 ];
 

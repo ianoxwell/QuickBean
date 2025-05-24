@@ -45,3 +45,5 @@ export enum BookingStatus {
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded'
 }
+
+export type TLoginProvider = 'local' | 'google' | 'facebook' | 'apple';
