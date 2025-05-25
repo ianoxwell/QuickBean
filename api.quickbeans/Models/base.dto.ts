@@ -23,21 +23,21 @@ export interface IPagedMeta {
   readonly hasNextPage: boolean;
 }
 
-export enum Role {
+export enum ERole {
   ADMIN = 'admin',
   KITCHEN = 'kitchen',
   FRONT_OF_HOUSE = 'front_of_house',
   PATRON = 'patron'
 }
 
-export enum ProductType {
+export enum EProductType {
   HOT_DRINK = 'hot_drink',
   TEA_BREWED = 'tea_brewed',
   COLD_DRINK = 'cold_drink',
   FOOD = 'food'
 }
 
-export enum BookingStatus {
+export enum EBookingStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
   PREPARING = 'preparing',

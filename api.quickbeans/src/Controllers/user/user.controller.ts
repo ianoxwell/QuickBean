@@ -1,0 +1,178 @@
+import { CMessage } from '@base/message.class';
+import { IResetPasswordRequest } from '@models/reset-password-request.dto';
+import { INewUser, IUserJwtPayload, IUserLogin, IUserProfile, IUserSummary, IUserToken, IVerifyUserEmail } from '@models/user.dto';
+import { Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Get, Headers, HttpCode, Ip, Query, UseGuards } from '@nestjs/common/decorators';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { CustomLogger } from '@services/logger.service';
+import { CurrentUser } from './current-user.decorator';
+import { UserService } from './user.service';
+
+import { isMessage } from '@services/utils';
+import { User } from './User.entity';
+
+@ApiTags('User')
+@Controller({ path: 'user' })
+export class AccountController {
+  constructor(
+    private userService: UserService,
+    private logger: CustomLogger
+  ) {}
+
+  @Get()
+  @ApiOkResponse({
+    description: 'Quick and dirty get all current users'
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('JWT-auth')
+  async findAll(): Promise<IUserProfile[]> {
+    return this.userService.findAll();
+  }
+
+  @Post('register')
+  @ApiCreatedResponse({
+    description: 'User return'
+  })
+  async register(
+    @Body() registerUser: INewUser,
+    @Headers() headers: Record<string, string>
+  ): Promise<IUserProfile | IUserToken | CMessage> {
+    const isEmailAvailable = await this.userService.emailAvailable(registerUser.email);
+    if (!isEmailAvailable) {
+      return new CMessage('Email address is already registered', HttpStatus.CONFLICT);
+    }
+
+    let user: User | IUserToken = await this.userService.registerUser(registerUser, headers.origin);
+
+    if (Object.prototype.hasOwnProperty.call(user, 'token')) {
+      this.logger.warn(`Existing non verified user ${(user as IUserToken).user.email}`);
+      return user as IUserToken;
+    }
+
+    user = user as User;
+    this.logger.warn(`New user created for registration ${user.email}`);
+    return {
+      id: user.id,
+      name: user.name,
+      phone: user.phone,
+      email: user.email
+    };
+  }
+
+  @Post('verify-email')
+  @ApiBadRequestResponse()
+  @HttpCode(200)
+  @ApiOkResponse({
+    description: 'A success message if the account exists and token matches',
+    type: CMessage
+  })
+  async verifyEmail(@Body() verify: IVerifyUserEmail): Promise<CMessage | IUserToken> {
+    if (!verify.email || verify.email.length < 4 || !verify.email.includes('@')) {
+      throw new HttpException({ status: HttpStatus.BAD_REQUEST, message: 'Email address does not look right' }, HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.userService.verifyUser(verify);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  @ApiBadRequestResponse()
+  @ApiOkResponse({
+    description: 'Confirms email address message has been sent',
+    type: CMessage
+  })
+  async forgotPassword(@Body() mail: IResetPasswordRequest, @Headers() headers: Record<string, string>): Promise<CMessage> {
+    if (!mail.email || mail.email.length < 4 || !mail.email.includes('@')) {
+      return new CMessage('Email address does not look right, try correcting and send again', HttpStatus.BAD_REQUEST);
+    }
+
+    // If email address doesn't exist throw bad juju
+    if (await this.userService.emailAvailable(mail.email)) {
+      return new CMessage('Email address not exist, super suspicious like', HttpStatus.NOT_FOUND);
+    }
+
+    return this.userService.forgotPassword(mail.email, headers.origin);
+  }
+
+  @Post('validate-reset-token')
+  @HttpCode(200)
+  @ApiOkResponse({
+    description: 'Confirms password reset and returns jwk to login with',
+    type: CMessage
+  })
+  @ApiBadRequestResponse()
+  async validateResetToken(@Body() verify: IVerifyUserEmail): Promise<CMessage> {
+    if (!verify || !verify.token || verify.token.length < 16 || !verify.email) {
+      throw new HttpException(
+        { status: HttpStatus.BAD_REQUEST, message: 'Not verifying something with no information' },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    const result = await this.userService.validateResetToken(verify);
+
+    return { message: result ? 'Token is valid' : 'Invalid Token' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  @ApiOkResponse({
+    description:
+      'Confirms password reset and returns jwk to login with. In terms of flow, the front end on receiving success message will then use the same pw to login.'
+  })
+  async resetPassword(@Body() reset: IResetPasswordRequest): Promise<CMessage | IUserToken> {
+    if (!reset.email || reset.email.length < 4 || !reset.email.includes('@')) {
+      return new CMessage('Email address does not look right', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!reset.token || reset.token.length < 16) {
+      return new CMessage('Token is not looking correct, try again', HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.userService.resetPassword(reset);
+  }
+
+  @Get('email-available')
+  async checkEmailAvailable(@Query('email') email: string): Promise<boolean> {
+    if (!email || email.length < 4 || !email.includes('@')) {
+      throw new HttpException({ status: HttpStatus.BAD_REQUEST, message: 'Email address does not look right' }, HttpStatus.BAD_REQUEST);
+    }
+
+    return this.userService.emailAvailable(email);
+  }
+
+  @Post('login')
+  @HttpCode(200)
+  @ApiOkResponse({
+    description: 'jwt bearer token'
+  })
+  @ApiBadRequestResponse()
+  async userLogin(@Body() user: IUserLogin, @Ip() ip: string): Promise<IUserToken | CMessage> {
+    if (!user.email || user.email.length < 4 || !user.email.includes('@')) {
+      throw new HttpException({ status: HttpStatus.BAD_REQUEST, message: 'Email address does not look right' }, HttpStatus.BAD_REQUEST);
+    }
+
+    const userResponse = await this.userService.findOneUser(user);
+    if (isMessage<IUserToken>(userResponse)) {
+      this.logger.warn(`User log on attempt from ${ip} to ${user.email}`, userResponse);
+    } else {
+      this.logger.warn(`Successful user log on ${userResponse.user.email} from ${ip}`);
+    }
+
+    return userResponse;
+  }
+
+  // get-account
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('JWT-auth')
+  @Get('profile')
+  async whoAmI(@CurrentUser() user: IUserJwtPayload): Promise<IUserSummary | CMessage> {
+    const result = await this.userService.findById(user.userId);
+    if (!result) {
+      return { message: 'You have an existential crisis - your not real', status: HttpStatus.AMBIGUOUS };
+    }
+
+    return result;
+  }
+}

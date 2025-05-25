@@ -1,4 +1,4 @@
-import { ProductType } from '@models/base.dto';
+import { EProductType } from '@models/base.dto';
 import venues from './venues.const';
 import modifiers from './modifiers.const';
 
@@ -8,7 +8,7 @@ const products = [
     description: 'Espresso with steamed milk',
     baseCost: 4.0,
     isActive: true,
-    productType: ProductType.HOT_DRINK,
+    productType: EProductType.HOT_DRINK,
     modifiers: [modifiers[0], modifiers[1]],
     venue: venues[0]
   },
@@ -17,7 +17,7 @@ const products = [
     description: 'Slow steeped cold coffee',
     baseCost: 5.0,
     isActive: true,
-    productType: ProductType.COLD_DRINK,
+    productType: EProductType.COLD_DRINK,
     modifiers: [modifiers[0], modifiers[1]],
     venue: venues[0]
   }

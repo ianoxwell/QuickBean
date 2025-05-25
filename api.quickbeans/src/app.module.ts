@@ -6,11 +6,13 @@ import { OrderItem } from '@controllers/order/OrderItem.entity';
 import { Product } from '@controllers/product/Product.entity';
 import { StatusModule } from '@controllers/status/status.module';
 import { User } from '@controllers/user/User.entity';
+import { UserModule } from '@controllers/user/user.module';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '@services/auth/auth.module';
 
 @Module({
   imports: [
@@ -36,7 +38,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         }
       ]
     }),
-    StatusModule
+    StatusModule,
+    AuthModule,
+    UserModule
   ],
   controllers: [],
   providers: []

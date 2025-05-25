@@ -1,6 +1,6 @@
 import { User } from '@controllers/user/User.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
-import { Role } from '@models/base.dto';
+import { ERole } from '@models/base.dto';
 import venues from './venues.const';
 
 const users: User[] = [
@@ -12,7 +12,7 @@ const users: User[] = [
     isActive: true,
     verified: new Date(),
     loginProvider: 'local',
-    roles: [Role.ADMIN],
+    roles: [ERole.ADMIN],
     timesLoggedIn: 0,
     venues: venues as Venue[]
   },
@@ -24,7 +24,7 @@ const users: User[] = [
     isActive: true,
     verified: new Date(),
     loginProvider: 'local',
-    roles: [Role.KITCHEN],
+    roles: [ERole.KITCHEN],
     venues: venues as Venue[],
     timesLoggedIn: 0
   }

@@ -1,5 +1,5 @@
 import { Venue } from '@controllers/venue/Venue.entity';
-import { Role, TLoginProvider } from '@models/base.dto';
+import { ERole, TLoginProvider } from '@models/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
@@ -69,7 +69,7 @@ export class User {
   /** Roles and venues */
 
   @Column('simple-array')
-  roles: Role[];
+  roles: ERole[];
 
   @ManyToMany(() => Venue)
   @JoinTable()
