@@ -1,9 +1,11 @@
 import { Checkout } from '@controllers/checkout/Checkout.entity';
 import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
 import { Modifier, ModifierOption } from '@controllers/modifier/Modifier.entity';
+import { ModifierModule } from '@controllers/modifier/modifier.module';
 import { Order } from '@controllers/order/Order.entity';
 import { OrderItem } from '@controllers/order/OrderItem.entity';
 import { Product } from '@controllers/product/Product.entity';
+import { ProductModule } from '@controllers/product/product.module';
 import { StatusModule } from '@controllers/status/status.module';
 import { User } from '@controllers/user/User.entity';
 import { UserModule } from '@controllers/user/user.module';
@@ -41,6 +43,8 @@ import { AuthModule } from '@services/auth/auth.module';
     }),
     StatusModule,
     AuthModule,
+    ModifierModule,
+    ProductModule,
     UserModule,
     VenueModule
   ],

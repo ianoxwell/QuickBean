@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Venue } from './Venue.entity';
-import { IVenueProducts, IVenueShort } from '@models/venue.dto';
+import { IVenueWithProducts, IVenueShort } from '@models/venue.dto';
 import { IVenue } from '@models/venue.dto';
 import { CMessage } from '@base/message.class';
 import { ProductService } from '@controllers/product/product.service';
@@ -111,7 +111,7 @@ export class VenueService {
     };
   }
 
-  mapVenueToIVenueProducts(venue: Venue, products: IProduct[]): IVenueProducts {
+  mapVenueToIVenueProducts(venue: Venue, products: IProduct[]): IVenueWithProducts {
     return {
       ...this.mapVenueToIVenue(venue),
       products,

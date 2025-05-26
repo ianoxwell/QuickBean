@@ -1,6 +1,5 @@
 import { CMessage } from '@base/message.class';
-import { Modifier, ModifierOption } from '@controllers/modifier/Modifier.entity';
-import { IModifier, IModifierOption } from '@models/modifier.dto';
+import { ModifierService } from '@controllers/modifier/modifier.service';
 import { IProduct } from '@models/products.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +8,10 @@ import { Product } from './Product.entity';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectRepository(Product) private readonly productRepository: Repository<Product>) {}
+  constructor(
+    @InjectRepository(Product) private readonly productRepository: Repository<Product>,
+    private modifierService: ModifierService
+  ) {}
 
   async findById(id: number): Promise<Product | null> {
     return this.productRepository.findOne({ where: { id, isActive: true } });
@@ -54,25 +56,7 @@ export class ProductService {
       imageUrl: product.imageUrl,
       isActive: product.isActive,
       productType: product.productType,
-      modifiers: product.modifiers.map((modifier) => this.mapModifierToIModifier(modifier))
-    };
-  }
-
-  mapModifierToIModifier(modifier: Modifier): IModifier {
-    return {
-      id: modifier.id,
-      name: modifier.name,
-      options: modifier.options.map((option) => this.mapModifierOptionsToIProduct(option))
-    };
-  }
-
-  mapModifierOptionsToIProduct(modifierOption: ModifierOption): IModifierOption {
-    return {
-      id: modifierOption.id,
-      label: modifierOption.label,
-      description: modifierOption.description,
-      priceAdjustment: modifierOption.priceAdjustment,
-      percentAdjustment: modifierOption.percentAdjustment
+      modifiers: product.modifiers.map((modifier) => this.modifierService.mapModifierToIModifier(modifier))
     };
   }
 }

@@ -23,7 +23,7 @@ export interface IVenue extends IVenueShort {
   privacyPolicy: string;
 }
 
-export interface IVenueProducts extends IVenue {
+export interface IVenueWithProducts extends IVenue {
   products: IProduct[];
   checkoutCategories: { id: number; name: string; order: number; checkoutIds: number[] }[];
 }

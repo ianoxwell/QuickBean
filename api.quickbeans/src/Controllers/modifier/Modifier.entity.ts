@@ -9,6 +9,9 @@ export class Modifier {
   @Column({ unique: false })
   name: string;
 
+  @Column({ default: true })
+  isActive: boolean;
+
   @OneToMany(() => ModifierOption, (option) => option.modifier, { cascade: true })
   options: ModifierOption[];
 
