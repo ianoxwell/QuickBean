@@ -20,7 +20,22 @@ async function bootstrap() {
 
   // Seed Venues
   const venueRepo = dataSource.getRepository(Venue);
-  await venueRepo.upsert(venues, ['name']);
+  await Promise.all(
+    venues.map(async (venue) => {
+      const existingVenue = await venueRepo.findOneBy({ name: venue.name });
+      if (existingVenue) {
+        // If the venue already exists, update it with the new data
+        const updatedVenue = venueRepo.merge(existingVenue, venue);
+        console.log(`Venue ${venue.name} already exists, updating...`);
+        return await venueRepo.save(updatedVenue);
+      }
+      // If the venue does not exist, create a new one
+
+      console.log(`Creating venue: ${venue.name}`);
+      return await venueRepo.save(venue);
+    })
+  );
+
   console.log('Venues seeded');
 
   // Seed Users

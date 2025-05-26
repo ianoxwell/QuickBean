@@ -17,6 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload: any): IUserJwtPayload {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return { userId: payload.userId, email: payload.email, name: payload.name, roles: payload.roles };
+    return { id: payload.userId, email: payload.email, name: payload.name, roles: payload.roles };
   }
 }

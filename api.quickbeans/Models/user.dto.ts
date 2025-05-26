@@ -8,7 +8,7 @@ export interface IUserProfile extends IBaseDto {
 }
 
 export interface IUserJwtPayload {
-  userId: number;
+  id: number;
   email: string;
   name: string;
   roles: ERole[];

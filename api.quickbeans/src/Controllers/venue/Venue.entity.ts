@@ -8,6 +8,9 @@ export class Venue {
   @Column({ unique: true, length: 255 })
   name!: string;
 
+  @Column({ unique: true, length: 255 })
+  slug: string;
+
   @Column()
   websiteUrl: string;
 

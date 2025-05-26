@@ -1,6 +1,9 @@
+import { IProduct } from './products.dto';
+
 export interface IVenueShort {
   id: number;
   name: string;
+  slug: string;
   websiteUrl: string;
   publicPhone?: string;
   logoImage?: string;
@@ -18,4 +21,9 @@ export interface IVenue extends IVenueShort {
   legalBusinessNumber: string;
   timezone: string;
   privacyPolicy: string;
+}
+
+export interface IVenueProducts extends IVenue {
+  products: IProduct[];
+  checkoutCategories: { id: number; name: string; order: number; checkoutIds: number[] }[];
 }

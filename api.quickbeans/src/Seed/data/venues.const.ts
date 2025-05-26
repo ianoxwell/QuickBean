@@ -4,6 +4,8 @@ const venues: Partial<Venue>[] = [
   {
     name: 'Downtown Coffee Bar',
     websiteUrl: 'https://downtowncoffee.example.com',
+    slug: 'downtown-coffee-bar',
+    logoImage: 'https://downtowncoffee.example.com/logo.png',
     isActive: true,
     countryId: 'AU',
     openingHours: [

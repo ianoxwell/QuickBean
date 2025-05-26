@@ -1,6 +1,5 @@
 import { Venue } from '@controllers/venue/Venue.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { CheckoutCategory } from './CheckoutCategory.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Checkout {
@@ -22,11 +21,9 @@ export class Checkout {
   @Column({ nullable: true })
   heroImage: string;
 
+  @Column({ default: true })
+  isActive: boolean;
+
   @ManyToOne(() => Venue)
   venue: Venue;
-
-  @OneToMany(() => CheckoutCategory, (category) => category.checkout, {
-    cascade: true
-  })
-  categories: CheckoutCategory[];
 }

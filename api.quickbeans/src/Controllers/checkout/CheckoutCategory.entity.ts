@@ -1,12 +1,5 @@
 import { Product } from '@controllers/product/Product.entity';
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Checkout } from './Checkout.entity';
 
 @Entity()
@@ -19,9 +12,12 @@ export class CheckoutCategory {
 
   @Column()
   order: number;
+  @Column({ default: true })
+  isActive: boolean;
 
-  @ManyToOne(() => Checkout)
-  checkout: Checkout;
+  @ManyToMany(() => Checkout)
+  @JoinTable()
+  checkouts: Checkout[];
 
   @ManyToMany(() => Product)
   @JoinTable()

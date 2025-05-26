@@ -8,6 +8,7 @@ import { StatusModule } from '@controllers/status/status.module';
 import { User } from '@controllers/user/User.entity';
 import { UserModule } from '@controllers/user/user.module';
 import { Venue } from '@controllers/venue/Venue.entity';
+import { VenueModule } from '@controllers/venue/venue.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -40,7 +41,8 @@ import { AuthModule } from '@services/auth/auth.module';
     }),
     StatusModule,
     AuthModule,
-    UserModule
+    UserModule,
+    VenueModule
   ],
   controllers: [],
   providers: []

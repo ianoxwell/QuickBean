@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: new CustomLogger()
+    // logger: new CustomLogger()
   });
   app.enableCors({ origin: process.env.ALLOWED_ORIGINS?.split(',') || [] }); // TODO lock down the cors locations
   app.use(compression());

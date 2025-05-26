@@ -168,7 +168,7 @@ export class AccountController {
   @ApiBearerAuth('JWT-auth')
   @Get('profile')
   async whoAmI(@CurrentUser() user: IUserJwtPayload): Promise<IUserSummary | CMessage> {
-    const result = await this.userService.findById(user.userId);
+    const result = await this.userService.findById(user.id);
     if (!result) {
       return { message: 'You have an existential crisis - your not real', status: HttpStatus.AMBIGUOUS };
     }

@@ -50,7 +50,7 @@ export class UserService {
 
     const venues = await Promise.all(
       (user.venues || []).map(async (venue) => {
-        return await this.venuesService.findById(venue.id);
+        return await this.venuesService.findByIdEntity(venue.id);
       })
     );
 
