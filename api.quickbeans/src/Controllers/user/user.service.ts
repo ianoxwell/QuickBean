@@ -11,6 +11,7 @@ import { User } from './User.entity';
 import { ERole } from '@models/base.dto';
 import { VenueService } from '@controllers/venue/venue.service';
 import { CustomLogger } from '@services/logger.service';
+import { Venue } from '@controllers/venue/Venue.entity';
 
 @Injectable()
 export class UserService {
@@ -29,7 +30,12 @@ export class UserService {
     return findExistingUser === null;
   }
 
-  async registerUser(user: INewUser, host: string): Promise<IUserToken | User> {
+  async findByIdEntity(id: number): Promise<User | null> {
+    const user = await this.repository.findOne({ where: { id, isActive: true } });
+    return user || null;
+  }
+
+  async registerUser(user: INewUser, host?: string): Promise<IUserToken | User> {
     const isSocial = user.loginProvider?.toLowerCase() === 'google';
     this.logger.log(`Registering user with email: ${user.email}, social: ${isSocial} host: ${host}`);
 
@@ -82,6 +88,30 @@ export class UserService {
     return { user: this.mapUserToSummary(freshUser), token: this.createToken(freshUser) };
   }
 
+  async createUserEntity(user: IUserProfile, venue: Venue): Promise<User> {
+    const existingUser = await this.repository.findOne({ where: { email: user.email, isActive: true } });
+    if (existingUser) {
+      return existingUser;
+    }
+
+    const newUser = this.repository.create({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      isActive: true,
+      loginProvider: 'local',
+      roles: [ERole.PATRON],
+      venues: [venue]
+    });
+
+    newUser.passwordHash = await bcrypt.hash('tempPassword', 10); // Default password if not provided
+    newUser.verificationToken = randomBytes(16).toString('hex');
+
+    const savedUser = await this.repository.save(newUser);
+    this.logger.log(`Created new user: ${savedUser.name} with email: ${savedUser.email}`);
+    return savedUser;
+  }
+
   async findById(id: number): Promise<IUserSummary | undefined> {
     const user = await this.repository.findOne({ where: { id } });
     if (!user || !user.isActive) {
@@ -89,25 +119,6 @@ export class UserService {
     }
 
     return this.mapUserToSummary(user);
-  }
-
-  mapUserToSummary(user: User): IUserSummary {
-    return {
-      name: user.name,
-      email: user.email,
-      photoUrl: user.photoUrl,
-      isActive: user.isActive,
-      phone: user.phone,
-      loginProvider: user.loginProvider,
-      verified: user.verified,
-      failedLoginAttempt: user.failedLoginAttempt,
-      lastFailedLoginAttempt: user.lastFailedLoginAttempt,
-      timesLoggedIn: user.timesLoggedIn,
-      firstLogin: user.firstLogin,
-      lastLogin: user.lastLogin,
-      roles: user.roles,
-      venues: user.venues?.map((venue) => this.venuesService.mapVenueToIVenueShort(venue)) || []
-    };
   }
 
   /** Only to be used by the auth service */
@@ -171,7 +182,7 @@ export class UserService {
   }
 
   /** Temp or partial - later will secure or remove */
-  findAll(): Promise<IUserProfile[]> {
+  async findAll(): Promise<IUserProfile[]> {
     return this.repository.find().then((result: User[]) => {
       return result.map((user: User) => {
         return {
@@ -278,6 +289,25 @@ export class UserService {
     }
 
     return { token: this.createToken(account), user: this.mapUserToSummary(account) };
+  }
+
+  mapUserToSummary(user: User): IUserSummary {
+    return {
+      name: user.name,
+      email: user.email,
+      photoUrl: user.photoUrl,
+      isActive: user.isActive,
+      phone: user.phone,
+      loginProvider: user.loginProvider,
+      verified: user.verified,
+      failedLoginAttempt: user.failedLoginAttempt,
+      lastFailedLoginAttempt: user.lastFailedLoginAttempt,
+      timesLoggedIn: user.timesLoggedIn,
+      firstLogin: user.firstLogin,
+      lastLogin: user.lastLogin,
+      roles: user.roles,
+      venues: user.venues?.map((venue) => this.venuesService.mapVenueToIVenueShort(venue)) || []
+    };
   }
 
   private createToken(user: User): string {

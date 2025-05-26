@@ -19,10 +19,10 @@ export interface INewUser {
   email: string;
   phone?: string;
   password?: string;
-  photoUrl: string;
+  photoUrl?: string;
   loginProvider: TLoginProvider;
   verified?: Date;
-  roles?: ERole[];
+  roles: ERole[];
   venues?: IVenueShort[];
 }
 

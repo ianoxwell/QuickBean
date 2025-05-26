@@ -4,12 +4,12 @@ export interface IVenueShort {
   id: number;
   name: string;
   slug: string;
-  websiteUrl: string;
   publicPhone?: string;
   logoImage?: string;
 }
 
 export interface IVenue extends IVenueShort {
+  websiteUrl: string;
   isActive: boolean;
   countryId: string;
   openingHours: { day: number; open: number; close: number }[];

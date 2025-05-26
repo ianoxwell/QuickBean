@@ -9,12 +9,6 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Venue)
-  venue: Venue;
-
-  @ManyToOne(() => User)
-  patron: User;
-
   @Column()
   orderDate: Date;
 
@@ -38,4 +32,10 @@ export class Order {
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: OrderItem[];
+
+  @ManyToOne(() => Venue)
+  venue: Venue;
+
+  @ManyToOne(() => User)
+  patron: User;
 }

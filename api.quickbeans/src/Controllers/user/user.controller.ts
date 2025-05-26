@@ -27,7 +27,7 @@ export class AccountController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   async findAll(): Promise<IUserProfile[]> {
-    return this.userService.findAll();
+    return await this.userService.findAll();
   }
 
   @Post('register')

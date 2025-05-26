@@ -12,3 +12,11 @@ export interface IModifierOption {
   priceAdjustment?: number;
   percentAdjustment?: number;
 }
+
+export interface ISelectedModifierOption {
+  modifierId: number;
+  optionId: number;
+  label: string;
+  priceAdjustment?: number;
+  percentAdjustment?: number;
+}

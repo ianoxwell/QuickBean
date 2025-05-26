@@ -95,7 +95,8 @@ export class VenueService {
       legalBusinessName: venue.legalBusinessName,
       legalBusinessNumber: venue.legalBusinessNumber,
       timezone: venue.timezone,
-      privacyPolicy: venue.privacyPolicy
+      privacyPolicy: venue.privacyPolicy,
+      websiteUrl: venue.websiteUrl
     };
   }
 
@@ -106,7 +107,6 @@ export class VenueService {
       name: venue.name,
       slug: venue.slug,
       logoImage: venue.logoImage,
-      websiteUrl: venue.websiteUrl,
       publicPhone: venue.publicPhone
     };
   }
