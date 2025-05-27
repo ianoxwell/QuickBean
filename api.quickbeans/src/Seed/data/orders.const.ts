@@ -1,8 +1,10 @@
+import { Checkout } from '@controllers/checkout/Checkout.entity';
 import { Order } from '@controllers/order/Order.entity';
 import { OrderItem } from '@controllers/order/OrderItem.entity';
 import { Product } from '@controllers/product/Product.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { EBookingStatus } from '@models/base.dto';
+import CCheckouts from './checkout.const';
 import products from './products.const';
 import users from './users.const';
 import venues from './venues.const';
@@ -45,6 +47,7 @@ function randomOrderItems() {
 const orders: Partial<Order>[] = Array.from({ length: 4 }).map(() => {
   const patron = users[2]; // Patty Patron
   const venue = venues[0];
+  const checkout = CCheckouts[0]; // Use the first checkout for the venue
   const orderItems = randomOrderItems();
   const grandTotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   return {
@@ -57,7 +60,8 @@ const orders: Partial<Order>[] = Array.from({ length: 4 }).map(() => {
     bookingStatus: EBookingStatus.CONFIRMED,
     items: orderItems as OrderItem[],
     venue: venue as Venue,
-    patron
+    patron,
+    checkout: checkout as Checkout
   };
 });
 

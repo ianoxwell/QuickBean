@@ -3,6 +3,7 @@ import { Venue } from '@controllers/venue/Venue.entity';
 import { EBookingStatus } from '@models/base.dto';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Index } from 'typeorm';
 import { OrderItem } from './OrderItem.entity';
+import { Checkout } from '@controllers/checkout/Checkout.entity';
 
 @Entity()
 export class Order {
@@ -41,4 +42,8 @@ export class Order {
   @Index()
   @ManyToOne(() => User)
   patron: User;
+
+  @Index()
+  @ManyToOne(() => Checkout)
+  checkout: Checkout;
 }

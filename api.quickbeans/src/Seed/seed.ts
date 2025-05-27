@@ -120,48 +120,6 @@ async function bootstrap() {
   );
   console.log('Products seeded');
 
-  // Seed Orders
-  const orderRepo = dataSource.getRepository(Order);
-  await Promise.all(
-    orders.map(async (order) => {
-      const venue = await venueRepo.findOneBy({ name: order.venue.name });
-      if (!venue) {
-        throw new Error(`Venue not found for order: ${order.venue.name}`);
-      }
-
-      const patron = await userRepo.findOneBy({ email: order.patron.email });
-      if (!patron) {
-        throw new Error(`Patron not found for order: ${order.patron.email}`);
-      }
-
-      // Create order items with products
-      const orderItems = Promise.all(
-        order.items.map(async (item) => {
-          const product = await productRepo.findOneBy({ name: item.product.name, venue: { name: item.product.venue?.name } });
-          if (!product) {
-            throw new Error(`Product not found for order item: ${item.product.name}`);
-          }
-
-          product.venue = venue; // Ensure the product is associated with the venue
-          return orderRepo.manager.create(OrderItem, {
-            ...item,
-            product,
-            order: null // Set later when saving the order
-          });
-        })
-      );
-      const newOrder = orderRepo.create({
-        ...order,
-        venue,
-        patron,
-        items: await orderItems
-      });
-      const savedOrder = await orderRepo.save(newOrder);
-      console.log(`Order ${savedOrder.receiptNumber} created for venue ${venue.name} and patron ${patron.email}`);
-      return savedOrder;
-    })
-  );
-
   // Seed checkouts
   const checkoutRepo = dataSource.getRepository(Checkout);
   const productsList = await productRepo.findBy({ venue: { id: venue.id }, isActive: true });
@@ -227,6 +185,55 @@ async function bootstrap() {
     })
   );
   console.log('Checkouts seeded');
+
+  // Seed Orders
+  const orderRepo = dataSource.getRepository(Order);
+  const orderItemRepo = dataSource.getRepository(OrderItem);
+  await Promise.all(
+    orders.map(async (order) => {
+      const venue = await venueRepo.findOneBy({ name: order.venue.name });
+      if (!venue) {
+        throw new Error(`Venue not found for order: ${order.venue.name}`);
+      }
+
+      const patron = await userRepo.findOneBy({ email: order.patron.email });
+      if (!patron) {
+        throw new Error(`Patron not found for order: ${order.patron.email}`);
+      }
+
+      const checkout = await checkoutRepo.findOneBy({ slug: order.checkout?.slug, venue: { id: venue.id }, isActive: true });
+      if (!checkout) {
+        throw new Error(`Checkout not found for order: ${order.venue.slug}`);
+      }
+
+      // Create order items with products
+      const orderItems = Promise.all(
+        order.items.map(async (item) => {
+          const product = await productRepo.findOneBy({ name: item.product.name, venue: { name: item.product.venue?.name } });
+          if (!product) {
+            throw new Error(`Product not found for order item: ${item.product.name}`);
+          }
+
+          product.venue = venue; // Ensure the product is associated with the venue
+          return orderItemRepo.create({
+            ...item,
+            product,
+            order: null // Set later when saving the order
+          });
+        })
+      );
+      const newOrder = orderRepo.create({
+        ...order,
+        venue,
+        patron,
+        checkout,
+        items: await orderItems
+      });
+      const savedOrder = await orderRepo.save(newOrder);
+      console.log(`Order ${savedOrder.receiptNumber} created for venue ${venue.name} and patron ${patron.email}`);
+      return savedOrder;
+    })
+  );
 
   console.log('✅ Seeding complete');
   await app.close();
