@@ -38,9 +38,10 @@ export class OrderService {
   }
 
   async findOrdersByPatronId(patronId: number, take = 200): Promise<IOrder[] | null> {
-    const orders = await this.orderRepository.find({
+    const orders: Order[] = await this.orderRepository.find({
       where: { patron: { id: patronId } },
-      relations: ['venue', 'items', 'items.product'],
+      relations: ['venue', 'items', 'items.product', 'patron'],
+      order: { orderDate: 'DESC' }, // Order by most recent first
       take
     });
     if (!orders || orders.length === 0) {

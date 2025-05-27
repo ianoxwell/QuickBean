@@ -1,7 +1,7 @@
 import { Venue } from '@controllers/venue/Venue.entity';
 import { ERole, TLoginProvider } from '@models/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['email'])
@@ -12,9 +12,11 @@ export class User {
   @Column()
   name: string;
 
+  @Index()
   @Column({ unique: true })
   email!: string;
 
+  @Index()
   @Column({ nullable: true })
   phone: string;
   @Column({ nullable: true })

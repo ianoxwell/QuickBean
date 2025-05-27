@@ -1,5 +1,5 @@
 import { Venue } from '@controllers/venue/Venue.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CheckoutCategory } from './CheckoutCategory.entity';
 
 @Entity()
@@ -10,6 +10,7 @@ export class Checkout {
   @Column()
   name: string;
 
+  @Index()
   @Column({ unique: true })
   slug!: string;
 

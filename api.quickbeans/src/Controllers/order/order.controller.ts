@@ -1,6 +1,6 @@
 import { CMessage } from '@base/message.class';
 import { IOrder } from '@models/order.dto';
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 
@@ -18,5 +18,19 @@ export class OrderController {
     }
 
     return this.orderService.createOrder(orderData);
+  }
+
+  @Get('patron')
+  async getOrdersByPatronId(@Query('patronId') patronId: number): Promise<IOrder[] | CMessage> {
+    if (!patronId) {
+      return new CMessage('Patron ID is required.', HttpStatus.BAD_REQUEST);
+    }
+
+    const orders = await this.orderService.findOrdersByPatronId(patronId, 2);
+    if (!orders || orders.length === 0) {
+      return new CMessage(`No orders found for patron with ID ${patronId}.`, HttpStatus.NOT_FOUND);
+    }
+
+    return orders;
   }
 }

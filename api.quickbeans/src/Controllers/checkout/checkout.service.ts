@@ -21,7 +21,7 @@ export class CheckoutService {
   async findByVenueId(id: number): Promise<ICheckoutShort[] | null> {
     const checkouts = await this.checkoutRepository.find({
       where: { venue: { id }, isActive: true },
-      relations: ['checkoutCategories', 'checkoutCategories.products']
+      relations: ['categories', 'categories.products', 'categories.products.modifiers', 'venue']
     });
 
     if (!checkouts || checkouts.length === 0) {
@@ -31,15 +31,32 @@ export class CheckoutService {
     return checkouts.map((checkout) => this.mapCheckoutToICheckoutShort(checkout));
   }
 
-  async findBySlug(slug: string, venueId: number): Promise<ICheckout | null> {
-    const checkout = await this.checkoutRepository.findOne({
-      where: { slug, isActive: true, venue: { id: venueId } },
-      relations: ['venue']
-    });
+  async findBySlug(slug: string, venueSlug: string): Promise<ICheckout | null> {
+    console.time('findBySlug');
+    const checkout = await this.checkoutRepository
+      .createQueryBuilder('checkout')
+      .leftJoinAndSelect('checkout.venue', 'venue')
+      .leftJoinAndSelect('checkout.categories', 'categories')
+      .leftJoinAndSelect('categories.products', 'products')
+      .leftJoinAndSelect('products.modifiers', 'modifiers')
+      .leftJoinAndSelect('modifiers.options', 'options')
+      .where('checkout.slug = :slug', { slug })
+      .andWhere('checkout.isActive = true')
+      .andWhere('venue.slug = :venueSlug', { venueSlug })
+      .getOne();
+
+    // await this.checkoutRepository.findOne({
+    //   where: { slug, isActive: true, venue: { slug: venueSlug } },
+    //   relations: ['categories', 'categories.products', 'categories.products.modifiers', 'categories.products.modifiers.options', 'venue']
+    // });
     if (!checkout) {
       return null;
     }
-    return this.mapCheckoutToICheckout(checkout);
+
+    const mappedCheckout = this.mapCheckoutToICheckout(checkout, checkout.categories);
+    console.timeEnd('findBySlug');
+
+    return mappedCheckout;
   }
 
   async updateCheckout(id: number, checkoutData: ICheckout): Promise<ICheckout | CMessage> {
@@ -93,6 +110,7 @@ export class CheckoutService {
       id: category.id,
       name: category.name,
       order: category.order,
+      productType: category.productType,
       products: category.products.map((product) => this.productService.mapProductToIProduct(product))
     };
   }
@@ -102,6 +120,7 @@ export class CheckoutService {
     return {
       id: category.id,
       name: category.name,
+      productType: category.productType,
       order: category.order,
       checkoutIds: category.checkouts ? category.checkouts.map((checkout) => checkout.id) : []
     };
@@ -122,7 +141,7 @@ export class CheckoutService {
   mapCheckoutToICheckout(checkout: Checkout, checkoutCategories?: CheckoutCategory[]): ICheckout {
     return {
       ...this.mapCheckoutToICheckoutShort(checkout),
-      checkoutCategories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
+      categories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
       venue: checkout.venue ? this.venueService.mapVenueToIVenue(checkout.venue) : undefined
     };
   }

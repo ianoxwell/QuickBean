@@ -1,15 +1,17 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Venue {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, length: 255 })
+  @Index()
+  @Column({ unique: true, length: 255, nullable: false })
   name!: string;
 
-  @Column({ unique: true, length: 255 })
-  slug: string;
+  @Index()
+  @Column({ unique: true, length: 255, nullable: false })
+  slug!: string;
 
   @Column()
   websiteUrl: string;

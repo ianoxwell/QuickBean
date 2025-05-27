@@ -11,6 +11,6 @@ export interface ICheckoutShort {
 }
 
 export interface ICheckout extends ICheckoutShort {
-  checkoutCategories: ICheckoutCategoryWithProducts[];
+  categories: ICheckoutCategoryWithProducts[];
   venue?: IVenue;
 }

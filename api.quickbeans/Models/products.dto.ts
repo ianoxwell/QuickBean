@@ -2,7 +2,7 @@ import { EProductType } from '@models/base.dto';
 import { IModifier } from './modifier.dto';
 
 export interface IProduct {
-  id: number;
+  id?: number;
   name: string;
   description: string;
   baseCost: number;
