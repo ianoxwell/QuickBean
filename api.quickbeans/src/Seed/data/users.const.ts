@@ -27,6 +27,30 @@ const users: User[] = [
     roles: [ERole.KITCHEN],
     venues: venues as Venue[],
     timesLoggedIn: 0
+  },
+  {
+    name: 'Patty Patron',
+    email: 'patron@coffee.com',
+    phone: '0400000003',
+    passwordHash: 'patron123',
+    isActive: true,
+    verified: new Date(),
+    loginProvider: 'local',
+    roles: [ERole.PATRON],
+    venues: venues as Venue[],
+    timesLoggedIn: 0
+  },
+  {
+    name: 'Frank FrontOfHouse',
+    email: 'front@coffee.com',
+    phone: '0400000004',
+    passwordHash: 'front123',
+    isActive: true,
+    verified: new Date(),
+    loginProvider: 'local',
+    roles: [ERole.FRONT_OF_HOUSE],
+    venues: venues as Venue[],
+    timesLoggedIn: 0
   }
 ];
 

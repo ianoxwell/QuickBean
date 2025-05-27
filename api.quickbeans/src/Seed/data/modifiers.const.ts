@@ -19,6 +19,15 @@ const modifiers = [
       { label: 'Almond', priceAdjustment: 0.5 },
       { label: 'Soy', priceAdjustment: 0.5 }
     ] as ModifierOption[]
+  },
+  {
+    name: 'Ice Level',
+    venue: venues[0],
+    options: [
+      { label: 'Regular Ice', priceAdjustment: 0 },
+      { label: 'Less Ice', priceAdjustment: 0 },
+      { label: 'No Ice', priceAdjustment: 0 }
+    ] as ModifierOption[]
   }
 ];
 

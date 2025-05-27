@@ -11,6 +11,12 @@ import products from './data/products.const';
 import users from './data/users.const';
 import venues from './data/venues.const';
 import { SeederModule } from './seeder.module';
+import { Order } from '@controllers/order/Order.entity';
+import orders from './data/orders.const';
+import { OrderItem } from '@controllers/order/OrderItem.entity';
+import { Checkout } from '@controllers/checkout/Checkout.entity';
+import CCheckouts from './data/checkout.const';
+import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(SeederModule);
@@ -35,6 +41,7 @@ async function bootstrap() {
       return await venueRepo.save(venue);
     })
   );
+  const venue = await venueRepo.findOneBy({ name: venues[0].name });
 
   console.log('Venues seeded');
 
@@ -86,6 +93,7 @@ async function bootstrap() {
 
   // Seed Products
   const productRepo = dataSource.getRepository(Product);
+  const modifiersList = await modifierRepo.find();
   await Promise.all(
     products.map(async (product) => {
       const existingProduct = await productRepo.findOneBy({ name: product.name, venue: { name: product.venue?.name } });
@@ -94,19 +102,131 @@ async function bootstrap() {
         return existingProduct;
       }
 
-      // Find the venue by name
-      const venue = await venueRepo.findOneBy({ name: product.venue?.name });
-      if (!venue) {
-        throw new Error(`Venue not found: ${product.venue?.name}`);
-      }
-
       // Assign the found venue to the product
       product.venue = venue;
+      product.modifiers =
+        product.modifiers?.map((mod) => {
+          const modifier = modifiersList.find((m) => m.name === mod.name);
+          if (!modifier) {
+            throw new Error(`Modifier not found: ${mod.name}`);
+          }
+
+          return modifier;
+        }) || [];
 
       // Save the product
       return await productRepo.save(product);
     })
   );
+  console.log('Products seeded');
+
+  // Seed Orders
+  const orderRepo = dataSource.getRepository(Order);
+  await Promise.all(
+    orders.map(async (order) => {
+      const venue = await venueRepo.findOneBy({ name: order.venue.name });
+      if (!venue) {
+        throw new Error(`Venue not found for order: ${order.venue.name}`);
+      }
+
+      const patron = await userRepo.findOneBy({ email: order.patron.email });
+      if (!patron) {
+        throw new Error(`Patron not found for order: ${order.patron.email}`);
+      }
+
+      // Create order items with products
+      const orderItems = Promise.all(
+        order.items.map(async (item) => {
+          const product = await productRepo.findOneBy({ name: item.product.name, venue: { name: item.product.venue?.name } });
+          if (!product) {
+            throw new Error(`Product not found for order item: ${item.product.name}`);
+          }
+
+          product.venue = venue; // Ensure the product is associated with the venue
+          return orderRepo.manager.create(OrderItem, {
+            ...item,
+            product,
+            order: null // Set later when saving the order
+          });
+        })
+      );
+      const newOrder = orderRepo.create({
+        ...order,
+        venue,
+        patron,
+        items: await orderItems
+      });
+      const savedOrder = await orderRepo.save(newOrder);
+      console.log(`Order ${savedOrder.receiptNumber} created for venue ${venue.name} and patron ${patron.email}`);
+      return savedOrder;
+    })
+  );
+
+  // Seed checkouts
+  const checkoutRepo = dataSource.getRepository(Checkout);
+  const productsList = await productRepo.findBy({ venue: { id: venue.id }, isActive: true });
+  console.log('Products list fetched for checkouts', productsList);
+
+  const checkoutCategoryRepo = dataSource.getRepository(CheckoutCategory);
+  const checkoutCategoriesList = await checkoutCategoryRepo.find();
+  await Promise.all(
+    CCheckouts.map(async (checkout) => {
+      const existingCheckout = await checkoutRepo.findOneBy({ slug: checkout.slug });
+      if (existingCheckout) {
+        console.log(`Checkout ${checkout.name} already exists, skipping...`);
+        return existingCheckout;
+      }
+
+      // Assign the venue to the checkout
+      checkout.venue = venue;
+
+      // Prepare categories array
+      const categoriesToAssign: CheckoutCategory[] = [];
+      for (const category of checkout.categories) {
+        let checkoutCategory = checkoutCategoriesList.find((c) => c.name === category.name && c.productType === category.productType);
+
+        if (!checkoutCategory) {
+          // If the category does not exist, create a new one
+          checkoutCategory = checkoutCategoryRepo.create({
+            name: category.name,
+            productType: category.productType,
+            order: category.order,
+            isActive: true,
+            products: category.products.map((product) => {
+              const existingProduct = productsList.find((p) => p.name === product.name);
+              if (!existingProduct) {
+                throw new Error(`Product not found for checkout category: ${category.name}, with product name: ${product.name}`);
+              }
+
+              return existingProduct;
+            })
+          });
+
+          checkoutCategory = await checkoutCategoryRepo.save(checkoutCategory);
+          console.log('Created new checkout category', checkoutCategory.name, 'for checkout', checkout.name);
+        } else {
+          checkoutCategory.products = category.products.map((product) => {
+            const existingProduct = productsList.find((p) => p.name === product.name);
+
+            if (!existingProduct) {
+              throw new Error(`Product not found for checkout category: ${product.name}`);
+            }
+            return existingProduct;
+          });
+
+          checkoutCategory = await checkoutCategoryRepo.save(checkoutCategory);
+        }
+
+        categoriesToAssign.push(checkoutCategory);
+      }
+
+      checkout.categories = categoriesToAssign;
+      console.log(`Creating checkout: ${checkout.name}`, checkout);
+
+      return await checkoutRepo.save(checkout);
+    })
+  );
+  console.log('Checkouts seeded');
 
   console.log('✅ Seeding complete');
   await app.close();

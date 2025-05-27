@@ -6,7 +6,7 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColum
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ unique: false })
   name: string;
@@ -18,7 +18,7 @@ export class Product {
   baseCost: number;
 
   @Column({ nullable: true })
-  imageUrl: string;
+  imageUrl?: string;
 
   @Column({ default: true })
   isActive: boolean;

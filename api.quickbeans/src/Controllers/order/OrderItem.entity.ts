@@ -1,4 +1,5 @@
 import { Product } from '@controllers/product/Product.entity';
+import { ISelectedModifierOption } from '@models/modifier.dto';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from './Order.entity';
 
@@ -20,5 +21,5 @@ export class OrderItem {
   product: Product;
 
   @Column({ type: 'jsonb', nullable: true })
-  selectedModifiers: { modifierId: number; optionId: number }[];
+  selectedModifiers: ISelectedModifierOption[];
 }

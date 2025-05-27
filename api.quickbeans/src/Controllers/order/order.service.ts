@@ -1,7 +1,7 @@
 import { CMessage } from '@base/message.class';
 import { UserService } from '@controllers/user/user.service';
 import { VenueService } from '@controllers/venue/venue.service';
-import { IOrder } from '@models/order.dto';
+import { IOrder, IOrderItem } from '@models/order.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -100,19 +100,21 @@ export class OrderService {
       discount: order.discount,
       comments: order.comments,
       bookingStatus: order.bookingStatus,
-      items: [],
-      //   items: order.items.map((item) => ({
-      //     id: item.id,
-      //     label: item.product.label,
-      //     productId: item.product.id,
-      //     quantity: item.quantity,
-      //     price: item.price,
-      //     selectedModifiers: item.selectedModifiers
-      //   })),
+      items: order.items.map((item) => this.mapOrderItemToIOrderItem(item)),
       venueId: order.venue?.id,
       venue: order.venue ? { id: order.venue.id, name: order.venue.name, slug: order.venue.slug } : undefined,
       patronId: order.patron?.id,
       patron: order.patron ? { id: order.patron.id, name: order.patron.name, email: order.patron.email } : undefined
+    };
+  }
+
+  mapOrderItemToIOrderItem(item: OrderItem): IOrderItem {
+    return {
+      id: item.id,
+      productId: item.product.id,
+      quantity: item.quantity,
+      price: item.price,
+      selectedModifiers: item.selectedModifiers // Assuming this is already in the correct format
     };
   }
 }
