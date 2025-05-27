@@ -1,5 +1,6 @@
 import { Venue } from '@controllers/venue/Venue.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { CheckoutCategory } from './CheckoutCategory.entity';
 
 @Entity()
 export class Checkout {
@@ -26,4 +27,7 @@ export class Checkout {
 
   @ManyToOne(() => Venue)
   venue: Venue;
+
+  @ManyToMany(() => CheckoutCategory, (category) => category.checkouts)
+  categories: CheckoutCategory[];
 }
