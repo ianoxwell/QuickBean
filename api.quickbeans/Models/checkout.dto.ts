@@ -5,12 +5,12 @@ export interface ICheckoutShort {
   id: number;
   name: string;
   slug: string;
-  description: string;
   backgroundImageUrl?: string;
   heroImage?: string;
 }
 
 export interface ICheckout extends ICheckoutShort {
+  description: string;
   categories: ICheckoutCategoryWithProducts[];
   venue?: IVenue;
 }

@@ -130,10 +130,7 @@ export class CheckoutService {
     return {
       id: checkout.id,
       name: checkout.name,
-      slug: checkout.slug,
-      description: checkout.description,
-      backgroundImageUrl: checkout.backgroundImageUrl,
-      heroImage: checkout.heroImage
+      slug: checkout.slug
     };
   }
 
@@ -141,6 +138,9 @@ export class CheckoutService {
   mapCheckoutToICheckout(checkout: Checkout, checkoutCategories?: CheckoutCategory[]): ICheckout {
     return {
       ...this.mapCheckoutToICheckoutShort(checkout),
+      backgroundImageUrl: checkout.backgroundImageUrl,
+      heroImage: checkout.heroImage,
+      description: checkout.description,
       categories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
       venue: checkout.venue ? this.venueService.mapVenueToIVenue(checkout.venue) : undefined
     };

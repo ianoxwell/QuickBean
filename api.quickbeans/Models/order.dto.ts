@@ -2,6 +2,7 @@ import { EBookingStatus } from '@models/base.dto';
 import { ISelectedModifierOption } from './modifier.dto';
 import { IVenueShort } from './venue.dto';
 import { IUserProfile } from './user.dto';
+import { ICheckoutShort } from './checkout.dto';
 
 export interface IOrder {
   id: number;
@@ -17,6 +18,8 @@ export interface IOrder {
   venue?: IVenueShort;
   patronId?: number;
   patron?: IUserProfile;
+  checkoutId?: number;
+  checkout?: ICheckoutShort;
 }
 
 export interface IOrderItem {

@@ -26,7 +26,7 @@ export class OrderController {
       return new CMessage('Patron ID is required.', HttpStatus.BAD_REQUEST);
     }
 
-    const orders = await this.orderService.findOrdersByPatronId(patronId, 2);
+    const orders = await this.orderService.findOrdersByPatronId(patronId);
     if (!orders || orders.length === 0) {
       return new CMessage(`No orders found for patron with ID ${patronId}.`, HttpStatus.NOT_FOUND);
     }

@@ -38,16 +38,23 @@ export class OrderService {
   }
 
   async findOrdersByPatronId(patronId: number, take = 200): Promise<IOrder[] | null> {
-    const orders: Order[] = await this.orderRepository.find({
-      where: { patron: { id: patronId } },
-      relations: ['venue', 'items', 'items.product', 'patron'],
-      order: { orderDate: 'DESC' }, // Order by most recent first
-      take
-    });
+    console.time('findOrdersByPatronId');
+    const orders: Order[] = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.venue', 'venue')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('items.product', 'product')
+      .leftJoinAndSelect('order.patron', 'patron')
+      .leftJoinAndSelect('order.checkout', 'checkout')
+      .where('patron.id = :patronId', { patronId })
+      .orderBy('order.orderDate', 'DESC')
+      .take(take)
+      .getMany();
     if (!orders || orders.length === 0) {
       return null;
     }
 
+    console.timeEnd('findOrdersByPatronId');
     return orders.map((order) => this.mapOrderToIOrder(order));
   }
 
@@ -105,7 +112,9 @@ export class OrderService {
       venueId: order.venue?.id,
       venue: order.venue ? { id: order.venue.id, name: order.venue.name, slug: order.venue.slug } : undefined,
       patronId: order.patron?.id,
-      patron: order.patron ? { id: order.patron.id, name: order.patron.name, email: order.patron.email } : undefined
+      patron: order.patron ? { id: order.patron.id, name: order.patron.name, email: order.patron.email } : undefined,
+      checkoutId: order.checkout?.id,
+      checkout: order.checkout ? { id: order.checkout.id, name: order.checkout.name, slug: order.checkout.slug } : undefined
     };
   }
 
