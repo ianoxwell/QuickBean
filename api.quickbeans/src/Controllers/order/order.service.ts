@@ -114,7 +114,14 @@ export class OrderService {
       patronId: order.patron?.id,
       patron: order.patron ? { id: order.patron.id, name: order.patron.name, email: order.patron.email } : undefined,
       checkoutId: order.checkout?.id,
-      checkout: order.checkout ? { id: order.checkout.id, name: order.checkout.name, slug: order.checkout.slug } : undefined
+      checkout: order.checkout
+        ? {
+            id: order.checkout.id,
+            name: order.checkout.name,
+            slug: order.checkout.slug,
+            checkoutUrl: `${order.venue.slug}/${order.checkout.slug}`
+          }
+        : undefined
     };
   }
 
