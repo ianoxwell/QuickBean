@@ -1,10 +1,14 @@
-import { apiSlice } from '@features/api/apiSlice';
+import userSlice from '@pages/account/userSlice';
+import checkoutSlice from '@pages/checkoutSlice';
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import { configureStore } from '@reduxjs/toolkit';
+import { apiSlice } from './apiSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 
 export const store = configureStore({
   reducer: {
+    user: userSlice,
+    checkout: checkoutSlice,
     [apiSlice.reducerPath]: apiSlice.reducer
   },
   middleware: (getDefaultMiddleware) =>
