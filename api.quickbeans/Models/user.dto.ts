@@ -54,3 +54,7 @@ export interface IVerifyUserEmail {
   token: string;
   email: string;
 }
+
+export interface IResetPasswordRequest extends IUserLogin {
+  token: string;
+}

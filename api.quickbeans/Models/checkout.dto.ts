@@ -7,10 +7,16 @@ export interface ICheckoutShort {
   slug: string;
   backgroundImageUrl?: string;
   heroImage?: string;
+  checkoutUrl: string;
 }
 
 export interface ICheckout extends ICheckoutShort {
   description: string;
   categories: ICheckoutCategoryWithProducts[];
   venue?: IVenue;
+}
+
+export interface ICheckoutQuery {
+  slug: string;
+  venueSlug: string;
 }

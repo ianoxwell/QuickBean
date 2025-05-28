@@ -45,10 +45,6 @@ export class CheckoutService {
       .andWhere('venue.slug = :venueSlug', { venueSlug })
       .getOne();
 
-    // await this.checkoutRepository.findOne({
-    //   where: { slug, isActive: true, venue: { slug: venueSlug } },
-    //   relations: ['categories', 'categories.products', 'categories.products.modifiers', 'categories.products.modifiers.options', 'venue']
-    // });
     if (!checkout) {
       return null;
     }
@@ -130,7 +126,8 @@ export class CheckoutService {
     return {
       id: checkout.id,
       name: checkout.name,
-      slug: checkout.slug
+      slug: checkout.slug,
+      checkoutUrl: `${checkout.venue.slug}/${checkout.slug}`
     };
   }
 
