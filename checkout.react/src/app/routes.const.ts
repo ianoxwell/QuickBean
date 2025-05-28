@@ -1,16 +1,20 @@
 export const CRoutes = {
+  menu: 'menu',
+  cart: 'cart',
+  payment: 'payment',  
+  confirmation: 'confirmation',
+  status: 'order-status',
+
+  // user / account related routes
+  account: 'account',
   login: 'login',
   forgotPassword: 'forgot-password',
   verifyEmail: 'verify-email',
   resetPassword: 'reset-password',
 
   // protected routes
-  recipes: '',
-  recipe: 'recipe',
+  profile: 'profile',
   orders: 'orders',
-  schedule: 'schedule',
-  ingredients: 'ingredients',
-  settings: 'settings',
 };
 
 

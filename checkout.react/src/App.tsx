@@ -1,7 +1,16 @@
+import { CRoutes } from '@app/routes.const';
 import { colorsTuple, createTheme, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { Routes } from 'react-router-dom';
+import MenuItemModal from '@pages/menu/MenuItemModal';
+import MenuPage from '@pages/menu/MenuPage';
+import AccountWrapper from '@pages/account/AccountWrapper';
+import ForgotPassword from '@pages/account/ForgotPassword';
+import Login from '@pages/account/Login';
+import ResetPassword from '@pages/account/ResetPassword';
+import VerifyEmail from '@pages/account/VerifyEmail';
+import SharedLayout from '@pages/SharedLayout';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 
 const theme = createTheme({
@@ -20,7 +29,8 @@ const theme = createTheme({
 });
 
 function App() {
-  const base = import.meta.env.VITE_BASE_URL;
+  const defaultVenue: string = import.meta.env.VITE_DEFAULT_VENUE;
+  const defaultCheckout: string = import.meta.env.VITE_DEFAULT_CHECKOUT;
 
   return (
     <>
@@ -28,9 +38,29 @@ function App() {
         <Notifications position="top-center" color="accent" limit={5} autoClose={6000} zIndex={1001} />
         {/* Note guide to mantine notifications - https://mantine.dev/x/notifications/#functions */}
         <ModalsProvider>
-          <h1>Quickbeans checkout</h1>
-          <div>URL - {base}</div>
-          <Routes></Routes>
+          <Routes>
+            {/* Redirect '/' to a default venueSlug/checkoutSlug */}
+            <Route path="/" element={<Navigate to={`/${defaultVenue}/${defaultCheckout}`} replace />} />
+            <Route path="/:venueSlug/:checkoutSlug" element={<SharedLayout />}>
+              <Route index element={<MenuPage />} />
+              <Route
+                path={`${CRoutes.menu}/:id`}
+                element={
+                  <>
+                    <MenuPage />
+                    <MenuItemModal />
+                  </>
+                }
+              />
+
+              <Route path={CRoutes.account} element={<AccountWrapper />}>
+                <Route path={CRoutes.login} element={<Login />} />
+                <Route path={CRoutes.forgotPassword} element={<ForgotPassword />} />
+                <Route path={CRoutes.verifyEmail} element={<VerifyEmail />} />
+                <Route path={CRoutes.resetPassword} element={<ResetPassword />} />
+              </Route>
+            </Route>
+          </Routes>
         </ModalsProvider>
       </MantineProvider>
     </>
