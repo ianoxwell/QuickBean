@@ -1,0 +1,39 @@
+.bottom-nav {
+  --menu-height: 3.75rem;
+  --card-shadow: 0 -0.5rem 2.5rem var(--shadow-color);
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  min-height: var(--menu-height);
+  z-index: 100;
+  background: var(--mantine-color-body);
+  filter: drop-shadow(var(--card-shadow));
+
+  .nav-item {
+    text-align: center;
+    line-height: var(--menu-height);
+    flex: 1;
+    color: var(--mantine-color-text);
+    svg {
+      fill: var(--mantine-color-body);
+      vertical-align: text-bottom;
+    }
+    &:not(:last-child) {
+      border-right: 1px solid var(--mantine-primary-color-contrast);
+    }
+    &.active {
+      color: var(--accent);
+    }
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}

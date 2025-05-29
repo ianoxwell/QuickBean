@@ -1,4 +1,5 @@
 import { useGetCheckoutQuery } from '@app/apiSlice';
+import { GlobalNavigation } from '@components/GlobalNavigation/GlobalNavigation.component';
 import { isMessage } from '@utils/typescriptHelpers';
 import { Outlet, useParams } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ const SharedLayout = () => {
             <div>Error {data?.message}</div>
           ) : (
             <>
+              <GlobalNavigation />
               <h1>{data.name}</h1>
               <section className="main-content">
                 <Outlet />

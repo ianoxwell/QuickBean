@@ -32,9 +32,14 @@ const userSlice = createSlice({
     },
     toggleIsMember: (state) => {
       state.isMember = !state.isMember;
+    },
+    logoutUser: (state) => {
+      state.user = undefined;
+      removeUserFromLocalStorage();
+      notifications.show({ message: 'You have been logged out' });
     }
   }
 });
 
-export const { setUser, toggleIsMember } = userSlice.actions;
+export const { setUser, toggleIsMember, logoutUser } = userSlice.actions;
 export default userSlice.reducer;
