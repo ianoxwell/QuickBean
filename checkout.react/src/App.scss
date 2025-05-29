@@ -1,33 +1,58 @@
 @use './styles/mixins.scss';
 
 :root {
-  --darker-accent: #003c25;
-  --accent-foreground: #128758;
-  --text-on-accent: #ffffff;
-  --background-normal: #f5f5f5;
-  --text-on-normal: #070707;
-  --muted-text: #6a6a6a;
-  --menu-background: #ffffff;
-  --alert-yellow: #f7bd29;
-  --burnt-orange: #e6600b; // (some titles?)
+  --light-background: #ffffff;
+  --light-card-background: #f5f5f5;
+  --light-card-border: #ffffff;
+  --light-text: #131a2e;
+  --light-muted-text: #494949;
+  --light-accent: #a97c37;
+  --light-primary: #55433c;
+  --light-secondary: #7a5b4c;
+  --light-primary-text: #ffffff;
+  --light-warning: #ff5722;
 
-  background-color: var(--background-normal);
-  color: var(--text-on-normal);
+  --dark-background: #201b18;
+  --dark-card-background: #272220;
+  --dark-card-border: #37302d;
+  --dark-text: #f5f5f5;
+  --dark-muted-text: #c9c9c9;
+  --dark-accent: #a97c37;
+  --dark-primary: #55433c;
+  --dark-primary-text: #ffffff;
+  --dark-secondary: #7a5b4c;
+  --dark-warning: #ff3030;
+
   min-height: 100vh;
-  --mantine-h1-font-size: calc(1.875rem* var(--mantine-scale)); //30px
-  --mantine-h2-font-size: calc(1.5rem* var(--mantine-scale)); // 24px
-  --mantine-h3-font-size: calc(1.25rem* var(--mantine-scale)); //20px
-  --mantine-h4-font-size: calc(1rem* var(--mantine-scale)); //16px
-  @include mixins.breakpoint(md) { // Default
-    --mantine-h1-font-size: calc(2.125rem* var(--mantine-scale)); //34px
-    --mantine-h2-font-size: calc(1.625rem* var(--mantine-scale)); //26px
-    --mantine-h3-font-size: calc(1.375rem* var(--mantine-scale)); //22px
-    --mantine-h4-font-size: calc(1.125rem* var(--mantine-scale)); //18
+  --mantine-h1-font-size: calc(1.875rem * var(--mantine-scale)); //30px
+  --mantine-h2-font-size: calc(1.5rem * var(--mantine-scale)); // 24px
+  --mantine-h3-font-size: calc(1.25rem * var(--mantine-scale)); //20px
+  --mantine-h4-font-size: calc(1rem * var(--mantine-scale)); //16px
+  @include mixins.breakpoint(md) {
+    // Default
+    --mantine-h1-font-size: calc(2.125rem * var(--mantine-scale)); //34px
+    --mantine-h2-font-size: calc(1.625rem * var(--mantine-scale)); //26px
+    --mantine-h3-font-size: calc(1.375rem * var(--mantine-scale)); //22px
+    --mantine-h4-font-size: calc(1.125rem * var(--mantine-scale)); //18
   }
   @include mixins.breakpoint(lg) {
-    --mantine-h1-font-size: calc(2.5rem* var(--mantine-scale)); //40px
-    --mantine-h2-font-size: calc(1.875rem* var(--mantine-scale)); //30px
-    --mantine-h3-font-size: calc(1.625rem* var(--mantine-scale)); //26px
-    --mantine-h4-font-size: calc(1.375rem* var(--mantine-scale)); //22px
+    --mantine-h1-font-size: calc(2.5rem * var(--mantine-scale)); //40px
+    --mantine-h2-font-size: calc(1.875rem * var(--mantine-scale)); //30px
+    --mantine-h3-font-size: calc(1.625rem * var(--mantine-scale)); //26px
+    --mantine-h4-font-size: calc(1.375rem * var(--mantine-scale)); //22px
   }
+  &[data-mantine-color-scheme='dark'] {
+    --mantine-color-body: var(--dark-background);
+    --mantine-color-text: var(--mantine-color-bright);
+  }
+  &[data-mantine-color-scheme='light'] {
+    --mantine-color-body: var(--light-background);
+    --mantine-color-text: var(--mantine-color-dark);
+  }
+}
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
 }

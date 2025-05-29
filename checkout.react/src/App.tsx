@@ -1,24 +1,23 @@
 import { CRoutes } from '@app/routes.const';
-import { colorsTuple, createTheme, MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import MenuItemModal from '@pages/menu/MenuItemModal';
-import MenuPage from '@pages/menu/MenuPage';
+import '@mantine/notifications/styles.css';
 import AccountWrapper from '@pages/account/AccountWrapper';
 import ForgotPassword from '@pages/account/ForgotPassword';
 import Login from '@pages/account/Login';
 import ResetPassword from '@pages/account/ResetPassword';
 import VerifyEmail from '@pages/account/VerifyEmail';
+import MenuItemModal from '@pages/menu/MenuItemModal';
+import MenuPage from '@pages/menu/MenuPage';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 
 const theme = createTheme({
-  fontFamily: 'Quicksand, sans-serif',
-  primaryColor: 'accent',
-  colors: {
-    accent: colorsTuple('#128758')
-  },
+  fontFamily: 'Lato, Quicksand, sans-serif',
   breakpoints: {
     xs: '37em',
     sm: '48em',
@@ -34,7 +33,7 @@ function App() {
 
   return (
     <>
-      <MantineProvider theme={theme}>
+      <MantineProvider defaultColorScheme="auto" theme={theme}>
         <Notifications position="top-center" color="accent" limit={5} autoClose={6000} zIndex={1001} />
         {/* Note guide to mantine notifications - https://mantine.dev/x/notifications/#functions */}
         <ModalsProvider>
