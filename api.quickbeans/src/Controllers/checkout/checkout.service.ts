@@ -135,8 +135,8 @@ export class CheckoutService {
   mapCheckoutToICheckout(checkout: Checkout, checkoutCategories?: CheckoutCategory[]): ICheckout {
     return {
       ...this.mapCheckoutToICheckoutShort(checkout),
-      backgroundImageUrl: checkout.backgroundImageUrl,
       heroImage: checkout.heroImage,
+      heroImageTextColor: checkout.heroImageTextColor,
       description: checkout.description,
       categories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
       venue: checkout.venue ? this.venueService.mapVenueToIVenue(checkout.venue) : undefined

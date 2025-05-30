@@ -5,13 +5,13 @@ export interface ICheckoutShort {
   id: number;
   name: string;
   slug: string;
-  backgroundImageUrl?: string;
   heroImage?: string;
   checkoutUrl: string;
 }
 
 export interface ICheckout extends ICheckoutShort {
   description: string;
+  heroImageTextColor: string;
   categories: ICheckoutCategoryWithProducts[];
   venue?: IVenue;
 }

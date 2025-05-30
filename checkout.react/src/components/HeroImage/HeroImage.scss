@@ -1,0 +1,93 @@
+@use '../../styles/mixins.scss';
+
+$heroSize: 10rem;
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $heroSize;
+  overflow: hidden;
+  z-index: 1;
+  border-bottom-left-radius: calc($heroSize - 1rem);
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.5);
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-attachment: scroll;
+    background-size: cover;
+    z-index: 1;
+    position: absolute;
+    transition: all 0.1s;
+    will-change: transform;
+    transform-style: preserve-3d;
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+  }
+}
+.hero-text {
+  position: absolute;
+  z-index: 2;
+  width: calc(100% - 4rem);
+  top: 2rem;
+  left: 3rem;
+  text-align: right;
+  &--wrapper {
+    padding-right: 1rem;
+  }
+  h1 {
+    font-size: 1.25rem;
+  }
+  filter: drop-shadow(0 0.5rem 1rem rgba(0, 0, 0, 0.5));
+  p {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin: 0.25rem 0;
+  }
+  @include mixins.breakpoint(sm) {
+    h1 {
+      font-size: 1.5rem;
+    }
+    p {
+      font-size: 0.875rem;
+    }
+  }
+  @include mixins.breakpoint(md) {
+    h1 {
+      font-size: 1.75rem;
+    }
+    p {
+      font-size: 1rem;
+    }
+  }
+}
+.hero-min-height {
+  min-height: $heroSize;
+  width: 0;
+  position: relative;
+  margin-bottom: 1rem;
+}
+.venue-logo {
+  position: absolute;
+  bottom: -5.5rem;
+  left: -1rem;
+  border: 2px solid var(--mantine-color-body);
+  border-radius: 50%;
+  z-index: 4;
+  &:hover {
+    border: 2px solid var(--accent);
+  }
+  @include mixins.breakpoint(sm) {
+    bottom: -5rem;
+  }
+  @include mixins.breakpoint(md) {
+    bottom: -4rem;
+  }
+}

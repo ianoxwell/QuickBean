@@ -1,5 +1,6 @@
 import { useGetCheckoutQuery } from '@app/apiSlice';
 import { GlobalNavigation } from '@components/GlobalNavigation/GlobalNavigation.component';
+import HeroImage from '@components/HeroImage/HeroImage';
 import { isMessage } from '@utils/typescriptHelpers';
 import { Outlet, useParams } from 'react-router-dom';
 
@@ -18,7 +19,7 @@ const SharedLayout = () => {
           ) : (
             <>
               <GlobalNavigation />
-              <h1>{data.name}</h1>
+              <HeroImage />
               <section className="main-content">
                 <Outlet />
               </section>

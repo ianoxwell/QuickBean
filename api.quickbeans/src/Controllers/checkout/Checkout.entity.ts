@@ -18,10 +18,10 @@ export class Checkout {
   description: string;
 
   @Column({ nullable: true })
-  backgroundImageUrl: string;
-
-  @Column({ nullable: true })
   heroImage: string;
+
+  @Column({ default: '#FFFFFF' })
+  heroImageTextColor: string;
 
   @Column({ default: true })
   isActive: boolean;

@@ -6,9 +6,9 @@ const CCheckouts = [
   {
     name: 'Downtown Coffee Bar Checkout',
     slug: 'dcb-checkout',
-    description: 'Order your favorite drinks at Downtown Coffee Bar.',
-    backgroundImageUrl: 'https://downtowncoffee.example.com/bg.jpg',
-    heroImage: 'https://downtowncoffee.example.com/hero.jpg',
+    description: 'Coffee downtown',
+    heroImageTextColor: '#FFFFFF',
+    heroImage: 'https://raw.githubusercontent.com/ianoxwell/QuickBean/main/assets/patrick-tomasso-GXXYkSwndP4-unsplash.jpg',
     venue: venues[0],
     categories: [
       {

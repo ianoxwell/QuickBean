@@ -3,12 +3,10 @@ import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { logoutUser } from '@pages/account/userSlice';
 import { Calendar, CircleUser, LayoutDashboard } from 'lucide-react';
-import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
 
 export const GlobalNavigation = () => {
-  const [navigation] = useState(links);
   const fillColor = '#128758';
   const iconSize = 24;
   const dispatch = useAppDispatch();
