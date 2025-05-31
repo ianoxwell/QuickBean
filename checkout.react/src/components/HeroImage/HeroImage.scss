@@ -39,13 +39,13 @@ $heroSize: 10rem;
   top: 2rem;
   left: 3rem;
   text-align: right;
+  filter: drop-shadow(0 0.5rem 1rem rgba(0, 0, 0, 0.5));
   &--wrapper {
     padding-right: 1rem;
   }
   h1 {
     font-size: 1.25rem;
   }
-  filter: drop-shadow(0 0.5rem 1rem rgba(0, 0, 0, 0.5));
   p {
     font-size: 0.75rem;
     opacity: 0.9;

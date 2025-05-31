@@ -24,7 +24,7 @@ export const GlobalNavigation = () => {
 
   return (
     <>
-      <nav className="bottom-nav">
+      <nav aria-label="Quickbeans navigation" className="bottom-nav">
         <NavLink to={CRoutes.menu} aria-label="Menu" className="nav-item">
           {({ isActive }) => {
             return <LayoutDashboard fill={isActive ? fillColor : 'white'} size={iconSize} />;

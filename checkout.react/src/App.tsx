@@ -39,9 +39,9 @@ function App() {
         <ModalsProvider>
           <Routes>
             {/* Redirect '/' to a default venueSlug/checkoutSlug */}
-            <Route path="/" element={<Navigate to={`/${defaultVenue}/${defaultCheckout}`} replace />} />
+            <Route path="/" element={<Navigate to={`/${defaultVenue}/${defaultCheckout}/${CRoutes.menu}`} replace />} />
             <Route path="/:venueSlug/:checkoutSlug" element={<SharedLayout />}>
-              <Route index element={<MenuPage />} />
+              <Route path={CRoutes.menu} element={<MenuPage />} />
               <Route
                 path={`${CRoutes.menu}/:id`}
                 element={

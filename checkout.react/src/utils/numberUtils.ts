@@ -36,5 +36,5 @@ export const fixWholeNumber = (value: number | string | undefined, length = 3): 
   }
 
   const num = Number(value);
-  return Number.isInteger(num) ? num.toString() : num.toFixed(length);
+  return num.toFixed(length);
 };
