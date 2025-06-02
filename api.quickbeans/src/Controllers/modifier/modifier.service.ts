@@ -34,8 +34,8 @@ export class ModifierService {
       id: modifierOption.id,
       label: modifierOption.label,
       description: modifierOption.description,
-      priceAdjustment: modifierOption.priceAdjustment,
-      percentAdjustment: modifierOption.percentAdjustment
+      priceAdjustment: Number(modifierOption.priceAdjustment),
+      percentAdjustment: Number(modifierOption.percentAdjustment)
     };
   }
 }

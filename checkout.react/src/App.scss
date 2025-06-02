@@ -47,6 +47,8 @@
     --mantine-color-body: var(--dark-background);
     --mantine-primary-color-contrast: var(--dark-card-border);
     --mantine-color-text: var(--dark-text);
+    --mantine-primary-color-filled: var(--dark-primary);
+    --mantine-primary-color-filled-hover: var(--dark-secondary);
     --accent: var(--dark-accent);
     --shadow-color: rgba(255, 255, 255, 0.1);
     --card: var(--dark-card-background);
@@ -56,6 +58,9 @@
     --mantine-color-body: var(--light-background);
     --mantine-primary-color-contrast: var(--light-card-border);
     --mantine-color-text: var(--light-text);
+    --mantine-primary-color-filled: var(--light-primary);
+    --mantine-primary-color-filled-hover: var(--light-secondary);
+
     --accent: var(--light-accent);
     --shadow-color: rgba(0, 0, 0, 0.1);
     --card: var(--light-card-background);

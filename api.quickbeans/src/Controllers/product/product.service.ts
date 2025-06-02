@@ -52,7 +52,7 @@ export class ProductService {
       id: product.id,
       name: product.name,
       description: product.description,
-      baseCost: product.baseCost,
+      baseCost: Number(product.baseCost),
       imageUrl: product.imageUrl,
       isActive: product.isActive,
       productType: product.productType,
