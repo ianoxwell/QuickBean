@@ -25,6 +25,7 @@ const MenuItemModal = () => {
   const [order, setOrder] = useState<IOrderItem>({
     id: orderItem?.id || 0,
     productId: product?.id || 0,
+    product: product || ({} as IProduct),
     quantity: orderItem?.quantity || 1,
     price: product?.baseCost || 0,
     selectedModifiers: orderItem?.selectedModifiers || []

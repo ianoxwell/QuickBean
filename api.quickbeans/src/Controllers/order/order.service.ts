@@ -129,6 +129,7 @@ export class OrderService {
     return {
       id: item.id,
       productId: item.product.id,
+      product: item.product,
       quantity: item.quantity,
       price: item.price,
       selectedModifiers: item.selectedModifiers // Assuming this is already in the correct format

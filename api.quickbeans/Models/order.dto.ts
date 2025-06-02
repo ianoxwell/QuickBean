@@ -1,8 +1,9 @@
 import { EBookingStatus } from '@models/base.dto';
-import { ISelectedModifierOption } from './modifier.dto';
-import { IVenueShort } from './venue.dto';
-import { IUserProfile } from './user.dto';
 import { ICheckoutShort } from './checkout.dto';
+import { ISelectedModifierOption } from './modifier.dto';
+import { IProduct } from './products.dto';
+import { IUserProfile } from './user.dto';
+import { IVenueShort } from './venue.dto';
 
 export interface IOrder {
   id: number;
@@ -24,7 +25,10 @@ export interface IOrder {
 
 export interface IOrderItem {
   id: number;
+  // This can be used for tracking or referencing the item in a more user-friendly way
+  uniqueId?: string; // Optional unique identifier for the order item
   productId: number;
+  product: IProduct;
   quantity: number;
   price: number;
   selectedModifiers?: ISelectedModifierOption[];

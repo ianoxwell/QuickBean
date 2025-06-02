@@ -1,4 +1,5 @@
 import userSlice from '@pages/account/userSlice';
+import orderSlice from '@pages/checkout/order.slice';
 import checkoutSlice from '@pages/checkoutSlice';
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import { configureStore } from '@reduxjs/toolkit';
@@ -9,6 +10,7 @@ export const store = configureStore({
   reducer: {
     user: userSlice,
     checkout: checkoutSlice,
+    order: orderSlice,
     [apiSlice.reducerPath]: apiSlice.reducer
   },
   middleware: (getDefaultMiddleware) =>
