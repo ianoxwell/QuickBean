@@ -1,5 +1,7 @@
+import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import QuantityInput from '@components/QuantityInput/QuantityInput.component';
 import { ActionIcon, Button, Chip, Group, Image, Modal, useMatches } from '@mantine/core';
 import { IOrderItem } from '@models/order.dto';
 import { IProduct } from '@models/products.dto';
@@ -10,7 +12,6 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addCheckoutItem } from '../checkout/order.slice';
-import { useAppDispatch } from '@app/hooks';
 
 const MenuItemModal = () => {
   const location = useLocation();
@@ -189,9 +190,21 @@ const MenuItemModal = () => {
             )}
           </div>
           <div className="modal-wrapper--contents__action">
-            <span>Price - ${totalPrice}</span>
-            <Button variant="filled" onClick={addCheckoutItemToOrder} type="button">
-              Add to Order
+            <QuantityInput
+              quantity={order.quantity}
+              onChange={(value) => {
+                const newQuantity = typeof value === 'number' ? value : parseInt(value, 10);
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                  return; // Ignore invalid input
+                }
+                order.quantity = newQuantity;
+                order.price = calcOrderItemPrice(order, product);
+                setOrder(order);
+                setTotalPrice(fixWholeNumber(order.price, 2));
+              }}
+            />
+            <Button size="input-sm" onClick={addCheckoutItemToOrder} type="button">
+              Add to Order - ${totalPrice}
             </Button>
           </div>
         </div>
