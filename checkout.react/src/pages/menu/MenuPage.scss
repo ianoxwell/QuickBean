@@ -89,8 +89,11 @@
     border-top-left-radius: 5rem;
     background-color: var(--mantine-color-body);
     padding: 2rem;
-    height: 70vh;
+    height: calc(100vh - 21.25rem);
     position: relative;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
     z-index: 1;
     &__modifier {
       h2 {
@@ -98,6 +101,18 @@
         margin-bottom: 0.25rem;
       }
       margin-bottom: 1.5rem;
+    }
+    &__action {
+      position: sticky;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      margin: 0 -2rem -2rem;
+      background: var(--mantine-color-body, #fff);
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
     }
   }
   &--header {

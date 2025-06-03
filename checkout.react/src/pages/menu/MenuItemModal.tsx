@@ -1,6 +1,6 @@
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { ActionIcon, Chip, Group, Image, Modal, useMatches } from '@mantine/core';
+import { ActionIcon, Button, Chip, Group, Image, Modal, useMatches } from '@mantine/core';
 import { IOrderItem } from '@models/order.dto';
 import { IProduct } from '@models/products.dto';
 import { calcOrderItemPrice } from '@utils/costCalculator';
@@ -9,10 +9,13 @@ import { ChevronLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { addCheckoutItem } from '../checkout/order.slice';
+import { useAppDispatch } from '@app/hooks';
 
 const MenuItemModal = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   // const iconSize = 16;
   const iconPlusSize = 28;
   const { checkout } = useSelector((store: RootState) => store.checkout);
@@ -87,6 +90,34 @@ const MenuItemModal = () => {
     setTotalPrice(fixWholeNumber(order.price, 2));
   };
 
+  const addCheckoutItemToOrder = () => {
+    if (!checkout) {
+      console.error('Checkout is not defined. Cannot add item to order.');
+      return;
+    }
+
+    if (!product) {
+      console.error('Product is not defined. Cannot add item to order.');
+      return;
+    }
+
+    if (!order) {
+      console.error('Order is not defined. Cannot add item to order.');
+      return;
+    }
+
+    if (order.quantity <= 0) {
+      console.error('Order quantity must be greater than 0.');
+      return;
+    }
+
+    order.product = product;
+    // Dispatch the action to add the item to the checkout
+    dispatch(addCheckoutItem({ orderItem: order, checkout }));
+    // Close the modal after adding the item
+    closeModal();
+  };
+
   if (!product) {
     return null; // If no product is provided, do not render the modal
   }
@@ -119,43 +150,50 @@ const MenuItemModal = () => {
           <h1 className="modal-wrapper--title__text">{product.name}</h1>
         </div>
         <div className="modal-wrapper--contents">
-          <p>{product.description}</p>
-          {!!product.modifiers.length && (
-            <>
-              {product.modifiers.map((modifier) => {
-                return (
-                  <div className="modal-wrapper--contents__modifier" key={modifier.id}>
-                    <h2>{modifier.name}</h2>
-                    <Chip.Group value={selectedModifiers.filter((m) => parseInt(m.split('-')[0]) === modifier.id)}>
-                      <Group>
-                        {modifier.options.map((option) => {
-                          return (
-                            <Chip
-                              className="modal-wrapper--contents__modifier__option"
-                              key={`${modifier.id}-${option.id}`}
-                              value={`${modifier.id}-${option.id}`}
-                              onChange={() => {
-                                modifierChange(option.id, modifier.id);
-                              }}
-                              radius="md"
-                            >
-                              <span>{option.label}</span>
-                              {(option.priceAdjustment ?? 0) > 0 && (
-                                <span className="modal-wrapper--contents__modifier__option__price">
-                                  +${fixWholeNumber(option.priceAdjustment ?? 0, 2)}
-                                </span>
-                              )}
-                            </Chip>
-                          );
-                        })}
-                      </Group>
-                    </Chip.Group>
-                  </div>
-                );
-              })}
-            </>
-          )}
-          <div>Price - ${totalPrice}</div>
+          <div>
+            <p>{product.description}</p>
+            {!!product.modifiers.length && (
+              <>
+                {product.modifiers.map((modifier) => {
+                  return (
+                    <div className="modal-wrapper--contents__modifier" key={modifier.id}>
+                      <h2>{modifier.name}</h2>
+                      <Chip.Group value={selectedModifiers.filter((m) => parseInt(m.split('-')[0]) === modifier.id)}>
+                        <Group>
+                          {modifier.options.map((option) => {
+                            return (
+                              <Chip
+                                className="modal-wrapper--contents__modifier__option"
+                                key={`${modifier.id}-${option.id}`}
+                                value={`${modifier.id}-${option.id}`}
+                                onChange={() => {
+                                  modifierChange(option.id, modifier.id);
+                                }}
+                                radius="md"
+                              >
+                                <span>{option.label}</span>
+                                {(option.priceAdjustment ?? 0) > 0 && (
+                                  <span className="modal-wrapper--contents__modifier__option__price">
+                                    +${fixWholeNumber(option.priceAdjustment ?? 0, 2)}
+                                  </span>
+                                )}
+                              </Chip>
+                            );
+                          })}
+                        </Group>
+                      </Chip.Group>
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
+          <div className="modal-wrapper--contents__action">
+            <span>Price - ${totalPrice}</span>
+            <Button variant="filled" onClick={addCheckoutItemToOrder} type="button">
+              Add to Order
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

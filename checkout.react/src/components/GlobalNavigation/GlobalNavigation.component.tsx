@@ -2,9 +2,10 @@ import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { logoutUser } from '@pages/account/userSlice';
-import { Calendar, CircleUser, LayoutDashboard } from 'lucide-react';
+import { CircleUser, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
+import { Indicator } from '@mantine/core';
 
 export const GlobalNavigation = () => {
   const fillColor = '#128758';
@@ -13,6 +14,7 @@ export const GlobalNavigation = () => {
   const navigate = useNavigate();
   // const { user } = useAppSelector((store: RootState) => store.user.user) as IUserToken;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
+  const { itemCount } = useAppSelector((store: RootState) => store.order);
 
   const navigateSettings = () => {
     navigate(`/${checkout?.checkoutUrl}/${CRoutes.orders}`);
@@ -33,7 +35,18 @@ export const GlobalNavigation = () => {
         {/* TODO add awareness of number of items in cart - on selection to show modal from bottom of cart */}
         <NavLink to={CRoutes.cart} aria-label="Cart" className="nav-item">
           {({ isActive }) => {
-            return <Calendar fill={isActive ? fillColor : 'white'} size={iconSize} />;
+            return (
+              <Indicator
+                size={16}
+                label={itemCount}
+                inline
+                position="top-end"
+                color="red"
+                style={{ '--indicator-translate-y': '40%', '--indicator-translate-x': '70%' } as React.CSSProperties}
+              >
+                <ShoppingCart fill={isActive ? fillColor : 'white'} size={iconSize} />
+              </Indicator>
+            );
           }}
         </NavLink>
         {/* TODO make popup and aware if logged in - includes logout */}

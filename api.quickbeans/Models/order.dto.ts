@@ -7,7 +7,7 @@ import { IVenueShort } from './venue.dto';
 
 export interface IOrder {
   id: number;
-  orderDate: Date;
+  orderDate: Date | string;
   receiptNumber: string;
   amountPaid: number;
   grandTotal: number;

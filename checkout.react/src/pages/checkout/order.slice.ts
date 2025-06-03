@@ -61,7 +61,7 @@ const orderSlice = createSlice({
       );
       // Set the order date to now if it's a new order
       if (!state.order.id) {
-        state.order.orderDate = new Date();
+        state.order.orderDate = new Date().toISOString();
       }
 
       // Ensure the order has a receipt number
@@ -146,7 +146,7 @@ const orderSlice = createSlice({
 
 const createBlankOrder = (checkout?: ICheckout): IOrder => ({
   id: 0,
-  orderDate: new Date(),
+  orderDate: new Date().toISOString(),
   receiptNumber: '',
   amountPaid: 0,
   grandTotal: 0,
