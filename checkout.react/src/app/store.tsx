@@ -1,5 +1,5 @@
 import userSlice from '@pages/account/userSlice';
-import orderSlice from '@pages/checkout/order.slice';
+import orderSlice from '@pages/order/order.slice';
 import checkoutSlice from '@pages/checkoutSlice';
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import { configureStore } from '@reduxjs/toolkit';

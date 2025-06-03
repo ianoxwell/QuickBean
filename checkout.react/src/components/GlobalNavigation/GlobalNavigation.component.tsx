@@ -35,17 +35,19 @@ export const GlobalNavigation = () => {
         {/* TODO add awareness of number of items in cart - on selection to show modal from bottom of cart */}
         <NavLink to={CRoutes.cart} aria-label="Cart" className="nav-item">
           {({ isActive }) => {
-            return (
+            return itemCount ? (
               <Indicator
                 size={16}
                 label={itemCount}
                 inline
                 position="top-end"
                 color="red"
-                style={{ '--indicator-translate-y': '40%', '--indicator-translate-x': '70%' } as React.CSSProperties}
+                style={{ '--indicator-translate-y': '40%', '--indicator-translate-x': '70%' }}
               >
                 <ShoppingCart fill={isActive ? fillColor : 'white'} size={iconSize} />
               </Indicator>
+            ) : (
+              <ShoppingCart fill={isActive ? fillColor : 'white'} size={iconSize} />
             );
           }}
         </NavLink>

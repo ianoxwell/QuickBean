@@ -11,7 +11,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { addCheckoutItem } from '../checkout/order.slice';
+import { addCheckoutItem } from '../order/order.slice';
 
 const MenuItemModal = () => {
   const location = useLocation();

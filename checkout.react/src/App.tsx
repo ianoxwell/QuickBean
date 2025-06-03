@@ -15,6 +15,7 @@ import MenuPage from '@pages/menu/MenuPage';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
+import OrderCartPage from '@pages/order/OrderCartPage';
 
 const theme = createTheme({
   fontFamily: 'Lato, Quicksand, sans-serif',
@@ -51,6 +52,7 @@ function App() {
                   </>
                 }
               />
+              <Route path={CRoutes.cart} element={<OrderCartPage />} />
 
               <Route path={CRoutes.account} element={<AccountWrapper />}>
                 <Route path={CRoutes.login} element={<Login />} />
