@@ -1,13 +1,12 @@
-import { RootState } from '@app/store';
-import { ActionIcon, Space, Stack, TableOfContents, useMantineColorScheme } from '@mantine/core';
-import { Moon, Sun } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import ProductItem from './ProductItem';
-import './MenuPage.scss';
 import { CRoutes } from '@app/routes.const';
+import { RootState } from '@app/store';
+import { Space, Stack, TableOfContents } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import './MenuPage.scss';
+import ProductItem from './ProductItem';
 
 const MenuPage = () => {
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  
   const { checkout } = useSelector((store: RootState) => store.checkout);
 
   return (
@@ -62,20 +61,6 @@ const MenuPage = () => {
           </div>
         );
       })()}
-      <ActionIcon
-        variant="outline"
-        color={colorScheme === 'dark' ? 'yellow' : 'blue'}
-        onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
-        title="Toggle color scheme"
-        size="xl"
-        aria-label="Toggle color scheme"
-      >
-        {colorScheme === 'dark' ? (
-          <Sun style={{ width: 18, height: 18 }} />
-        ) : (
-          <Moon style={{ width: 18, height: 18 }} />
-        )}
-      </ActionIcon>
     </div>
   );
 };

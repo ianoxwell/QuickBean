@@ -1,11 +1,11 @@
 import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { Indicator, Menu, useMantineColorScheme } from '@mantine/core';
 import { logoutUser } from '@pages/account/userSlice';
-import { CircleUser, LayoutDashboard, ShoppingCart } from 'lucide-react';
+import { CircleUser, LayoutDashboard, LogOut, Moon, ShoppingCart, Sun } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
-import { Indicator } from '@mantine/core';
 
 export const GlobalNavigation = () => {
   const fillColor = '#128758';
@@ -15,6 +15,7 @@ export const GlobalNavigation = () => {
   // const { user } = useAppSelector((store: RootState) => store.user.user) as IUserToken;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { itemCount } = useAppSelector((store: RootState) => store.order);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const navigateSettings = () => {
     navigate(`/${checkout?.checkoutUrl}/${CRoutes.orders}`);
@@ -52,11 +53,31 @@ export const GlobalNavigation = () => {
           }}
         </NavLink>
         {/* TODO make popup and aware if logged in - includes logout */}
-        <NavLink to={CRoutes.account} aria-label="Profile" className="nav-item">
-          {({ isActive }) => {
-            return <CircleUser fill={isActive ? fillColor : 'white'} size={iconSize} />;
-          }}
-        </NavLink>
+        <Menu width={200}>
+          <Menu.Target>
+            <NavLink to="#no-where" aria-label="Profile" className="nav-item">
+              {({ isActive }) => {
+                return <CircleUser fill={isActive ? fillColor : 'white'} size={iconSize} />;
+              }}
+            </NavLink>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item onClick={navigateSettings} leftSection={<LayoutDashboard size={iconSize} />}>
+              Past Orders
+            </Menu.Item>
+            <Menu.Item
+              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+              leftSection={colorScheme === 'dark' ? <Sun size={iconSize} /> : <Moon size={iconSize} />}
+            >
+              Toggle color scheme
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item onClick={logUserOut} leftSection={<LogOut size={iconSize} />}>
+              Logout
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </nav>
     </>
   );
