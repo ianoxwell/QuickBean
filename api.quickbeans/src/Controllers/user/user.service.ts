@@ -116,7 +116,7 @@ export class UserService {
       return { message: 'No such email address found.', status: HttpStatus.NOT_FOUND };
     }
 
-    if (!user.isActive || !['ros', 'Local'].includes(user.loginProvider)) {
+    if (!user.isActive || !['quickbook', 'local'].includes(user.loginProvider.toLowerCase())) {
       return {
         message: !user.isActive ? 'Account has been deactivated' : 'Try logging in with Social provider (Google)',
         status: HttpStatus.UNAUTHORIZED
