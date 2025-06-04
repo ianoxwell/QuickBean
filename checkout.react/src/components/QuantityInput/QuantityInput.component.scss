@@ -1,8 +1,28 @@
+@use '../../styles/mixins.scss';
+
 .quantity-input {
-    &__input {
-        width: 3.25rem;
-        input {
-            text-align: center;;
-        }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  @include mixins.breakpoint('sm') {
+    gap: 0.5rem;
+  }
+  &__input {
+    width: 3.25rem;
+    input {
+      text-align: center;
     }
+  }
+  &.size--sm {
+    button {
+      --ai-size: 1.125rem;
+    }
+    .quantity-input__input {
+      width: 2.5rem;
+      input {
+        font-size: 0.875rem;
+      }
+    }
+  }
 }
