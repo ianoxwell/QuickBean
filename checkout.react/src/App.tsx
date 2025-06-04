@@ -5,17 +5,17 @@ import '@mantine/dates/styles.css';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
-import AccountWrapper from '@pages/account/AccountWrapper';
-import ForgotPassword from '@pages/account/ForgotPassword';
 import Login from '@pages/account/Login';
-import ResetPassword from '@pages/account/ResetPassword';
 import VerifyEmail from '@pages/account/VerifyEmail';
+import ConfirmationPage from '@pages/confirmation/ConfirmationPage';
 import MenuItemModal from '@pages/menu/MenuItemModal';
 import MenuPage from '@pages/menu/MenuPage';
+import OrderCartPage from '@pages/order/OrderCartPage';
+import PaymentPage from '@pages/payment/PayMentPage';
+import ProtectedRoute from '@pages/ProtectedRoute';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
-import OrderCartPage from '@pages/order/OrderCartPage';
 
 const theme = createTheme({
   fontFamily: 'Lato, Quicksand, sans-serif',
@@ -42,6 +42,7 @@ function App() {
             {/* Redirect '/' to a default venueSlug/checkoutSlug */}
             <Route path="/" element={<Navigate to={`/${defaultVenue}/${defaultCheckout}/${CRoutes.menu}`} replace />} />
             <Route path="/:venueSlug/:checkoutSlug" element={<SharedLayout />}>
+              {/* Unprotected routes */}
               <Route path={CRoutes.menu} element={<MenuPage />} />
               <Route
                 path={`${CRoutes.menu}/:id`}
@@ -53,13 +54,34 @@ function App() {
                 }
               />
               <Route path={CRoutes.cart} element={<OrderCartPage />} />
+              <Route path={CRoutes.login} element={<Login />} />
 
-              <Route path={CRoutes.account} element={<AccountWrapper />}>
-                <Route path={CRoutes.login} element={<Login />} />
-                <Route path={CRoutes.forgotPassword} element={<ForgotPassword />} />
-                <Route path={CRoutes.verifyEmail} element={<VerifyEmail />} />
-                <Route path={CRoutes.resetPassword} element={<ResetPassword />} />
-              </Route>
+              {/* Protected routes */}
+              <Route
+                path={CRoutes.payment}
+                element={
+                  <ProtectedRoute>
+                    <PaymentPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={CRoutes.confirmation}
+                element={
+                  <ProtectedRoute>
+                    <ConfirmationPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path={CRoutes.verifyEmail}
+                element={
+                  <ProtectedRoute>
+                    <VerifyEmail />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
           </Routes>
         </ModalsProvider>
