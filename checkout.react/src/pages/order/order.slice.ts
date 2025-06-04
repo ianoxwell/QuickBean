@@ -35,6 +35,7 @@ const orderSlice = createSlice({
       const existingItemIndex = state.order.items.findIndex(
         (item) =>
           (item.id === orderItem.id &&
+            item.productId === orderItem.productId &&
             JSON.stringify(item.selectedModifiers) === JSON.stringify(orderItem.selectedModifiers)) ||
           item.uniqueId === orderItem.uniqueId
       );
@@ -78,7 +79,7 @@ const orderSlice = createSlice({
       if (!state.order) return;
 
       // Find the index of the item to remove
-      const itemIndex = state.order.items.findIndex((item) => item.uniqueId === payload.itemUniqueId);
+      const itemIndex = state.order.items.findIndex((item) => item.uniqueId && item.uniqueId === payload.itemUniqueId);
       if (itemIndex > -1) {
         // Remove the item from the order
         state.order.items.splice(itemIndex, 1);
@@ -99,17 +100,21 @@ const orderSlice = createSlice({
       }
     },
     modifyCheckoutItem: (state, { payload }: { payload: IOrderItem }) => {
-      if (!state.order) return;
+      if (!state.order || !payload.uniqueId) return;
 
       // Find the index of the item to modify
-      const itemIndex = state.order.items.findIndex((item) => item.id === payload.id);
+      const itemIndex = state.order.items.findIndex((item) => item.uniqueId && item.uniqueId === payload.uniqueId);
       if (itemIndex > -1) {
-        // Update the item with new values
-        const existingItem = state.order.items[itemIndex];
-        existingItem.quantity = payload.quantity;
-        existingItem.selectedModifiers = payload.selectedModifiers;
-        existingItem.price = calcOrderItemPrice(existingItem, existingItem.product);
-
+        if (payload.quantity <= 0) {
+          // If quantity is 0 or less, remove the item
+          state.order.items.splice(itemIndex, 1);
+        } else {
+          // Update the item with new values
+          const existingItem = state.order.items[itemIndex];
+          existingItem.quantity = payload.quantity;
+          existingItem.selectedModifiers = payload.selectedModifiers;
+          existingItem.price = calcOrderItemPrice(existingItem, existingItem.product);
+        }
         // Recalculate the grand total
         state.order.grandTotal = calcOrderTotal(
           state.order.items,
