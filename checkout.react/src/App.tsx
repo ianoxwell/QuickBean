@@ -55,6 +55,7 @@ function App() {
               />
               <Route path={CRoutes.cart} element={<OrderCartPage />} />
               <Route path={CRoutes.login} element={<Login />} />
+              <Route path={CRoutes.verify} element={<VerifyEmail />} />
 
               {/* Protected routes */}
               <Route
@@ -70,15 +71,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ConfirmationPage />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={CRoutes.verifyEmail}
-                element={
-                  <ProtectedRoute>
-                    <VerifyEmail />
                   </ProtectedRoute>
                 }
               />

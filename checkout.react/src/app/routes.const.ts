@@ -4,7 +4,7 @@ export const CRoutes = {
 
   // user / account related routes
   login: 'login',
-  verifyEmail: 'verify-email',
+  verify: 'verify',
 
   // protected routes
   payment: 'payment',

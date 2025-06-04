@@ -1,8 +1,7 @@
 // Import the RTK Query methods from the React-specific entry point
-
 import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
-import { INewUser, IResetPasswordRequest, IUserLogin, IUserToken, IVerifyUserEmail } from '@models/user.dto';
+import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserToken } from '@models/user.dto';
 import { setCheckout } from '@pages/checkoutSlice';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { getUserFromLocalStorage, isTokenFresh } from '@utils/localStorage';
@@ -41,23 +40,13 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   // All of our requests will check if token is available and attach (baseQuery) and all responses will be checked for 401 not authorized
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Schedules'],
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
-    loginUser: builder.mutation<IUserToken | IMessage, IUserLogin>({
-      query: (userLogin) => ({ url: '/account/login', method: 'POST', body: userLogin })
+    loginUser: builder.mutation<IOneTimeCodeExpires | IMessage, INewUser>({
+      query: (userLogin) => ({ url: '/user/login', method: 'POST', body: userLogin })
     }),
-    registerUser: builder.mutation<IUserToken | IMessage, INewUser>({
-      query: (newUser) => ({ url: '/account/register', method: 'POST', body: newUser })
-    }),
-    verifyUserEmail: builder.mutation<IUserToken | IMessage, IVerifyUserEmail>({
-      query: (emailToken) => ({ url: '/account/verify-email', method: 'POST', body: emailToken })
-    }),
-    forgotPasswordEmail: builder.mutation<IMessage, string>({
-      query: (email) => ({ url: '/account/forgot-password', method: 'POST', body: { email } })
-    }),
-    resetPassword: builder.mutation<IUserToken | IMessage, IResetPasswordRequest>({
-      query: (reset) => ({ url: '/account/reset-password', method: 'POST', body: reset })
+    verifyOneTimeCode: builder.mutation<IUserToken | IMessage, IUserLogin>({
+      query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
     }),
     getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({
       query: (slugs) => ({ url: `checkout?slug=${slugs.slug}&venueSlug=${slugs.venueSlug}` }),
@@ -78,11 +67,4 @@ export const apiSlice = createApi({
 });
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const {
-  useLoginUserMutation,
-  useRegisterUserMutation,
-  useVerifyUserEmailMutation,
-  useForgotPasswordEmailMutation,
-  useResetPasswordMutation,
-  useGetCheckoutQuery
-} = apiSlice;
+export const { useLoginUserMutation, useVerifyOneTimeCodeMutation, useGetCheckoutQuery } = apiSlice;
