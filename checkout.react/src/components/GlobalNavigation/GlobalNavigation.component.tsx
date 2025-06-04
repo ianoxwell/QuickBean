@@ -3,7 +3,7 @@ import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Indicator, Menu, useMantineColorScheme } from '@mantine/core';
 import { logoutUser } from '@pages/account/userSlice';
-import { CircleUser, LayoutDashboard, LogOut, Moon, ShoppingCart, Sun } from 'lucide-react';
+import { CircleUser, LayoutDashboard, LogIn, LogOut, Moon, ShoppingCart, Sun } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
 
@@ -16,6 +16,7 @@ export const GlobalNavigation = () => {
   // const { user } = useAppSelector((store: RootState) => store.user.user) as IUserToken;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { itemCount } = useAppSelector((store: RootState) => store.order);
+  const { user } = useAppSelector((store: RootState) => store.user);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const navigateSettings = () => {
@@ -24,6 +25,10 @@ export const GlobalNavigation = () => {
 
   const logUserOut = () => {
     dispatch(logoutUser());
+  };
+
+  const logUserIn = () => {
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.login}`);
   };
 
   return (
@@ -64,9 +69,11 @@ export const GlobalNavigation = () => {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item onClick={navigateSettings} leftSection={<LayoutDashboard size={iconSize} />}>
-              Past Orders
-            </Menu.Item>
+            {!!user && (
+              <Menu.Item onClick={navigateSettings} leftSection={<LayoutDashboard size={iconSize} />}>
+                Past Orders
+              </Menu.Item>
+            )}
             <Menu.Item
               onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
               leftSection={colorScheme === 'dark' ? <Sun size={iconSize} /> : <Moon size={iconSize} />}
@@ -74,9 +81,15 @@ export const GlobalNavigation = () => {
               Toggle color scheme
             </Menu.Item>
             <Menu.Divider />
-            <Menu.Item onClick={logUserOut} leftSection={<LogOut size={iconSize} />}>
-              Logout
-            </Menu.Item>
+            {user ? (
+              <Menu.Item onClick={logUserOut} leftSection={<LogOut size={iconSize} />}>
+                Logout
+              </Menu.Item>
+            ) : (
+              <Menu.Item onClick={logUserIn} leftSection={<LogIn size={iconSize} />}>
+                Login
+              </Menu.Item>
+            )}
           </Menu.Dropdown>
         </Menu>
       </nav>

@@ -5,13 +5,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import { notifications } from '@mantine/notifications';
 
 export interface IUserState {
-  isMember: boolean;
   user: IUserToken | undefined;
   previousOrders: IOrder[];
 }
 
 const initialState: IUserState = {
-  isMember: true,
   user: getUserFromLocalStorage(),
   previousOrders: []
 };
@@ -30,9 +28,6 @@ const userSlice = createSlice({
 
       state.user = payload;
     },
-    toggleIsMember: (state) => {
-      state.isMember = !state.isMember;
-    },
     logoutUser: (state) => {
       state.user = undefined;
       removeUserFromLocalStorage();
@@ -41,5 +36,5 @@ const userSlice = createSlice({
   }
 });
 
-export const { setUser, toggleIsMember, logoutUser } = userSlice.actions;
+export const { setUser, logoutUser } = userSlice.actions;
 export default userSlice.reducer;

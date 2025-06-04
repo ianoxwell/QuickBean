@@ -1,29 +1,29 @@
-import { useLoginUserMutation, useRegisterUserMutation } from '@app/apiSlice';
-import { useAppDispatch } from '@app/hooks';
+import { useLoginUserMutation } from '@app/apiSlice';
+import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { Button, Checkbox, Group, NavLink, TextInput, UnstyledButton } from '@mantine/core';
-import { isEmail, isNotEmpty, useForm } from '@mantine/form';
+import { Button, Checkbox, Group, TextInput } from '@mantine/core';
+import { isEmail, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { ERole } from '@models/base.dto';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { toggleIsMember } from './userSlice';
+import { IOrder } from '@models/order.dto';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const initialState = {
-  name: '',
-  phone: '',
-  email: 'testuser@noemail.com',
-  password: 'testPassword',
-  termsOfService: false
+  email: 'patron@coffee.com',
+  termsOfService: true
 };
 
 const Login = () => {
-  const { isMember } = useSelector((store: RootState) => store.user);
-  const dispatch = useAppDispatch();
-  const [loginUser, { isLoading: isLoginLoading }] = useLoginUserMutation();
-  const [registerUser, { isLoading: isRegisterLoading }] = useRegisterUserMutation();
-  const isLoading = useMemo(() => isLoginLoading || isRegisterLoading, [isLoginLoading, isRegisterLoading]);
+  const base = import.meta.env.VITE_BASE_URL;
+  const { user } = useAppSelector((store: RootState) => store.user);
+  const { checkout } = useAppSelector((store: RootState) => store.checkout);
+  const navigate = useNavigate();
+  const [registerUser, { isLoading }] = useLoginUserMutation();
+
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+  const { order }: { order: IOrder | null } = location.state ?? { order: null };
 
   const submitButton = async () => {
     form.validate();
@@ -31,28 +31,20 @@ const Login = () => {
       return;
     }
 
-    const { name, phone, email, password } = form.getValues();
+    const { email } = form.getValues();
     console.log('current form', form.getValues(), form.isValid(), form.errors);
     // Note to self the form.errors is usually blank if the form is not touched
 
-    if (isMember) {
-      try {
-        await loginUser({ email, password }).unwrap();
-      } catch (error: unknown) {
-        console.log('Looks like a massive mistake happened', error);
-        if (typeof error === 'object' && error !== null && 'message' in error) {
-          notifications.show({ message: (error as { message: string }).message, color: 'red' });
-        }
+    try {
+      await registerUser({ email, loginProvider: 'local', roles: [ERole.PATRON] }).unwrap();
+      // navigate to the one time code verification page
+      navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.verify}`, { state: { email, order } });
+    } catch (error) {
+      console.log('Looks like a massive mistake happened', error);
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        notifications.show({ message: (error as { message: string }).message, color: 'red' });
       }
-
-      return;
     }
-
-    registerUser({ name, phone, email, password, loginProvider: 'local', photoUrl: '', roles: [ERole.PATRON] });
-  };
-
-  const toggleMember = () => {
-    dispatch(toggleIsMember());
   };
 
   const form = useForm({
@@ -60,39 +52,22 @@ const Login = () => {
     validateInputOnChange: true,
     initialValues: initialState,
     validate: {
-      name: (name) => (isMember || name.length > 2 ? null : 'Name needs to be longer than 3 characters'),
-      phone: (phone) => (isMember || phone.length > 7 ? null : 'Number should be longer than 7 characters'),
       email: isEmail('Invalid email'),
-      password: isNotEmpty('password required'),
-      termsOfService: (tos) => (isMember || !!tos ? null : 'Required for business')
+      termsOfService: (tos) => (tos ? null : 'Required for business')
     }
   });
 
+  if (user) {
+    const checkoutUrl = order ? `${base}${checkout?.checkoutUrl}/${CRoutes.payment}` : from;
+    // If the user is already logged in, redirect them to the payment or the previous page
+    navigate(checkoutUrl, { replace: true });
+    return null;
+  }
+
   return (
     <>
-      <h2>{isMember ? 'Login' : 'Register'}</h2>
+      <h2>Email for order</h2>
       <form>
-        {!isMember && (
-          <>
-            <TextInput
-              withAsterisk
-              required
-              label="Name"
-              type="name"
-              key={form.key('name')}
-              {...form.getInputProps('name')}
-            />
-            <TextInput
-              withAsterisk
-              required
-              label="Mobile"
-              type="phone"
-              key={form.key('phone')}
-              {...form.getInputProps('phone')}
-            />
-          </>
-        )}
-
         <TextInput
           withAsterisk
           required
@@ -104,43 +79,18 @@ const Login = () => {
           {...form.getInputProps('email')}
         />
 
-        <TextInput
-          withAsterisk
-          required
-          type="password"
-          label="Password"
-          autoComplete="current-password"
-          key={form.key('password')}
-          {...form.getInputProps('password')}
+        <Checkbox
+          mt="md"
+          label="I agree to sell my privacy"
+          key={form.key('termsOfService')}
+          {...form.getInputProps('termsOfService', { type: 'checkbox' })}
         />
-
-        {isMember && (
-          <section className="forgot-password">
-            <span className="forgot-password--text">Forgot Password?</span>
-            <NavLink href={CRoutes.forgotPassword} rightSection="Reset" />
-          </section>
-        )}
-
-        {!isMember && (
-          <Checkbox
-            mt="md"
-            label="I agree to sell my privacy"
-            key={form.key('termsOfService')}
-            {...form.getInputProps('termsOfService', { type: 'checkbox' })}
-          />
-        )}
 
         <Group justify="flex-end" mt="md">
           <Button type="button" onClick={submitButton} fullWidth mt="md" radius="md" loading={isLoading}>
             Submit
           </Button>
         </Group>
-        <section className="register-login">
-          <span>{isMember ? 'Not a member yet?' : 'Already a member?'}</span>
-          <UnstyledButton type="button" onClick={toggleMember} className="member-btn">
-            {isMember ? 'Register' : 'Login'}
-          </UnstyledButton>
-        </section>
       </form>
     </>
   );
