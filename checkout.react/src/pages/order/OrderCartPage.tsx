@@ -1,36 +1,71 @@
 import { useAppSelector } from '@app/hooks';
+import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { Button } from '@mantine/core';
-import { getDateObject } from '@utils/dateUtils';
-import dayjs from 'dayjs';
+import { Button, Divider, Flex } from '@mantine/core';
+import { MapPin, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import CartItem from './CartItem';
+import './OrderCartPage.scss';
 
 const OrderCartPage = () => {
+  const base = import.meta.env.VITE_BASE_URL;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { order } = useAppSelector((store: RootState) => store.order);
+  const { user } = useAppSelector((store: RootState) => store.user);
+  const navigate = useNavigate();
+
+  const proceedToCheckout = () => {
+    const checkoutUrl = user
+      ? `${base}${checkout?.checkoutUrl}/${CRoutes.payment}`
+      : `${base}${checkout?.checkoutUrl}/${CRoutes.login}`;
+    navigate(checkoutUrl, { state: { order } });
+  };
+
+  if (!order || !order.items || !order.items.length) {
+    return <p>Your cart is currently empty.</p>;
+  }
 
   return (
-    <div>
-      <h1>Order Cart</h1>
-      <p>Checkout URL: {checkout?.checkoutUrl}</p>
-      <p>Order ID: {order?.id}</p>
-      <p>Order Date: {dayjs(getDateObject(order?.orderDate)).format('MMMM D, YYYY HH:mm')}</p>
-      <p>Receipt Number: {order?.receiptNumber}</p>
-      <p>Amount Paid: {order?.amountPaid}</p>
-      <p>Grand Total: {order?.grandTotal}</p>
-      <p>Discount: {order?.discount}</p>
-      <p>Comments: {order?.comments}</p>
-      <h2>Items in Order:</h2>
-      <ul>
-        {order?.items.map((item) => (
-          <li key={item.id}>
-            {item.product.name} - Quantity: {item.quantity} - Price: ${item.price.toFixed(2)}
-          </li>
-        ))}
-      </ul>
-      <Button size="input-sm" type="button">
-        Proceed to Checkout
-      </Button>
-    </div>
+    <>
+      {!!order && !!checkout && (
+        <div className="order-cart-page">
+          <section className="order-cart-page__header">
+            <div>
+              <h1>Your order</h1>
+              {!!checkout.venue && (
+                <div className="order-cart-page__address">
+                  <MapPin size={16} />
+                  <span>
+                    {checkout.venue.address}, {checkout.venue.city}
+                  </span>
+                </div>
+              )}
+            </div>
+            <Button type="button" leftSection={<Plus size={16} />}>
+              Add to order
+            </Button>
+          </section>
+          <section className="order-cart-page__details">
+            {order.items.map((item) => (
+              <CartItem key={`${item.id}-${item.uniqueId}`} isEditable={true} item={item}></CartItem>
+            ))}
+          </section>
+          <Divider my="lg" variant="dashed" />
+          <section className="order-cart-page__summary">
+            <div className="order-cart-page__summary-total">
+              <span className="order-cart-page__summary-total-label">Total (inc. tax)</span>
+              <span className="order-cart-page__summary-total-value">${order.grandTotal.toFixed(2)}</span>
+            </div>
+            <Divider my="lg" variant="dashed" />
+            <Flex justify="flex-end">
+              <Button size="input-sm" type="button" onClick={proceedToCheckout}>
+                Proceed to Checkout
+              </Button>
+            </Flex>
+          </section>
+        </div>
+      )}
+    </>
   );
 };
 
