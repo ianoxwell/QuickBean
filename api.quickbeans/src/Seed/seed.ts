@@ -1,22 +1,20 @@
+import { Checkout } from '@controllers/checkout/Checkout.entity';
+import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
 import { Modifier } from '@controllers/modifier/Modifier.entity';
+import { Order } from '@controllers/order/Order.entity';
+import { OrderItem } from '@controllers/order/OrderItem.entity';
 import { Product } from '@controllers/product/Product.entity';
 import { User } from '@controllers/user/User.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-
+import CCheckouts from './data/checkout.const';
 import modifiers from './data/modifiers.const';
+import orders from './data/orders.const';
 import products from './data/products.const';
 import users from './data/users.const';
 import venues from './data/venues.const';
 import { SeederModule } from './seeder.module';
-import { Order } from '@controllers/order/Order.entity';
-import orders from './data/orders.const';
-import { OrderItem } from '@controllers/order/OrderItem.entity';
-import { Checkout } from '@controllers/checkout/Checkout.entity';
-import CCheckouts from './data/checkout.const';
-import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(SeederModule);
@@ -59,7 +57,6 @@ async function bootstrap() {
       if (!venue) {
         throw new Error(`Venue not found: ${JSON.stringify(user.venues)}`);
       }
-      user.passwordHash = await bcrypt.hash(user.passwordHash || 'password', 10); // Default password if not provided
       user.venues = [venue]; // Assign the venue to the user
 
       return await userRepo.save(user);

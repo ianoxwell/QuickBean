@@ -1,6 +1,5 @@
 import { Venue } from '@controllers/venue/Venue.entity';
 import { ERole, TLoginProvider } from '@models/base.dto';
-import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
@@ -9,21 +8,12 @@ export class User {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Index()
   @Column({ unique: true })
   email!: string;
-
-  @Index()
-  @Column({ nullable: true })
-  phone: string;
-  @Column({ nullable: true })
-  photoUrl?: string;
-
-  @Column({ length: 200, nullable: true })
-  passwordHash: string;
 
   @Column({ default: true })
   isActive: boolean;
@@ -48,28 +38,12 @@ export class User {
 
   /** Token content */
   @Column({ length: 200, nullable: true })
-  verificationToken?: string;
-
-  @Column({ length: 200, nullable: true })
-  resetToken?: string;
+  oneTimeCode?: string;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  resetTokenExpires?: Date;
-
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  passwordLastReset?: Date;
-
-  @ApiProperty({
-    description: 'Has date implies that the user has been verified.'
-  })
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  verified?: Date;
-
-  @Column({ type: 'simple-array', nullable: true })
-  refreshTokens?: string[];
+  oneTimeCodeExpires?: Date;
 
   /** Roles and venues */
-
   @Column('simple-array')
   roles: ERole[];
 

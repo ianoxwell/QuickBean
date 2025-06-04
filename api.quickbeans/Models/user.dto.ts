@@ -2,35 +2,26 @@ import { ERole, IBaseDto, TLoginProvider } from './base.dto';
 import { IVenueShort } from './venue.dto';
 
 export interface IUserProfile extends IBaseDto {
-  name: string;
+  name?: string;
   email: string;
-  phone?: string;
 }
 
 export interface IUserJwtPayload {
   id: number;
   email: string;
-  name: string;
   roles: ERole[];
 }
 
 export interface INewUser {
-  name: string;
+  name?: string;
   email: string;
-  phone?: string;
-  password?: string;
-  photoUrl?: string;
   loginProvider: TLoginProvider;
-  verified?: Date;
   roles: ERole[];
   venues?: IVenueShort[];
 }
 
 export interface IUserSummary extends IUserProfile {
-  photoUrl: string;
   isActive: boolean;
-  loginProvider: string;
-  verified?: Date;
   failedLoginAttempt: number;
   lastFailedLoginAttempt?: Date;
   timesLoggedIn: number;
@@ -42,7 +33,7 @@ export interface IUserSummary extends IUserProfile {
 
 export interface IUserLogin {
   email: string;
-  password: string;
+  oneTimeCode: string;
 }
 
 export interface IUserToken {
@@ -57,4 +48,8 @@ export interface IVerifyUserEmail {
 
 export interface IResetPasswordRequest extends IUserLogin {
   token: string;
+}
+
+export interface IOneTimeCodeExpires {
+  expires: Date;
 }

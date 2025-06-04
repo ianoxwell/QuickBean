@@ -7,10 +7,7 @@ const users: User[] = [
   {
     name: 'Alice Admin',
     email: 'admin@coffee.com',
-    phone: '0400000001',
-    passwordHash: 'admin123', // This gets hashed in the seed script
     isActive: true,
-    verified: new Date(),
     loginProvider: 'local',
     roles: [ERole.ADMIN],
     timesLoggedIn: 0,
@@ -19,22 +16,16 @@ const users: User[] = [
   {
     name: 'Bob Barista',
     email: 'bob@coffee.com',
-    phone: '0400000002',
-    passwordHash: 'kitchen123',
     isActive: true,
-    verified: new Date(),
     loginProvider: 'local',
     roles: [ERole.KITCHEN],
     venues: venues as Venue[],
     timesLoggedIn: 0
   },
   {
-    name: 'Patty Patron',
+    name: null, // No name for this user
     email: 'patron@coffee.com',
-    phone: '0400000003',
-    passwordHash: 'patron123',
     isActive: true,
-    verified: new Date(),
     loginProvider: 'local',
     roles: [ERole.PATRON],
     venues: venues as Venue[],
@@ -43,10 +34,7 @@ const users: User[] = [
   {
     name: 'Frank FrontOfHouse',
     email: 'front@coffee.com',
-    phone: '0400000004',
-    passwordHash: 'front123',
     isActive: true,
-    verified: new Date(),
     loginProvider: 'local',
     roles: [ERole.FRONT_OF_HOUSE],
     venues: venues as Venue[],

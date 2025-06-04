@@ -67,3 +67,18 @@ export function getIncrementalDateFromTarget(targetDate?: Date, increment = 7): 
 export function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min; // Generates a whole number between min and max inclusive
 }
+
+// Generate a random 6-digit PIN as a string, first digit not 0
+export function createDigitPin(length: number): string {
+  const firstDigit = getRandomNumber(1, 9).toString();
+  const otherDigits = Array.from({ length: length - 1 }, () => getRandomNumber(0, 9).toString()).join('');
+  const pin = firstDigit + otherDigits;
+  return pin;
+}
+
+// get current time add x min
+export function getCurrentTimePlusMinutes(minutes: number): Date {
+  const currentDate = new Date();
+  currentDate.setMinutes(currentDate.getMinutes() + minutes);
+  return currentDate;
+}
