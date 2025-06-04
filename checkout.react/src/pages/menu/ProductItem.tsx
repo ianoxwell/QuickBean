@@ -7,11 +7,12 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const ProductItem = ({ product }: { product: IProduct }) => {
+  const base = import.meta.env.VITE_BASE_URL;
   const { checkout } = useSelector((store: RootState) => store.checkout);
   const navigate = useNavigate();
 
   const navigateToProduct = () => {
-    navigate(`/${checkout?.checkoutUrl}/${CRoutes.menu}/${product.id}`, { state: { product } });
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}/${product.id}`, { state: { product } });
   };
 
   return (

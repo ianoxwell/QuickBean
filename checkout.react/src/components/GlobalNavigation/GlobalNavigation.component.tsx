@@ -8,6 +8,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
 
 export const GlobalNavigation = () => {
+  const base = import.meta.env.VITE_BASE_URL;
   const fillColor = '#128758';
   const iconSize = 24;
   const dispatch = useAppDispatch();
@@ -18,7 +19,7 @@ export const GlobalNavigation = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const navigateSettings = () => {
-    navigate(`/${checkout?.checkoutUrl}/${CRoutes.orders}`);
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.orders}`);
   };
 
   const logUserOut = () => {

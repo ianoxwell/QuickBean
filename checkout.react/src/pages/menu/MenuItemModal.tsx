@@ -14,12 +14,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { addCheckoutItem } from '../order/order.slice';
 
 const MenuItemModal = () => {
+  const base = import.meta.env.VITE_BASE_URL;
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { checkout } = useSelector((store: RootState) => store.checkout);
   // const iconSize = 16;
   const iconPlusSize = 28;
-  const { checkout } = useSelector((store: RootState) => store.checkout);
   let { product, orderItem }: { product: IProduct | undefined; orderItem: IOrderItem | undefined } = location.state;
   const [selectedModifiers, setSelectedModifiers] = useState<string[]>([]);
   const modalProps = useMatches({
@@ -47,7 +48,7 @@ const MenuItemModal = () => {
   const closeModal = () => {
     product = undefined; // Clear the product state
     orderItem = undefined; // Clear the orderItem state
-    navigate(`/${checkout?.checkoutUrl}/${CRoutes.menu}`, { replace: true }); // Navigate back to the previous page
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`, { replace: true }); // Navigate back to the previous page
   };
 
   /** When any modifiers for the order item are changed */
@@ -192,6 +193,7 @@ const MenuItemModal = () => {
           <div className="modal-wrapper--contents__action">
             <QuantityInput
               quantity={order.quantity}
+              size="lg"
               onChange={(value) => {
                 const newQuantity = typeof value === 'number' ? value : parseInt(value, 10);
                 if (isNaN(newQuantity) || newQuantity < 0) {
