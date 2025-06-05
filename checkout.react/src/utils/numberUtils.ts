@@ -1,3 +1,5 @@
+import { IOrder } from "@models/order.dto";
+
 export const fractionNumber = (value: number | string | undefined): string => {
   if (!value) {
     return '0';
@@ -37,4 +39,9 @@ export const fixWholeNumber = (value: number | string | undefined, length = 3): 
 
   const num = Number(value);
   return num.toFixed(length);
+};
+
+export const calculateItemCount = (order: IOrder | undefined): number => {
+  if (!order || !order.items) return 0;
+  return order.items.reduce((count, item) => count + item.quantity, 0);
 };

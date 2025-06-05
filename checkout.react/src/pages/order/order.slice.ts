@@ -3,6 +3,8 @@ import { ICheckout } from '@models/checkout.dto';
 import { IOrder, IOrderItem } from '@models/order.dto';
 import { createSlice } from '@reduxjs/toolkit';
 import { calcOrderItemPrice, calcOrderTotal } from '@utils/costCalculator';
+import { addOrderToLocalStorage, getOrderFromLocalStorage, removeOrderFromLocalStorage } from '@utils/localStorage';
+import { calculateItemCount } from '@utils/numberUtils';
 import { generateRandomUniqueString } from '@utils/stringUtils';
 
 export interface IOrderState {
@@ -12,8 +14,8 @@ export interface IOrderState {
 }
 const initialState: IOrderState = {
   isLoading: false,
-  order: undefined,
-  itemCount: 0
+  order: getOrderFromLocalStorage(),
+  itemCount: calculateItemCount(getOrderFromLocalStorage())
 };
 
 const orderSlice = createSlice({
@@ -74,6 +76,7 @@ const orderSlice = createSlice({
       state.order.bookingStatus = EBookingStatus.PENDING;
       // Update the item count
       state.itemCount = calculateItemCount(state.order);
+      addOrderToLocalStorage(state.order);
     },
     removeCheckoutItem: (state, { payload }: { payload: { itemUniqueId: string; checkout: ICheckout } }) => {
       if (!state.order) return;
@@ -97,6 +100,7 @@ const orderSlice = createSlice({
 
         // Update the item count
         state.itemCount = calculateItemCount(state.order);
+        addOrderToLocalStorage(state.order);
       }
     },
     modifyCheckoutItem: (state, { payload }: { payload: IOrderItem }) => {
@@ -123,6 +127,7 @@ const orderSlice = createSlice({
 
         // Update the item count
         state.itemCount = calculateItemCount(state.order);
+        addOrderToLocalStorage(state.order);
       }
     },
     setCheckoutOrder: (state, { payload }: { payload: IOrder }) => {
@@ -136,12 +141,14 @@ const orderSlice = createSlice({
       state.order.bookingStatus = state.order.bookingStatus ?? EBookingStatus.PENDING;
       // Update the item count
       state.itemCount = calculateItemCount(state.order);
+      addOrderToLocalStorage(state.order);
     },
 
     clearCheckout: (state) => {
       state.order = createBlankOrder();
       state.itemCount = 0;
       state.isLoading = false;
+      removeOrderFromLocalStorage();
     },
     setLoading: (state, { payload }: { payload: boolean }) => {
       state.isLoading = payload;
@@ -162,11 +169,6 @@ const createBlankOrder = (checkout?: ICheckout): IOrder => ({
   checkoutId: checkout?.id,
   checkout: checkout
 });
-
-const calculateItemCount = (order: IOrder | undefined): number => {
-  if (!order || !order.items) return 0;
-  return order.items.reduce((count, item) => count + item.quantity, 0);
-};
 
 export const { addCheckoutItem, removeCheckoutItem, modifyCheckoutItem, setCheckoutOrder, clearCheckout, setLoading } =
   orderSlice.actions;
