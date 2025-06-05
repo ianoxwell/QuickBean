@@ -18,7 +18,7 @@ import { VenueModule } from '@controllers/venue/venue.module';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_KEY'),
-        signOptions: { expiresIn: '2h' }
+        signOptions: { expiresIn: '12h' }
       }),
       inject: [ConfigService]
     }),
