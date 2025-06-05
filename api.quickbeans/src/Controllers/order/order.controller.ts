@@ -1,19 +1,20 @@
 import { CMessage } from '@base/message.class';
 import { IOrder } from '@models/order.dto';
-import { Body, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 
 @ApiTags('Order')
-// @UseGuards(AuthGuard('jwt'))
-// @ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth('JWT-auth')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
   async createOrder(@Body() orderData: IOrder): Promise<IOrder | CMessage> {
-    if (!orderData.venueId || !orderData.patronId || !orderData.items || !orderData.items.length) {
+    if (!orderData.venueId || (!orderData.patronId && !orderData.patron?.email) || !orderData.items || !orderData.items.length) {
       return new CMessage('Venue ID, User ID, and items are required.', HttpStatus.BAD_REQUEST);
     }
 

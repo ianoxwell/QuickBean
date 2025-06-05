@@ -1,6 +1,7 @@
 import { CMessage } from '@base/message.class';
 import { UserService } from '@controllers/user/user.service';
 import { VenueService } from '@controllers/venue/venue.service';
+import { EBookingStatus } from '@models/base.dto';
 import { IOrder, IOrderItem } from '@models/order.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -59,12 +60,16 @@ export class OrderService {
   }
 
   async createOrder(orderData: IOrder): Promise<IOrder | CMessage> {
-    const order = this.orderRepository.create(orderData);
+    const order: Order = this.orderRepository.create(orderData);
+    order.amountPaid = order.grandTotal || 0; // Ensure amountPaid is set to grandTotal if not provided
     order.items = orderData.items.map((item) => {
       const orderItem = this.orderItemRepository.create(item);
       orderItem.order = order; // Set the order reference
       return orderItem;
     });
+    // Set order date to now if not provided or invalid
+    order.orderDate = orderData.orderDate ? new Date(orderData.orderDate) : new Date();
+    order.bookingStatus = EBookingStatus.PENDING; // Default booking status
 
     // check if the venue, checkout and patron exist
     const venue = await this.venueService.findByIdEntity(orderData.venueId);
@@ -73,14 +78,12 @@ export class OrderService {
     }
     let patron = await this.userService.findByIdEntity(orderData.patronId);
     if (!patron) {
-      // create a new patron if it does not exist
-      if (!orderData.patron) {
-        return new CMessage(`Patron with ID ${orderData.patronId} does not exist.`, HttpStatus.BAD_REQUEST);
-      }
-
-      patron = await this.userService.createUserEntity(orderData.patron, venue);
-      if (patron instanceof CMessage) {
-        return patron; // Return the error message if user creation failed
+      patron = await this.userService.findByEmailEntity(orderData.patron?.email);
+      if (!patron) {
+        patron = await this.userService.createUserEntity(orderData.patron, venue);
+        if (patron instanceof CMessage) {
+          return patron; // Return the error message if user creation failed
+        }
       }
     }
 

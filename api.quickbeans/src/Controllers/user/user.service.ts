@@ -33,6 +33,11 @@ export class UserService {
     return user || null;
   }
 
+  async findByEmailEntity(email: string): Promise<User | null> {
+    const user = await this.repository.findOne({ where: { email, isActive: true } });
+    return user || null;
+  }
+
   async registerUser(user: INewUser, host?: string): Promise<IOneTimeCodeExpires> {
     this.logger.log(`Registering user with email: ${user.email}, host: ${host}`);
 
