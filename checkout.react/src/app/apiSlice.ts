@@ -1,6 +1,7 @@
 // Import the RTK Query methods from the React-specific entry point
 import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
+import { IOrder } from '@models/order.dto';
 import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserToken } from '@models/user.dto';
 import { setCheckout } from '@pages/checkoutSlice';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
@@ -48,6 +49,9 @@ export const apiSlice = createApi({
     verifyOneTimeCode: builder.mutation<IUserToken | IMessage, IUserLogin>({
       query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
     }),
+    payNowCreateOrder: builder.mutation<IMessage, IOrder>({
+      query: (order) => ({ url: `order`, method: 'POST', body: order })
+    }),
     getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({
       query: (slugs) => ({ url: `checkout?slug=${slugs.slug}&venueSlug=${slugs.venueSlug}` }),
       keepUnusedDataFor: 0,
@@ -67,4 +71,5 @@ export const apiSlice = createApi({
 });
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useLoginUserMutation, useVerifyOneTimeCodeMutation, useGetCheckoutQuery } = apiSlice;
+export const { useLoginUserMutation, useVerifyOneTimeCodeMutation, usePayNowCreateOrderMutation, useGetCheckoutQuery } =
+  apiSlice;

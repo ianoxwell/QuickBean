@@ -1,0 +1,17 @@
+@use '../../styles/mixins.scss';
+
+.payment-page {
+  margin-bottom: 4rem;
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  &__method-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.5rem;;
+  }
+}

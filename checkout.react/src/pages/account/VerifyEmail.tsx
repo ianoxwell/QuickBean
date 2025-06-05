@@ -2,7 +2,7 @@ import { useVerifyOneTimeCodeMutation } from '@app/apiSlice';
 import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { Button, PinInput } from '@mantine/core';
+import { Button, PinInput, Space } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IMessage } from '@models/message.dto';
@@ -72,11 +72,19 @@ const VerifyEmail = () => {
           return (
             <>
               <h1>One time login code</h1>
+              <Space h="md" />
               <form>
-                <PinInput type={/^[0-9]*$/} oneTimeCode length={6} />
+                <PinInput
+                  type={/^[0-9]*$/}
+                  oneTimeCode
+                  length={6}
+                  key={form.key('oneTimeCode')}
+                  {...form.getInputProps('oneTimeCode')}
+                />
+                <Space h="md" />
                 <Button type="button" onClick={verifyPinCode} fullWidth mt="md" radius="md" loading={isLoading}>
                   Verify
-                </Button>{' '}
+                </Button>
               </form>
             </>
           );

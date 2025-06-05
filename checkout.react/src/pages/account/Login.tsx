@@ -32,9 +32,6 @@ const Login = () => {
     }
 
     const { email } = form.getValues();
-    console.log('current form', form.getValues(), form.isValid(), form.errors);
-    // Note to self the form.errors is usually blank if the form is not touched
-
     try {
       await registerUser({ email, loginProvider: 'local', roles: [ERole.PATRON] }).unwrap();
       // navigate to the one time code verification page
@@ -66,7 +63,7 @@ const Login = () => {
 
   return (
     <>
-      <h2>Email for order</h2>
+      <h2>Sign in or sign up</h2>
       <form>
         <TextInput
           withAsterisk

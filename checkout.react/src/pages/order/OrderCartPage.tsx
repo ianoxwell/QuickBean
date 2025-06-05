@@ -2,7 +2,7 @@ import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Button, Divider, Flex } from '@mantine/core';
-import { MapPin, Plus } from 'lucide-react';
+import { MapPin, Plus, StepForward } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
 import './OrderCartPage.scss';
@@ -13,6 +13,7 @@ const OrderCartPage = () => {
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
   const navigate = useNavigate();
+  const iconSize = 16;
 
   const proceedToCheckout = () => {
     const checkoutUrl = user
@@ -34,7 +35,7 @@ const OrderCartPage = () => {
               <h1>Your order</h1>
               {!!checkout.venue && (
                 <div className="order-cart-page__address">
-                  <MapPin size={16} />
+                  <MapPin size={iconSize} />
                   <span>
                     {checkout.venue.address}, {checkout.venue.city}
                   </span>
@@ -58,7 +59,7 @@ const OrderCartPage = () => {
             </div>
             <Divider my="lg" variant="dashed" />
             <Flex justify="flex-end">
-              <Button size="input-sm" type="button" onClick={proceedToCheckout}>
+              <Button type="button" rightSection={<StepForward size={iconSize} />} onClick={proceedToCheckout}>
                 Proceed to Checkout
               </Button>
             </Flex>
