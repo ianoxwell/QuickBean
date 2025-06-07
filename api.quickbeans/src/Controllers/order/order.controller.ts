@@ -4,10 +4,11 @@ import { Body, Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nest
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
+import { EBookingStatus } from '@models/base.dto';
 
 @ApiTags('Order')
-@UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth('JWT-auth')
+// @UseGuards(AuthGuard('jwt'))
+// @ApiBearerAuth('JWT-auth')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -33,5 +34,17 @@ export class OrderController {
     }
 
     return orders;
+  }
+
+  @Post('update-order')
+  async updateOrderStatus(
+    @Body() orderData: { receiptNumber: string; newStatus: EBookingStatus }
+  ): Promise<{ receiptNumber: string; newStatus: EBookingStatus } | CMessage> {
+    const updatedOrder = await this.orderService.updateOrderStatus(orderData.receiptNumber, orderData.newStatus);
+    if (!updatedOrder) {
+      return new CMessage(`Order with ID ${orderData.receiptNumber} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    return updatedOrder;
   }
 }

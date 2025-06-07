@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './Order.entity';
 import { OrderItem } from './OrderItem.entity';
+import { EventsGateway } from '@controllers/events/events.gateway';
 
 @Injectable()
 export class OrderService {
@@ -15,7 +16,8 @@ export class OrderService {
     @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem) private readonly orderItemRepository: Repository<OrderItem>,
     private venueService: VenueService,
-    private userService: UserService
+    private userService: UserService,
+    private eventsGateway: EventsGateway
   ) {}
 
   async findOrderById(id: number): Promise<IOrder | null> {
@@ -98,6 +100,30 @@ export class OrderService {
         `Error creating order: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  async updateOrderStatus(
+    receiptNumber: string,
+    status: EBookingStatus
+  ): Promise<{ receiptNumber: string; newStatus: EBookingStatus } | CMessage> {
+    const order = await this.orderRepository.findOne({ where: { receiptNumber }, loadRelationIds: false });
+    if (!order) {
+      return new CMessage(`Order with receipt number ${receiptNumber} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (order.bookingStatus !== status) {
+      order.bookingStatus = status;
+      try {
+        const updatedOrder = await this.orderRepository.save(order);
+        this.eventsGateway.notifyOrderStatusUpdate(receiptNumber, status);
+        return { receiptNumber: updatedOrder.receiptNumber, newStatus: updatedOrder.bookingStatus };
+      } catch (error: unknown) {
+        return new CMessage(
+          `Error updating order status: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 
