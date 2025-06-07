@@ -38,7 +38,8 @@ const PaymentPage = () => {
   };
 
   if (!order || !order.items || !order.items.length) {
-    return navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`);
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`);
+    return null; // No items in the order, redirect to menu
   }
 
   return (

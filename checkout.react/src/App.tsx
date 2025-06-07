@@ -11,7 +11,7 @@ import ConfirmationPage from '@pages/confirmation/ConfirmationPage';
 import MenuItemModal from '@pages/menu/MenuItemModal';
 import MenuPage from '@pages/menu/MenuPage';
 import OrderCartPage from '@pages/order/OrderCartPage';
-import PaymentPage from '@pages/payment/PayMentPage';
+import PaymentPage from '@pages/payment/PaymentPage';
 import ProtectedRoute from '@pages/ProtectedRoute';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Route, Routes } from 'react-router-dom';
