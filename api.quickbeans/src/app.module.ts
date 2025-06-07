@@ -1,6 +1,7 @@
 import { Checkout } from '@controllers/checkout/Checkout.entity';
 import { CheckoutModule } from '@controllers/checkout/checkout.module';
 import { CheckoutCategory } from '@controllers/checkout/CheckoutCategory.entity';
+import { EventsModule } from '@controllers/events/events.module';
 import { Modifier, ModifierOption } from '@controllers/modifier/Modifier.entity';
 import { ModifierModule } from '@controllers/modifier/modifier.module';
 import { Order } from '@controllers/order/Order.entity';
@@ -45,6 +46,7 @@ import { AuthModule } from '@services/auth/auth.module';
     }),
     AuthModule,
     CheckoutModule,
+    EventsModule,
     ModifierModule,
     OrderModule,
     ProductModule,

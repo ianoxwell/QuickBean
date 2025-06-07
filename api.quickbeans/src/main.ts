@@ -16,7 +16,6 @@ async function bootstrap() {
     .setTitle('QuickBeans API')
     .setDescription('Collection of API endpoints for Cafe ordering project')
     .setVersion('1.0.0')
-    .addTag('reference')
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'Enter JWT token bearer', in: 'header' }, 'JWT-auth')
     .build();
   const document = SwaggerModule.createDocument(app, config);
