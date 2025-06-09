@@ -1,14 +1,14 @@
 import { CMessage } from '@base/message.class';
+import { EBookingStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
 import { Body, Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
-import { EBookingStatus } from '@models/base.dto';
 
 @ApiTags('Order')
-// @UseGuards(AuthGuard('jwt'))
-// @ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth('JWT-auth')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -36,11 +36,13 @@ export class OrderController {
     return orders;
   }
 
+  // TODO ensure that the user is a venue staff member
   @Post('update-order')
   async updateOrderStatus(
-    @Body() orderData: { receiptNumber: string; newStatus: EBookingStatus }
-  ): Promise<{ receiptNumber: string; newStatus: EBookingStatus } | CMessage> {
-    const updatedOrder = await this.orderService.updateOrderStatus(orderData.receiptNumber, orderData.newStatus);
+    @Body() orderData: { receiptNumber: string; status: EBookingStatus }
+  ): Promise<{ receiptNumber: string; status: EBookingStatus } | CMessage> {
+    const updatedOrder = await this.orderService.updateOrderStatus(orderData.receiptNumber, orderData.status);
+    console.log('Updated order:', updatedOrder, orderData);
     if (!updatedOrder) {
       return new CMessage(`Order with ID ${orderData.receiptNumber} not found.`, HttpStatus.NOT_FOUND);
     }

@@ -106,7 +106,7 @@ export class OrderService {
   async updateOrderStatus(
     receiptNumber: string,
     status: EBookingStatus
-  ): Promise<{ receiptNumber: string; newStatus: EBookingStatus } | CMessage> {
+  ): Promise<{ receiptNumber: string; status: EBookingStatus } | CMessage> {
     const order = await this.orderRepository.findOne({ where: { receiptNumber }, loadRelationIds: false });
     if (!order) {
       return new CMessage(`Order with receipt number ${receiptNumber} not found.`, HttpStatus.NOT_FOUND);
@@ -116,8 +116,8 @@ export class OrderService {
       order.bookingStatus = status;
       try {
         const updatedOrder = await this.orderRepository.save(order);
-        this.eventsGateway.notifyOrderStatusUpdate(receiptNumber, status);
-        return { receiptNumber: updatedOrder.receiptNumber, newStatus: updatedOrder.bookingStatus };
+        this.eventsGateway.notifyOrderStatusUpdate({ receiptNumber, status });
+        return { receiptNumber: updatedOrder.receiptNumber, status: updatedOrder.bookingStatus };
       } catch (error: unknown) {
         return new CMessage(
           `Error updating order status: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,

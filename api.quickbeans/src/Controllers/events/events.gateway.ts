@@ -1,48 +1,49 @@
-import { OrderService } from '@controllers/order/order.service';
+import { Order } from '@controllers/order/Order.entity';
+import { IOrderStatusUpdate, IOrderSubscription } from '@models/order.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
-import { Observable, from, map } from 'rxjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { IOrder } from '@models/order.dto';
+import { Repository } from 'typeorm';
 
-interface ActiveOrderSubscription {
-  receiptNumber: string;
-  userId: number;
-}
-
-@ApiTags('Events')
 /**
  * WebSocket Gateway for Events.
  *
  * Events:
- * - 'events': Emits numbers 1, 2, 3 to the client.
- * - 'identity': Echoes back the number sent.
+ * - Subscribe to order updates by receipt number and user ID.
+ * - Unsubscribe from order updates.
+ * Emits order status updates to subscribed clients.
  *
  * Connect via ws://host/events
  */
+@ApiTags('Events')
 @WebSocketGateway({
   namespace: 'events',
   transports: ['websocket'],
   cors: {
-    origin: '*'
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || []
   }
 })
-export class EventsGateway {
+export class EventsGateway implements OnGatewayDisconnect {
+  constructor(@InjectRepository(Order) private readonly orderRepository: Repository<Order>) {}
   @WebSocketServer()
   server: Server;
 
   // Map: socket.id -> { receiptNumber, userId }
-  private activeOrderSockets = new Map<string, ActiveOrderSubscription>();
+  private activeOrderSockets = new Map<string, IOrderSubscription>();
   @SubscribeMessage('subscribeOrder')
-  handleSubscribeOrder(@MessageBody() data: { receiptNumber: string; userId: number }, @ConnectedSocket() client: Socket) {
+  async handleSubscribeOrder(@MessageBody() data: IOrderSubscription, @ConnectedSocket() client: Socket) {
     // Store the subscription
     this.activeOrderSockets.set(client.id, {
       receiptNumber: data.receiptNumber,
-      userId: data.userId
+      userId: data.userId,
+      venueId: data.venueId
     });
     // Optionally, send current order status
-    // const order = await this.orderService.findByReceiptNumber(data.receiptNumber);
-    // client.emit('orderStatus', order?.bookingStatus);
+    const order = await this.orderRepository.findOne({
+      where: { receiptNumber: data.receiptNumber, venue: { id: data.venueId } }
+    });
+    client.emit('orderStatus', { receiptNumber: order?.receiptNumber, status: order?.bookingStatus });
   }
 
   @SubscribeMessage('unsubscribeOrder')
@@ -55,22 +56,11 @@ export class EventsGateway {
     this.activeOrderSockets.delete(client.id);
   }
 
-  // @SubscribeMessage('events')
-  // findAll(@MessageBody() data: any, @ConnectedSocket() client: Socket): Observable<WsResponse<number>> {
-  //   console.log('Received data:', data, 'from client:', client.id);
-  //   return from([1, 2, 3]).pipe(map((item) => ({ event: 'events', data: item })));
-  // }
-
-  // @SubscribeMessage('identity')
-  // async identity(@MessageBody() data: number): Promise<number> {
-  //   return data;
-  // }
-
-  // Call this method from your order service when bookingStatus changes
-  notifyOrderStatusUpdate(receiptNumber: string, newStatus: string) {
+  // Call this method from your order service when bookingStatus changes, only updates and emits if active listeners
+  notifyOrderStatusUpdate(orderStatus: IOrderStatusUpdate) {
     for (const [socketId, sub] of this.activeOrderSockets.entries()) {
-      if (sub.receiptNumber === receiptNumber) {
-        this.server.to(socketId).emit('orderStatus', { receiptNumber, bookingStatus: newStatus });
+      if (sub.receiptNumber === orderStatus.receiptNumber) {
+        this.server.to(socketId).emit('orderStatus', orderStatus);
       }
     }
   }

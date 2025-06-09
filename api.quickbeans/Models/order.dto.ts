@@ -33,3 +33,14 @@ export interface IOrderItem {
   price: number;
   selectedModifiers?: ISelectedModifierOption[];
 }
+
+export interface IOrderStatusUpdate {
+  receiptNumber: string;
+  status: EBookingStatus;
+}
+
+export interface IOrderSubscription {
+  receiptNumber: string;
+  userId: number;
+  venueId: number;
+}
