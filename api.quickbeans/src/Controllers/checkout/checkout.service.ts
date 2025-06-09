@@ -8,6 +8,9 @@ import { ICheckoutCategory, ICheckoutCategoryWithProducts } from '@models/checko
 import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
 import { ProductService } from '@controllers/product/product.service';
 import { VenueService } from '@controllers/venue/venue.service';
+import { UserService } from '@controllers/user/user.service';
+import { IUserSummary } from '@models/user.dto';
+import { ERole } from '@models/base.dto';
 
 @Injectable()
 export class CheckoutService {
@@ -15,7 +18,8 @@ export class CheckoutService {
     @InjectRepository(Checkout) private readonly checkoutRepository: Repository<Checkout>,
     @InjectRepository(CheckoutCategory) private readonly checkoutCategoryRepository: Repository<CheckoutCategory>,
     private productService: ProductService,
-    private venueService: VenueService
+    private venueService: VenueService,
+    private userService: UserService
   ) {}
 
   async findByVenueId(id: number): Promise<ICheckoutShort[] | null> {
@@ -29,6 +33,37 @@ export class CheckoutService {
     }
 
     return checkouts.map((checkout) => this.mapCheckoutToICheckoutShort(checkout));
+  }
+
+  async findActiveByVenueId(venueId: number, userId: number): Promise<ICheckoutShort[] | CMessage> {
+    console.time('findActiveByVenueId');
+    const user: IUserSummary = await this.userService.findById(userId);
+    if (!user) {
+      return new CMessage(`User with ID ${userId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    //if user does not have access to the venue, return an error
+    const venue = await this.venueService.findById(venueId);
+    if (!venue) {
+      return new CMessage(`Venue with ID ${venueId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (!this.venueService.userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
+      return new CMessage(`User with ID ${userId} does not have access to venue with ID ${venueId}.`, HttpStatus.FORBIDDEN);
+    }
+
+    const checkouts = await this.checkoutRepository.find({
+      where: { venue: { id: venueId }, isActive: true },
+      relations: ['categories', 'categories.products', 'categories.products.modifiers', 'venue']
+    });
+
+    if (!checkouts || checkouts.length === 0) {
+      return new CMessage(`No active checkouts found for venue with ID ${venueId}.`, HttpStatus.NOT_FOUND);
+    }
+
+    const mappedCheckouts = checkouts.map((checkout) => this.mapCheckoutToICheckoutShort(checkout));
+    console.timeEnd('findActiveByVenueId');
+    return mappedCheckouts;
   }
 
   async findBySlug(slug: string, venueSlug: string): Promise<ICheckout | null> {

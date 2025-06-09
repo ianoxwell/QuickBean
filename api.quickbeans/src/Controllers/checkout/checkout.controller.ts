@@ -1,13 +1,36 @@
-import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CheckoutService } from './checkout.service';
-import { ICheckout } from '@models/checkout.dto';
+import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
 import { CMessage } from '@base/message.class';
+import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from '@controllers/user/current-user.decorator';
+import { IUserJwtPayload } from '@models/user.dto';
 
 @ApiTags('Checkout')
 @Controller('checkout')
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
+
+  @Get('active-checkouts')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('JWT-auth')
+  async getActiveCheckouts(
+    @Query('venueId') venueId: string | number,
+    @CurrentUser() user: IUserJwtPayload
+  ): Promise<ICheckoutShort[] | CMessage> {
+    if (!venueId) {
+      return new CMessage('Venue ID is required', HttpStatus.BAD_REQUEST);
+    }
+
+    venueId = typeof venueId === 'string' ? parseInt(venueId, 10) : venueId;
+    if (isNaN(venueId)) {
+      return new CMessage('Invalid venue ID format', HttpStatus.BAD_REQUEST);
+    }
+
+    const checkouts = await this.checkoutService.findActiveByVenueId(venueId, user.id);
+    return checkouts;
+  }
 
   @Get()
   async getCheckoutBySlug(@Query('slug') slug: string, @Query('venueSlug') venueSlug: string): Promise<ICheckout | CMessage> {

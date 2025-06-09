@@ -1,12 +1,13 @@
+import { CMessage } from '@base/message.class';
+import { ProductService } from '@controllers/product/product.service';
+import { ERole } from '@models/base.dto';
+import { IProduct } from '@models/products.dto';
+import { IUserSummary } from '@models/user.dto';
+import { IVenue, IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Venue } from './Venue.entity';
-import { IVenueWithProducts, IVenueShort } from '@models/venue.dto';
-import { IVenue } from '@models/venue.dto';
-import { CMessage } from '@base/message.class';
-import { ProductService } from '@controllers/product/product.service';
-import { IProduct } from '@models/products.dto';
 
 @Injectable()
 export class VenueService {
@@ -79,6 +80,29 @@ export class VenueService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  userHasAccessToVenue(user: IUserSummary, venue: IVenue, roles: ERole[]): boolean {
+    if (!user || !venue) {
+      return false;
+    }
+
+    if (!user.venues.map((v) => v.id).includes(venue.id)) {
+      return false; // User does not have access to this venue
+    }
+
+    // If the user has no roles, they do not have access
+    if (!user.roles || user.roles.length === 0) {
+      return false;
+    }
+
+    // Check if the user is an admin
+    if (user.roles.includes(ERole.ADMIN)) {
+      return true;
+    }
+
+    // If the user has any of the specified roles, they have access
+    return roles.find((role) => user.roles.includes(role)) ? true : false;
   }
 
   /** Map the Venue entity to IVenue */
