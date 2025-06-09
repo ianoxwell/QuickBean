@@ -27,14 +27,19 @@ const PaymentPage = () => {
       return;
     }
 
-    const payResult = await payNowOrder({ ...order, patronId: user.user.id, patron: user.user }).unwrap();
+    const payResult = await payNowOrder({
+      ...order,
+      patronId: user.user.id,
+      patron: user.user,
+      amountPaid: order.grandTotal
+    }).unwrap();
     if (isMessage(payResult)) {
       notifications.show({ message: payResult.message, color: 'red' });
       return;
     }
 
     // Redirect to confirmation page or show success message
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.confirmation}`, { state: { order } });
+    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.confirmation}/${payResult.receiptNumber}`);
   };
 
   if (!order || !order.items || !order.items.length) {
