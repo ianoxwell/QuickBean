@@ -67,7 +67,7 @@ function App() {
                 }
               />
               <Route
-                path={CRoutes.confirmation}
+                path={`${CRoutes.confirmation}/:receiptNumber`}
                 element={
                   <ProtectedRoute>
                     <ConfirmationPage />
