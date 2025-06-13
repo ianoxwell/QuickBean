@@ -47,4 +47,4 @@ export enum EBookingStatus {
   REFUNDED = 'refunded'
 }
 
-export type TLoginProvider = 'local' | 'google' | 'facebook' | 'apple';
+export type TLoginProvider = 'local' | 'admin' | 'google' | 'facebook' | 'apple';

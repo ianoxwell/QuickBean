@@ -29,14 +29,22 @@ export class VenueService {
     return this.mapVenueToIVenue(venue);
   }
 
-  async findBySlug(slug: string): Promise<IVenue | null> {
+  async findBySlug(slug: string): Promise<IVenueShort | null> {
     const venue = await this.venueRepository.findOne({ where: { slug, isActive: true } });
     if (!venue) {
       return null;
     }
 
-    const products = await this.productService.findByVenueId(venue.id);
+    return this.mapVenueToIVenueShort(venue);
+  }
 
+  async findByIdWithProducts(id: number): Promise<IVenueWithProducts | null> {
+    const venue = await this.venueRepository.findOne({ where: { id, isActive: true } });
+    if (!venue) {
+      return null;
+    }
+
+    const products = await this.productService.findByVenueId(venue.id);
     return this.mapVenueToIVenueProducts(venue, products);
   }
 
