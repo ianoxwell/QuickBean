@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '@controllers/user/User.entity';
+import { Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Venue {
@@ -54,4 +55,7 @@ export class Venue {
 
   @Column()
   privacyPolicy: string;
+
+  @ManyToMany(() => User, (user) => user.venues)
+  users: User[];
 }

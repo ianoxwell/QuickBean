@@ -1,7 +1,10 @@
 import { CMessage } from '@base/message.class';
+import { CurrentUser } from '@controllers/user/current-user.decorator';
+import { IUserJwtPayload } from '@models/user.dto';
 import { IVenue, IVenueShort } from '@models/venue.dto';
-import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { VenueService } from './venue.service';
 
 @ApiTags('Venue')
@@ -24,25 +27,31 @@ export class VenueController {
   }
 
   // , @CurrentUser() user: IUserJwtPayload
-  @Get()
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth('JWT-auth')
-  async getVenueById(@Query('id') id: number): Promise<IVenue | CMessage> {
-    if (!id) {
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('JWT-auth')
+  async getVenueById(
+    @Body() userVenue: { userId: number; venueId: number },
+    @CurrentUser() user: IUserJwtPayload
+  ): Promise<IVenue | CMessage> {
+    if (!userVenue.venueId) {
       return new CMessage('Venue ID is required.', HttpStatus.BAD_REQUEST);
     }
 
-    id = parseInt(id.toString(), 10);
-    if (isNaN(id) || id <= 0) {
+    if (!userVenue.userId || userVenue.userId !== user.id) {
+      return new CMessage('You do not have permission to access this venue.', HttpStatus.FORBIDDEN);
+    }
+    const { venueId } = userVenue;
+    if (isNaN(venueId) || venueId <= 0) {
       return new CMessage('Invalid venue ID provided.', HttpStatus.BAD_REQUEST);
     }
 
     //TODO insert security check to ensure the user has access to the venue and appropriate roles
-    // console.log(`User ${user.id} is requesting venue with slug: ${slug}`);
 
-    const venue = await this.venueService.findByIdWithProducts(id);
+    const venue = await this.venueService.findByIdWithProducts(venueId);
     if (!venue) {
-      return new CMessage(`Venue with ID ${id} not found.`, HttpStatus.NOT_FOUND);
+      return new CMessage(`Venue with ID ${venueId} not found.`, HttpStatus.NOT_FOUND);
     }
 
     return venue;
