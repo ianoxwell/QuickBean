@@ -2,7 +2,7 @@ import { CMessage } from '@base/message.class';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { VenueService } from '@controllers/venue/venue.service';
 import { ERole } from '@models/base.dto';
-import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserProfile, IUserSummary, IUserToken } from '@models/user.dto';
+import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserProfile, IUserSummary, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -36,6 +36,31 @@ export class UserService {
   async findByEmailEntity(email: string): Promise<User | null> {
     const user = await this.repository.findOne({ where: { email, isActive: true } });
     return user || null;
+  }
+
+  /** Note this should NOT be used in production - dev purposes only */
+  async loginExistingUser(email: string): Promise<IVerifyOneTimeCode | CMessage> {
+    this.logger.log(`Logging in existing user with email: ${email}`);
+    const existingUser = await this.repository.findOne({ where: { email, isActive: true } });
+    if (!existingUser) {
+      return new CMessage('No such email address found.', HttpStatus.NOT_FOUND);
+    }
+
+    if (existingUser.failedLoginAttempt > 3) {
+      existingUser.isActive = false;
+      await this.repository.update(existingUser.id, existingUser);
+      return new CMessage(
+        'Account has been locked out and deactivated - contact your friendly IT support person.',
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+
+    existingUser.oneTimeCode = createDigitPin(6);
+    existingUser.oneTimeCodeExpires = getCurrentTimePlusMinutes(10);
+    const updatedUser = await this.repository.save(existingUser);
+    this.logger.log(`Updated user with new one time code for email: ${email}`);
+
+    return { email: updatedUser.email, oneTimeCode: updatedUser.oneTimeCode, expires: updatedUser.oneTimeCodeExpires };
   }
 
   async registerUser(user: INewUser, host?: string): Promise<IOneTimeCodeExpires> {
@@ -116,7 +141,40 @@ export class UserService {
 
   /** Only to be used by the auth service */
   async verifyOneTimeCode(basicAuth: IUserLogin): Promise<IUserToken | CMessage> {
-    const user = await this.repository.findOne({ where: { email: basicAuth.email } });
+    const users: any[] = await this.repository.query(
+      `SELECT u.*, 
+        json_agg(distinct v.*) filter (where v.id is not NULL) as venues
+        FROM api_quickbeans.public.user u
+        LEFT JOIN api_quickbeans.public.user_venues_venue uvv ON uvv."userId" = u.id
+        LEFT JOIN api_quickbeans.public.venue v ON v.id = uvv."venueId"
+        WHERE u.email = $1
+        group by u.id`,
+      [basicAuth.email]
+    );
+
+    let user: User | null = null;
+
+    if (!!users && users.length > 0) {
+      // Map the raw SQL result to a User entity as best as possible
+      // This is a simplified mapping; adjust as needed for your schema
+      const userRow = users[0] as User & { venues: Venue[] | string };
+      user = {
+        id: userRow.id,
+        name: userRow.name,
+        email: userRow.email,
+        isActive: userRow.isActive,
+        loginProvider: userRow.loginProvider,
+        failedLoginAttempt: userRow.failedLoginAttempt || 0,
+        lastFailedLoginAttempt: userRow.lastFailedLoginAttempt ? new Date(userRow.lastFailedLoginAttempt) : null,
+        timesLoggedIn: userRow.timesLoggedIn || 0,
+        firstLogin: userRow.firstLogin ? new Date(userRow.firstLogin) : null,
+        lastLogin: userRow.lastLogin ? new Date(userRow.lastLogin) : null,
+        oneTimeCode: userRow.oneTimeCode,
+        oneTimeCodeExpires: userRow.oneTimeCodeExpires ? new Date(userRow.oneTimeCodeExpires) : null,
+        roles: userRow.roles || [],
+        venues: (userRow.venues && typeof userRow.venues === 'string' ? JSON.parse(userRow.venues) : userRow.venues) as Venue[]
+      };
+    }
     if (!user) {
       return { message: 'No such email address found.', status: HttpStatus.NOT_FOUND };
     }
@@ -149,9 +207,8 @@ export class UserService {
       !basicAuth.oneTimeCode ||
       !user.oneTimeCode ||
       !user.oneTimeCodeExpires ||
-      user.oneTimeCodeExpires.getTime() < new Date().getTime()
-      // commenting this out to allow login without pin code
-      // user.oneTimeCode !== basicAuth.oneTimeCode
+      user.oneTimeCodeExpires.getTime() < new Date().getTime() ||
+      user.oneTimeCode !== basicAuth.oneTimeCode
     ) {
       user.failedLoginAttempt++;
       user.lastFailedLoginAttempt = new Date();
@@ -165,11 +222,16 @@ export class UserService {
     user.timesLoggedIn++;
     user.failedLoginAttempt = 0;
     user.lastFailedLoginAttempt = null;
+    user.oneTimeCode = null;
+    user.oneTimeCodeExpires = null;
     if (!user.firstLogin) {
       user.firstLogin = currentDateTime;
     }
 
-    const result = await this.repository.update(user.id, user);
+    const updatedUser = structuredClone(user); // Clone to avoid mutating the original user object
+    // delete property venues to avoid circular reference in JSON
+    delete updatedUser.venues;
+    const result = await this.repository.update(user.id, updatedUser);
     if (!result) {
       return { message: 'Something went pear shaped updating the DB.', status: HttpStatus.INTERNAL_SERVER_ERROR };
     }
@@ -179,6 +241,7 @@ export class UserService {
 
   mapUserToSummary(user: User): IUserSummary {
     return {
+      id: user.id,
       name: user.name,
       email: user.email,
       isActive: user.isActive,

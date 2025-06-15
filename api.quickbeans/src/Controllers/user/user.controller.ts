@@ -1,7 +1,7 @@
 import { CMessage } from '@base/message.class';
-import { INewUser, IOneTimeCodeExpires, IUserJwtPayload, IUserLogin, IUserSummary, IUserToken } from '@models/user.dto';
+import { INewUser, IOneTimeCodeExpires, IUserJwtPayload, IUserLogin, IUserSummary, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
 import { Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
-import { Body, Get, Headers, HttpCode, UseGuards } from '@nestjs/common/decorators';
+import { Body, Get, Headers, HttpCode, Query, UseGuards } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CustomLogger } from '@services/logger.service';
@@ -24,6 +24,14 @@ export class AccountController {
     const user: IOneTimeCodeExpires = await this.userService.registerUser(registerUser, headers.origin);
 
     return user;
+  }
+
+  @Get('existing')
+  @ApiOkResponse({
+    description: 'One time code'
+  })
+  async getOneTimeCode(@Query('email') email: string): Promise<IVerifyOneTimeCode | CMessage> {
+    return await this.userService.loginExistingUser(email);
   }
 
   @Post('verify-otc')

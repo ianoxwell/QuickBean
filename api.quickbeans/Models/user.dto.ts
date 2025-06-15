@@ -54,3 +54,9 @@ export interface IResetPasswordRequest extends IUserLogin {
 export interface IOneTimeCodeExpires {
   expires: Date;
 }
+
+/** DEV user ONLY Do NOT use in production */
+export interface IVerifyOneTimeCode extends IOneTimeCodeExpires {
+  email: string;
+  oneTimeCode: string;
+}
