@@ -4,7 +4,7 @@ export const CRoutes = {
   verify: 'verify',
 
   // protected routes
-  dashboard: '', // include the historical orders for today
+  dashboard: 'home', // include the historical orders for today
   kitchen: 'kitchen', // active orders
   products: 'products', // list of products
   checkouts: 'checkouts', // checkout design and management

@@ -1,0 +1,35 @@
+.navbar {
+  height: 100%;
+  background-color: var(--mantine-primary-color-contrast);
+  .header-title {
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  &--items {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 1rem;
+    width: 100%;
+    .nav-link,
+    .nav-user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      text-decoration: none;
+      color: var(--mantine-color-text);
+      &:visited {
+        color: var(--mantine-color-text);
+      }
+      &:hover {
+        background-color: var(--mantine-primary-color-filled-hover);
+        color: var(--card);
+      }
+      &.active:not(.nav-user-menu) {
+        background: var(--accent);
+        color: var(--card);
+      }
+    }
+  }
+}

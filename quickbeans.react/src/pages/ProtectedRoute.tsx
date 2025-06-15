@@ -42,7 +42,18 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
         dispatch(setFullVenue(fullVenue));
       })();
     }
-  }, [isVenueLoading, isFullVenueLoading, venue, base, defaultVenue, getFullVenue, venueState, userToken, navigate]);
+  }, [
+    base,
+    defaultVenue,
+    isFullVenueLoading,
+    isVenueLoading,
+    userToken,
+    venue,
+    venueState,
+    dispatch,
+    getFullVenue,
+    navigate
+  ]);
 
   return children;
 };
