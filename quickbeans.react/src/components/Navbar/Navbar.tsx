@@ -57,12 +57,14 @@ const Navbar = () => {
         <Title order={1} mb="lg" className="header-title" visibleFrom="md">
           {venue?.name || 'QuickBeans'}
         </Title>
-        {navItems.map((item) => (
-          <NavLink key={item.label} aria-label={item.label} to={item.path} className="nav-link">
-            {item.icon}
-            <Text visibleFrom="md">{item.label}</Text>
-          </NavLink>
-        ))}
+        {navItems
+          .filter((item) => item.isAllowed)
+          .map((item) => (
+            <NavLink key={item.label} aria-label={item.label} to={item.path} className="nav-link">
+              {item.icon}
+              <Text visibleFrom="md">{item.label}</Text>
+            </NavLink>
+          ))}
       </Stack>
       <Stack className="navbar--items">
         <Divider />
