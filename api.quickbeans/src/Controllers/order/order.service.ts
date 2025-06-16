@@ -2,7 +2,7 @@ import { CMessage } from '@base/message.class';
 import { EventsGateway } from '@controllers/events/events.gateway';
 import { UserService } from '@controllers/user/user.service';
 import { VenueService } from '@controllers/venue/venue.service';
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,7 +72,7 @@ export class OrderService {
     });
     // Set order date to now if not provided or invalid
     order.orderDate = orderData.orderDate ? new Date(orderData.orderDate) : new Date();
-    order.bookingStatus = EBookingStatus.PENDING; // Default booking status
+    order.orderStatus = EOrderStatus.PENDING; // Default booking status
 
     // check if the venue, checkout and patron exist
     const venue = await this.venueService.findByIdEntity(orderData.venueId);
@@ -95,7 +95,7 @@ export class OrderService {
 
     try {
       const savedOrder = await this.orderRepository.save(order);
-      this.eventsGateway.notifyKitchenOrderUpdate(savedOrder);
+      this.eventsGateway.notifyKitchenOrderUpdate(savedOrder, true);
       return mapOrderToIOrder(savedOrder);
     } catch (error: unknown) {
       return new CMessage(
@@ -107,19 +107,29 @@ export class OrderService {
 
   async updateOrderStatus(
     receiptNumber: string,
-    status: EBookingStatus
-  ): Promise<{ receiptNumber: string; status: EBookingStatus } | CMessage> {
+    status: EOrderStatus
+  ): Promise<{ receiptNumber: string; status: EOrderStatus } | CMessage> {
     const order = await this.orderRepository.findOne({ where: { receiptNumber }, loadRelationIds: false });
     if (!order) {
       return new CMessage(`Order with receipt number ${receiptNumber} not found.`, HttpStatus.NOT_FOUND);
     }
 
-    if (order.bookingStatus !== status) {
-      order.bookingStatus = status;
+    if (order.orderStatus !== status) {
+      order.orderStatus = status;
       try {
+        // Note if I get the relations to start with I usually get an error on saving
         const updatedOrder = await this.orderRepository.save(order);
         this.eventsGateway.notifyOrderStatusUpdate({ receiptNumber, status });
-        return { receiptNumber: updatedOrder.receiptNumber, status: updatedOrder.bookingStatus };
+        const newOrderFull = await this.orderRepository.findOne({
+          where: { id: updatedOrder.id },
+          relations: ['items', 'items.product', 'venue']
+        });
+        if (!newOrderFull) {
+          return new CMessage(`Order with ID ${updatedOrder.id} not found after update.`, HttpStatus.NOT_FOUND);
+        }
+
+        this.eventsGateway.notifyKitchenOrderUpdate(newOrderFull);
+        return { receiptNumber: updatedOrder.receiptNumber, status: updatedOrder.orderStatus };
       } catch (error: unknown) {
         return new CMessage(
           `Error updating order status: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,

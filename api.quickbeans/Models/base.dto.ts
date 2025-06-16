@@ -37,12 +37,11 @@ export enum EProductType {
   FOOD = 'food'
 }
 
-export enum EBookingStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  PREPARING = 'preparing',
-  READY = 'ready',
-  COMPLETED = 'completed',
+export enum EOrderStatus {
+  PENDING = 'pending', // order has been placed - grey
+  PREPARING = 'preparing', // order is being prepared - yellow
+  READY = 'ready', // order is ready for pickup - green
+  COMPLETED = 'completed', // order has been picked up or delivered - blue
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded'
 }

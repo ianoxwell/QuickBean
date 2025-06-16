@@ -1,11 +1,11 @@
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { ICheckoutShort } from './checkout.dto';
 import { ISelectedModifierOption } from './modifier.dto';
 import { IProduct } from './products.dto';
 import { IUserProfile } from './user.dto';
 import { IVenueShort } from './venue.dto';
 
-export interface IOrder {
+export interface IShortOrder {
   id?: number;
   orderDate?: Date | string;
   receiptNumber?: string;
@@ -13,7 +13,10 @@ export interface IOrder {
   grandTotal: number;
   discount?: number;
   comments?: string;
-  bookingStatus: EBookingStatus;
+  bookingStatus: EOrderStatus;
+}
+
+export interface IOrder extends IShortOrder {
   items: IOrderItem[];
   venueId?: number;
   venue?: IVenueShort;
@@ -36,7 +39,7 @@ export interface IOrderItem {
 
 export interface IOrderStatusUpdate {
   receiptNumber: string;
-  status: EBookingStatus;
+  status: EOrderStatus;
 }
 
 export interface IOrderSubscription {

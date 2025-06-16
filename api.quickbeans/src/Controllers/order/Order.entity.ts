@@ -1,6 +1,6 @@
 import { User } from '@controllers/user/User.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Index } from 'typeorm';
 import { OrderItem } from './OrderItem.entity';
 import { Checkout } from '@controllers/checkout/Checkout.entity';
@@ -29,8 +29,8 @@ export class Order {
   @Column({ nullable: true })
   comments: string;
 
-  @Column({ type: 'enum', enum: EBookingStatus })
-  bookingStatus: EBookingStatus;
+  @Column({ type: 'enum', enum: EOrderStatus, default: EOrderStatus.PENDING })
+  orderStatus: EOrderStatus;
 
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
   items: OrderItem[];

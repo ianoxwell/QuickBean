@@ -1,8 +1,8 @@
-import { IOrder, IOrderItem } from '@models/order.dto';
+import { IOrder, IOrderItem, IShortOrder } from '@models/order.dto';
 import { Order } from './Order.entity';
 import { OrderItem } from './OrderItem.entity';
 
-export const mapOrderToIOrder = (order: Order): IOrder => {
+export const mapOrderToIShortOrder = (order: Order): IShortOrder => {
   return {
     id: order.id,
     orderDate: order.orderDate,
@@ -11,7 +11,13 @@ export const mapOrderToIOrder = (order: Order): IOrder => {
     grandTotal: order.grandTotal,
     discount: order.discount,
     comments: order.comments,
-    bookingStatus: order.bookingStatus,
+    bookingStatus: order.orderStatus
+  };
+};
+
+export const mapOrderToIOrder = (order: Order): IOrder => {
+  return {
+    ...mapOrderToIShortOrder(order),
     items: order.items.map((item) => mapOrderItemToIOrderItem(item)),
     venueId: order.venue?.id,
     venue: order.venue ? { id: order.venue.id, name: order.venue.name, slug: order.venue.slug } : undefined,

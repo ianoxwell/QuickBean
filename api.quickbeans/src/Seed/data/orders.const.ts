@@ -1,9 +1,8 @@
 import { Checkout } from '@controllers/checkout/Checkout.entity';
 import { Order } from '@controllers/order/Order.entity';
 import { OrderItem } from '@controllers/order/OrderItem.entity';
-import { Product } from '@controllers/product/Product.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import CCheckouts from './checkout.const';
 import products from './products.const';
 import users from './users.const';
@@ -36,7 +35,7 @@ function randomOrderItems() {
     usedIndexes.add(idx);
     const product = products[idx];
     items.push({
-      product: product as Product,
+      product: product,
       quantity: randInt(1, 4),
       price: product.baseCost
     });
@@ -52,12 +51,12 @@ const orders: Partial<Order>[] = Array.from({ length: 4 }).map(() => {
   const grandTotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   return {
     orderDate: randomFutureDate(),
-    receiptNumber: `R${randInt(10000, 99999)}`,
+    receiptNumber: `R-${randInt(10000, 99999)}`,
     amountPaid: grandTotal,
     grandTotal,
     discount: 0,
     comments: '',
-    bookingStatus: EBookingStatus.CONFIRMED,
+    bookingStatus: EOrderStatus.COMPLETED,
     items: orderItems as OrderItem[],
     venue: venue as Venue,
     patron,

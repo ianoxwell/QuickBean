@@ -1,5 +1,5 @@
 import { Order } from '@controllers/order/Order.entity';
-import { mapOrderToIOrder } from '@controllers/order/order.util';
+import { mapOrderToIOrder, mapOrderToIShortOrder } from '@controllers/order/order.util';
 import { IKitchenOrderSubscription, IOrderStatusUpdate, IOrderSubscription } from '@models/order.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -45,7 +45,7 @@ export class EventsGateway implements OnGatewayDisconnect {
     const order = await this.orderRepository.findOne({
       where: { receiptNumber: data.receiptNumber, venue: { id: data.venueId } }
     });
-    client.emit('orderStatus', { receiptNumber: order?.receiptNumber, status: order?.bookingStatus });
+    client.emit('orderStatus', { receiptNumber: order?.receiptNumber, status: order?.orderStatus });
   }
 
   @SubscribeMessage('unsubscribeOrder')
@@ -88,7 +88,7 @@ export class EventsGateway implements OnGatewayDisconnect {
 
     client.emit(
       'kitchenOrders',
-      orders.map((order) => mapOrderToIOrder(order))
+      orders.map((order) => mapOrderToIOrder(order)) // must be full order including items
     );
   }
 
@@ -107,10 +107,10 @@ export class EventsGateway implements OnGatewayDisconnect {
   }
 
   // Call from the order service when a new booking is made to notify kitchen
-  notifyKitchenOrderUpdate(order: Order) {
+  notifyKitchenOrderUpdate(order: Order, isFullOrder = false) {
     for (const [socketId, sub] of this.activeKitchenOrderSockets.entries()) {
       if (sub.venueId === order.venue.id) {
-        this.server.to(socketId).emit('kitchenOrders', [mapOrderToIOrder(order)]);
+        this.server.to(socketId).emit('kitchenOrders', [isFullOrder ? mapOrderToIOrder(order) : mapOrderToIShortOrder(order)]); // on an update only send the short order
       }
     }
   }

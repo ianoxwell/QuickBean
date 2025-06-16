@@ -1,5 +1,5 @@
 import { CMessage } from '@base/message.class';
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
 import { Body, Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -39,8 +39,8 @@ export class OrderController {
   // TODO ensure that the user is a venue staff member
   @Post('update-order')
   async updateOrderStatus(
-    @Body() orderData: { receiptNumber: string; status: EBookingStatus }
-  ): Promise<{ receiptNumber: string; status: EBookingStatus } | CMessage> {
+    @Body() orderData: { receiptNumber: string; status: EOrderStatus }
+  ): Promise<{ receiptNumber: string; status: EOrderStatus } | CMessage> {
     const updatedOrder = await this.orderService.updateOrderStatus(orderData.receiptNumber, orderData.status);
     console.log('Updated order:', updatedOrder, orderData);
     if (!updatedOrder) {
