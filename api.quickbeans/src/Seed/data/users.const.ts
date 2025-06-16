@@ -23,7 +23,17 @@ const users: User[] = [
     timesLoggedIn: 0
   },
   {
-    name: null, // No name for this user
+    name: 'Frank FrontOfHouse',
+    email: 'front@coffee.com',
+    isActive: true,
+    loginProvider: 'local',
+    roles: [ERole.FRONT_OF_HOUSE],
+    venues: venues as Venue[],
+    timesLoggedIn: 0
+  },
+  // First patron
+  {
+    name: 'Patty Patron',
     email: 'patron@coffee.com',
     isActive: true,
     loginProvider: 'local',
@@ -31,12 +41,23 @@ const users: User[] = [
     venues: venues as Venue[],
     timesLoggedIn: 0
   },
+  // second patron
   {
-    name: 'Frank FrontOfHouse',
-    email: 'front@coffee.com',
+    name: 'Professor Patron',
+    email: 'professor@coffee.com',
     isActive: true,
     loginProvider: 'local',
-    roles: [ERole.FRONT_OF_HOUSE],
+    roles: [ERole.PATRON],
+    venues: venues as Venue[],
+    timesLoggedIn: 0
+  },
+  // third patron
+  {
+    name: 'Sally Student',
+    email: 'sally@coffee.com',
+    isActive: true,
+    loginProvider: 'local',
+    roles: [ERole.PATRON],
     venues: venues as Venue[],
     timesLoggedIn: 0
   }
