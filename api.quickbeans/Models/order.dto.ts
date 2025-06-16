@@ -44,3 +44,8 @@ export interface IOrderSubscription {
   userId: number;
   venueId: number;
 }
+
+export interface IKitchenOrderSubscription {
+  venueId: number;
+  userId: number;
+}

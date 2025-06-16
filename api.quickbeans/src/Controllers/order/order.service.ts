@@ -1,14 +1,15 @@
 import { CMessage } from '@base/message.class';
+import { EventsGateway } from '@controllers/events/events.gateway';
 import { UserService } from '@controllers/user/user.service';
 import { VenueService } from '@controllers/venue/venue.service';
 import { EBookingStatus } from '@models/base.dto';
-import { IOrder, IOrderItem } from '@models/order.dto';
+import { IOrder } from '@models/order.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './Order.entity';
+import { mapOrderToIOrder } from './order.util';
 import { OrderItem } from './OrderItem.entity';
-import { EventsGateway } from '@controllers/events/events.gateway';
 
 @Injectable()
 export class OrderService {
@@ -29,7 +30,7 @@ export class OrderService {
       return null;
     }
 
-    return this.mapOrderToIOrder(order);
+    return mapOrderToIOrder(order);
   }
 
   async findOrdersByVenueId(venueId: number, take = 200): Promise<Order[] | null> {
@@ -58,7 +59,7 @@ export class OrderService {
     }
 
     console.timeEnd('findOrdersByPatronId');
-    return orders.map((order) => this.mapOrderToIOrder(order));
+    return orders.map((order) => mapOrderToIOrder(order));
   }
 
   async createOrder(orderData: IOrder): Promise<IOrder | CMessage> {
@@ -94,7 +95,8 @@ export class OrderService {
 
     try {
       const savedOrder = await this.orderRepository.save(order);
-      return this.mapOrderToIOrder(savedOrder);
+      this.eventsGateway.notifyKitchenOrderUpdate(savedOrder);
+      return mapOrderToIOrder(savedOrder);
     } catch (error: unknown) {
       return new CMessage(
         `Error creating order: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
@@ -125,43 +127,5 @@ export class OrderService {
         );
       }
     }
-  }
-
-  mapOrderToIOrder(order: Order): IOrder {
-    return {
-      id: order.id,
-      orderDate: order.orderDate,
-      receiptNumber: order.receiptNumber,
-      amountPaid: order.amountPaid,
-      grandTotal: order.grandTotal,
-      discount: order.discount,
-      comments: order.comments,
-      bookingStatus: order.bookingStatus,
-      items: order.items.map((item) => this.mapOrderItemToIOrderItem(item)),
-      venueId: order.venue?.id,
-      venue: order.venue ? { id: order.venue.id, name: order.venue.name, slug: order.venue.slug } : undefined,
-      patronId: order.patron?.id,
-      patron: order.patron ? { id: order.patron.id, name: order.patron.name, email: order.patron.email } : undefined,
-      checkoutId: order.checkout?.id,
-      checkout: order.checkout
-        ? {
-            id: order.checkout.id,
-            name: order.checkout.name,
-            slug: order.checkout.slug,
-            checkoutUrl: `${order.venue.slug}/${order.checkout.slug}`
-          }
-        : undefined
-    };
-  }
-
-  mapOrderItemToIOrderItem(item: OrderItem): IOrderItem {
-    return {
-      id: item.id,
-      productId: item.product.id,
-      product: item.product,
-      quantity: item.quantity,
-      price: item.price,
-      selectedModifiers: item.selectedModifiers // Assuming this is already in the correct format
-    };
   }
 }
