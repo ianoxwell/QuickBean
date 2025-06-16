@@ -12,18 +12,17 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setUser } from './userSlice';
 
-const initialState = {
-  oneTimeCode: '142142'
-};
-
 const VerifyEmail = () => {
   const base = import.meta.env.VITE_BASE_URL;
   const [verifyUserEmail, { data: user, isLoading }] = useVerifyOneTimeCodeMutation();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { email, order } = location.state || {};
+  const { email, order, code } = location.state || {};
   const { checkout } = useSelector((store: RootState) => store.checkout);
+  const initialState = {
+    oneTimeCode: code || '142142'
+  };
 
   const form = useForm({
     mode: 'uncontrolled', // more performant - https://mantine.dev/form/uncontrolled/

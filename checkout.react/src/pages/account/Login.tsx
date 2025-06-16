@@ -1,12 +1,12 @@
-import { useLoginUserMutation } from '@app/apiSlice';
+import { useLazyLoginExistingUserQuery } from '@app/apiSlice';
 import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Button, Checkbox, Group, TextInput } from '@mantine/core';
 import { isEmail, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { ERole } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
+import { isMessage } from '@utils/typescriptHelpers';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const initialState = {
@@ -19,7 +19,7 @@ const Login = () => {
   const { user } = useAppSelector((store: RootState) => store.user);
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const navigate = useNavigate();
-  const [registerUser, { isLoading }] = useLoginUserMutation();
+  const [logonUser, { isLoading }] = useLazyLoginExistingUserQuery();
 
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
@@ -33,9 +33,18 @@ const Login = () => {
 
     const { email } = form.getValues();
     try {
-      await registerUser({ email, loginProvider: 'local', roles: [ERole.PATRON] }).unwrap();
+      const result = await logonUser(email).unwrap();
+      if (isMessage(result)) {
+        // Handle the message case
+        console.error('Error:', result.message);
+        notifications.show({ message: result.message, color: 'red' });
+        return;
+      }
+
       // navigate to the one time code verification page
-      navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.verify}`, { state: { email, order } });
+      navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.verify}`, {
+        state: { email, order, code: result.oneTimeCode }
+      });
     } catch (error) {
       console.log('Looks like a massive mistake happened', error);
       if (typeof error === 'object' && error !== null && 'message' in error) {

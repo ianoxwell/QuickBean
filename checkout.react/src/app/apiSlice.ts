@@ -3,7 +3,7 @@ import { EBookingStatus } from '@models/base.dto';
 import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
 import { IOrder, IOrderSubscription } from '@models/order.dto';
-import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserToken } from '@models/user.dto';
+import { INewUser, IOneTimeCodeExpires, IUserLogin, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
 import { setCheckout } from '@pages/checkoutSlice';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { getUserFromLocalStorage, isTokenFresh } from '@utils/localStorage';
@@ -56,6 +56,9 @@ export const apiSlice = createApi({
     loginUser: builder.mutation<IOneTimeCodeExpires | IMessage, INewUser>({
       query: (userLogin) => ({ url: '/user/login', method: 'POST', body: userLogin })
     }),
+    loginExistingUser: builder.query<IVerifyOneTimeCode | IMessage, string>({
+      query: (email) => ({ url: `/user/existing?email=${email}`, method: 'GET' })
+    }),
     verifyOneTimeCode: builder.mutation<IUserToken | IMessage, IUserLogin>({
       query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
     }),
@@ -76,14 +79,6 @@ export const apiSlice = createApi({
           // ignore errors
         }
       }
-    }),
-
-    updateOrderStatus: builder.mutation<IOrder | IMessage, { receiptNumber: string; status: string }>({
-      query: (orderData) => ({
-        url: 'order/update-order',
-        method: 'POST',
-        body: orderData
-      })
     }),
     getOrderStatusEvents: builder.query<{ receiptNumber: string; status: EBookingStatus }, IOrderSubscription>({
       queryFn: (arg) => ({
@@ -127,9 +122,9 @@ export const apiSlice = createApi({
 // Export the auto-generated hook for the `getPosts` query endpoint
 export const {
   useLoginUserMutation,
+  useLazyLoginExistingUserQuery,
   useVerifyOneTimeCodeMutation,
   usePayNowCreateOrderMutation,
   useGetCheckoutQuery,
-  useUpdateOrderStatusMutation,
   useGetOrderStatusEventsQuery
 } = apiSlice;
