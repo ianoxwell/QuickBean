@@ -77,16 +77,10 @@ main {
   min-width: var(--min-width);
   margin: 0 auto;
   .main-content {
-    padding: 1rem;
+    padding: 0.75rem;
     margin-bottom: 4rem;
     @include mixins.breakpoint(sm) {
-      padding: 2rem;
-    }
-    @include mixins.breakpoint(md) {
-      padding: 3rem;
-    }
-    @include mixins.breakpoint(lg) {
-      padding: 4rem;
+      padding: 1rem;
     }
   }
 }

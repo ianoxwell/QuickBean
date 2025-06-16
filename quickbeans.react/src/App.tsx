@@ -7,6 +7,7 @@ import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import Login from '@pages/account/Login';
 import VerifyEmail from '@pages/account/VerifyEmail';
+import KitchenPage from '@pages/kitchen/KitchenPage';
 import ProtectedRoute from '@pages/ProtectedRoute';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
@@ -46,7 +47,7 @@ function App() {
                 }
               >
                 <Route path={CRoutes.dashboard} element={<div>Dashboard Page</div>} />
-                <Route path={CRoutes.kitchen} element={<div>Kitchen Page</div>} />
+                <Route path={CRoutes.kitchen} element={<KitchenPage />} />
                 <Route path={CRoutes.products} element={<div>Products Page</div>} />
                 <Route path={CRoutes.checkouts} element={<div>Checkouts Page</div>} />
                 <Route path={CRoutes.settings} element={<div>Settings Page</div>} />

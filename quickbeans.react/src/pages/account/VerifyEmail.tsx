@@ -62,8 +62,6 @@ const VerifyEmail = () => {
             userId: userToken.user.id || 0
           }).unwrap();
           dispatch(setFullVenue(venue));
-          notifications.show({ message: 'Venue loaded successfully', color: 'green' });
-          // You can redirect or update the state as needed
           const checkoutUrl = userToken.user.roles.includes(ERole.KITCHEN)
             ? `${base}${venue.slug}/${CRoutes.kitchen}`
             : `${base}${venue.slug}/${CRoutes.dashboard}`;

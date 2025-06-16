@@ -1,11 +1,12 @@
 // Import the RTK Query methods from the React-specific entry point
 import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
-import { IOrder } from '@models/order.dto';
+import { IKitchenOrderSubscription, IOrder } from '@models/order.dto';
 import { IUserLogin, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
 import { IVenue, IVenueShort } from '@models/venue.dto';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { getUserFromLocalStorage, isTokenFresh } from '@utils/localStorage';
+import { io, Socket } from 'socket.io-client';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,
@@ -52,7 +53,7 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     getVenueShort: builder.query<IVenueShort, string>({
       query: (slug) => ({ url: `/venue/short?slug=${slug}`, method: 'GET' }),
-      keepUnusedDataFor: Number.MAX_VALUE, // Keeps data "forever"
+      keepUnusedDataFor: Number.MAX_VALUE // Keeps data "forever"
     }),
     getVenueFull: builder.mutation<IVenue, { venueId: number; userId: number }>({
       query: (ids) => ({ url: `/venue`, method: 'POST', body: ids })
@@ -75,6 +76,47 @@ export const apiSlice = createApi({
         method: 'POST',
         body: orderData
       })
+    }),
+    getOrderStatusEvents: builder.query<IOrder[], IKitchenOrderSubscription>({
+      queryFn: () => ({
+        data: []
+      }), // No HTTP fetch, just socket.io
+      async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
+        const socket: Socket = io(import.meta.env.VITE_WS_URL + '/events', {
+          transports: ['websocket'],
+          autoConnect: true
+        });
+
+        try {
+          await cacheDataLoaded;
+
+          socket.on('connect', () => {
+            // Subscribe to order status updates for this order/user
+            socket.emit('subscribeKitchenOrders', { venueId: arg.venueId, userId: arg.userId });
+          });
+
+          socket.on('kitchenOrders', (data: IOrder[]) => {
+            updateCachedData((draft) => {
+              // Update the cached data with the new order status updates
+              data.forEach((order: IOrder) => {
+                const existingOrder = draft.find((o) => o.receiptNumber === order.receiptNumber);
+                if (existingOrder) {
+                  existingOrder.bookingStatus = order.bookingStatus;
+                } else {
+                  draft.push(order);
+                }
+              });
+            });
+          });
+        } catch (error) {
+          console.error('Error setting up Socket.IO:', error);
+        }
+
+        await cacheEntryRemoved;
+        // Unsubscribe when cache entry is removed
+        socket.emit('unsubscribeKitchenOrder');
+        socket.disconnect();
+      }
     })
   })
 });
@@ -86,5 +128,6 @@ export const {
   useLazyLoginExistingUserQuery,
   useVerifyOneTimeCodeMutation,
   useGetCheckoutQuery,
-  useUpdateOrderStatusMutation
+  useUpdateOrderStatusMutation,
+  useGetOrderStatusEventsQuery
 } = apiSlice;
