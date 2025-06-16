@@ -145,7 +145,7 @@ const orderSlice = createSlice({
     },
 
     clearCheckout: (state) => {
-      state.order = createBlankOrder();
+      state.order = undefined;
       state.itemCount = 0;
       state.isLoading = false;
       removeOrderFromLocalStorage();
@@ -157,9 +157,6 @@ const orderSlice = createSlice({
 });
 
 const createBlankOrder = (checkout?: ICheckout): IOrder => ({
-  id: 0,
-  orderDate: new Date().toISOString(),
-  receiptNumber: '',
   amountPaid: 0,
   grandTotal: 0,
   items: [],

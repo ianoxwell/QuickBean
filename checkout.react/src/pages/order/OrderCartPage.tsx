@@ -1,10 +1,11 @@
-import { useAppSelector } from '@app/hooks';
+import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Button, Divider, Flex } from '@mantine/core';
-import { MapPin, Plus, StepForward } from 'lucide-react';
+import { MapPin, Plus, StepForward, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
+import { clearCheckout } from './order.slice';
 import './OrderCartPage.scss';
 
 const OrderCartPage = () => {
@@ -13,6 +14,7 @@ const OrderCartPage = () => {
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const iconSize = 16;
 
   const proceedToCheckout = () => {
@@ -22,8 +24,24 @@ const OrderCartPage = () => {
     navigate(checkoutUrl, { state: { order } });
   };
 
+  const clearCart = () => {
+    // Clear the order items and reset the order state
+    dispatch(clearCheckout());
+  };
+
   if (!order || !order.items || !order.items.length) {
-    return <p>Your cart is currently empty.</p>;
+    return (
+      <>
+        <p>Your cart is currently empty.</p>
+        <Button
+          type="button"
+          onClick={() => navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`)}
+          leftSection={<Plus size={16} />}
+        >
+          Add to order
+        </Button>
+      </>
+    );
   }
 
   return (
@@ -42,9 +60,18 @@ const OrderCartPage = () => {
                 </div>
               )}
             </div>
-            <Button type="button" leftSection={<Plus size={16} />}>
-              Add to order
-            </Button>
+            <Flex gap="md">
+              <Button
+                type="button"
+                onClick={() => navigate(`${base}${checkout.checkoutUrl}/${CRoutes.menu}`)}
+                leftSection={<Plus size={16} />}
+              >
+                Add to order
+              </Button>
+              <Button type="button" onClick={clearCart} variant="outline" rightSection={<Trash2 size={16} />}>
+                Clear cart
+              </Button>
+            </Flex>
           </section>
           <section className="order-cart-page__details">
             {order.items.map((item) => (

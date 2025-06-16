@@ -6,9 +6,9 @@ import { IUserProfile } from './user.dto';
 import { IVenueShort } from './venue.dto';
 
 export interface IOrder {
-  id: number;
-  orderDate: Date | string;
-  receiptNumber: string;
+  id?: number;
+  orderDate?: Date | string;
+  receiptNumber?: string;
   amountPaid: number;
   grandTotal: number;
   discount?: number;

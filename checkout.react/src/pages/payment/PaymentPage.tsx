@@ -1,5 +1,5 @@
 import { usePayNowCreateOrderMutation } from '@app/apiSlice';
-import { useAppSelector } from '@app/hooks';
+import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Accordion, Button, Flex, Image, Space, TextInput } from '@mantine/core';
@@ -10,12 +10,14 @@ import { CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import creditCard from '../../assets/visa-cards.png';
 import './PaymentPage.scss';
+import { clearCheckout } from '@pages/order/order.slice';
 
 const PaymentPage = () => {
   const base = import.meta.env.VITE_BASE_URL;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
+  const dispatch = useAppDispatch();
   const [payNowOrder, { isLoading }] = usePayNowCreateOrderMutation();
   const navigate = useNavigate();
   const iconSize = 16;
@@ -38,8 +40,14 @@ const PaymentPage = () => {
       return;
     }
 
+    dispatch(clearCheckout()); // Clear the checkout state after payment
+    notifications.show({
+      message: `Payment successful! Receipt Number: ${payResult.receiptNumber}`,
+      color: 'green'
+    });
     // Redirect to confirmation page or show success message
     navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.confirmation}/${payResult.receiptNumber}`);
+    return;
   };
 
   if (!order || !order.items || !order.items.length) {

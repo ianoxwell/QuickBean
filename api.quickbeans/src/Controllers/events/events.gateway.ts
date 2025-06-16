@@ -110,7 +110,7 @@ export class EventsGateway implements OnGatewayDisconnect {
   notifyKitchenOrderUpdate(order: Order) {
     for (const [socketId, sub] of this.activeKitchenOrderSockets.entries()) {
       if (sub.venueId === order.venue.id) {
-        this.server.to(socketId).emit('kitchenOrders', mapOrderToIOrder(order));
+        this.server.to(socketId).emit('kitchenOrders', [mapOrderToIOrder(order)]);
       }
     }
   }
