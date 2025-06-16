@@ -1,4 +1,4 @@
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { ICheckout } from '@models/checkout.dto';
 import { IOrder, IOrderItem } from '@models/order.dto';
 import { createSlice } from '@reduxjs/toolkit';
@@ -73,7 +73,7 @@ const orderSlice = createSlice({
       }
 
       // Ensure the order has a booking status
-      state.order.bookingStatus = EBookingStatus.PENDING;
+      state.order.bookingStatus = EOrderStatus.PENDING;
       // Update the item count
       state.itemCount = calculateItemCount(state.order);
       addOrderToLocalStorage(state.order);
@@ -138,7 +138,7 @@ const orderSlice = createSlice({
       }
 
       // Ensure the order has a booking status
-      state.order.bookingStatus = state.order.bookingStatus ?? EBookingStatus.PENDING;
+      state.order.bookingStatus = state.order.bookingStatus ?? EOrderStatus.PENDING;
       // Update the item count
       state.itemCount = calculateItemCount(state.order);
       addOrderToLocalStorage(state.order);
@@ -160,7 +160,7 @@ const createBlankOrder = (checkout?: ICheckout): IOrder => ({
   amountPaid: 0,
   grandTotal: 0,
   items: [],
-  bookingStatus: EBookingStatus.PENDING,
+  bookingStatus: EOrderStatus.PENDING,
   venueId: checkout?.venue?.id,
   venue: checkout?.venue,
   checkoutId: checkout?.id,

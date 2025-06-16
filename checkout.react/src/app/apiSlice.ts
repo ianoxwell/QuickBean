@@ -1,5 +1,5 @@
 // Import the RTK Query methods from the React-specific entry point
-import { EBookingStatus } from '@models/base.dto';
+import { EOrderStatus } from '@models/base.dto';
 import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
 import { IOrder, IOrderSubscription } from '@models/order.dto';
@@ -80,9 +80,9 @@ export const apiSlice = createApi({
         }
       }
     }),
-    getOrderStatusEvents: builder.query<{ receiptNumber: string; status: EBookingStatus }, IOrderSubscription>({
+    getOrderStatusEvents: builder.query<{ receiptNumber: string; status: EOrderStatus }, IOrderSubscription>({
       queryFn: (arg) => ({
-        data: { receiptNumber: arg.receiptNumber, status: EBookingStatus.PENDING }
+        data: { receiptNumber: arg.receiptNumber, status: EOrderStatus.PENDING }
       }), // No HTTP fetch, just socket.io
       async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
         const socket: Socket = io(import.meta.env.VITE_WS_URL + '/events', {
@@ -102,7 +102,7 @@ export const apiSlice = createApi({
             updateCachedData((draft) => {
               if (!draft) return;
               if (draft.receiptNumber === data.receiptNumber) {
-                draft.status = data.status as EBookingStatus; // Update the status in the cache
+                draft.status = data.status as EOrderStatus; // Update the status in the cache
               }
             });
           });

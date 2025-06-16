@@ -27,8 +27,8 @@
         color: var(--card);
       }
       &.active:not(.nav-user-menu) {
-        background: var(--accent);
-        color: var(--card);
+        background: var(--mantine-primary-color-filled);
+        color: var(--mantine-color-white);
       }
     }
   }

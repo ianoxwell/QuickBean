@@ -1,0 +1,24 @@
+.kitchen-page {
+  .order-item {
+    background-color: var(--card);
+    &__header {
+      padding: 1rem;
+      &.grey {
+        background-color: var(--mantine-color-gray-4);
+      }
+      &.yellow {
+        background-color: var(--mantine-color-yellow-4);
+      }
+      &.green {
+        background-color: var(--mantine-color-green-4);
+      }
+      &.blue {
+        background-color: var(--mantine-color-blue-4);
+      }
+      &.red {
+        background-color: var(--mantine-color-red-8);
+        color: var(--mantine-color-white);
+      }
+    }
+  }
+}
