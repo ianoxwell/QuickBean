@@ -24,7 +24,7 @@ const PaymentPage = () => {
 
   const payNow = async () => {
     // Simulate payment processing
-    console.log('Processing payment...');
+    console.log('Processing payment...', user);
     if (!order || !user) {
       return;
     }
@@ -40,13 +40,14 @@ const PaymentPage = () => {
       return;
     }
 
-    dispatch(clearCheckout()); // Clear the checkout state after payment
+    
     notifications.show({
       message: `Payment successful! Receipt Number: ${payResult.receiptNumber}`,
       color: 'green'
     });
     // Redirect to confirmation page or show success message
     navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.confirmation}/${payResult.receiptNumber}`);
+    dispatch(clearCheckout()); // Clear the checkout state after payment
     return;
   };
 

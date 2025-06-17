@@ -2,7 +2,7 @@ import { useLazyLoginExistingUserQuery } from '@app/apiSlice';
 import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { Button, Checkbox, Group, TextInput } from '@mantine/core';
+import { Button, Card, Checkbox, Group, Space, Stack, TextInput } from '@mantine/core';
 import { isEmail, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IOrder } from '@models/order.dto';
@@ -72,32 +72,48 @@ const Login = () => {
 
   return (
     <>
-      <h2>Sign in or sign up</h2>
-      <form>
-        <TextInput
-          withAsterisk
-          required
-          label="Email"
-          type="email"
-          placeholder="your@email.com"
-          autoComplete="email"
-          key={form.key('email')}
-          {...form.getInputProps('email')}
-        />
+      <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <h2>Sign in with existing account</h2>
+        <form>
+          <TextInput
+            withAsterisk
+            required
+            label="Email"
+            type="email"
+            placeholder="your@email.com"
+            autoComplete="email"
+            key={form.key('email')}
+            {...form.getInputProps('email')}
+          />
 
-        <Checkbox
-          mt="md"
-          label="I agree to sell my privacy"
-          key={form.key('termsOfService')}
-          {...form.getInputProps('termsOfService', { type: 'checkbox' })}
-        />
+          <Checkbox
+            mt="md"
+            label="I agree to sell my privacy"
+            key={form.key('termsOfService')}
+            {...form.getInputProps('termsOfService', { type: 'checkbox' })}
+          />
 
-        <Group justify="flex-end" mt="md">
-          <Button type="button" onClick={submitButton} fullWidth mt="md" radius="md" loading={isLoading}>
-            Submit
+          <Group justify="flex-end" mt="md">
+            <Button type="button" onClick={submitButton} fullWidth mt="md" radius="md" loading={isLoading}>
+              Submit
+            </Button>
+          </Group>
+        </form>
+      </Card>
+      <Card shadow="sm" padding="lg" radius="md" mt="xl" withBorder>
+        <h2>Demo purpose only try one of these existing accounts</h2>
+        <Stack gap="md" mt="md">
+          <Button type="button" onClick={() => form.setFieldValue('email', 'patron@coffee.com')}>
+            Login as Patty Patron
           </Button>
-        </Group>
-      </form>
+          <Button type="button" onClick={() => form.setFieldValue('email', 'professor@coffee.com')}>
+            Login as Professor Patron
+          </Button>
+          <Button type="button" onClick={() => form.setFieldValue('email', 'sally@coffee.com')}>
+            Login as Sally Patron
+          </Button>
+        </Stack>
+      </Card>
     </>
   );
 };

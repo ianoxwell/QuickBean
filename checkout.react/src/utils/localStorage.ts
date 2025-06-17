@@ -13,7 +13,7 @@ export const removeUserFromLocalStorage = () => {
 export const getUserFromLocalStorage = (): IUserToken | undefined => {
   const result = localStorage.getItem(CLocalStorageKeys.user);
   const user = typeof result === 'string' && result.includes('{') ? (JSON.parse(result) as IUserToken) : undefined;
-  return user;
+  return isTokenFresh(user?.token) ? user : undefined;
 };
 
 export const addOrderToLocalStorage = (order: IOrder) => {

@@ -1,0 +1,10 @@
+.confirmation-page {
+  .order-status-updates {
+    width: 50%;
+    min-width: 21rem;
+    margin: 2rem auto;
+    .mantine-Timeline-itemBody {
+      padding-top: 0.4375rem;
+    }
+  }
+}
