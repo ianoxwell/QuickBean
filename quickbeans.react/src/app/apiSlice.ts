@@ -1,7 +1,9 @@
 // Import the RTK Query methods from the React-specific entry point
 import { ICheckout, ICheckoutQuery, ICheckoutShort } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
+import { IModifier } from '@models/modifier.dto';
 import { IKitchenOrderSubscription, IOrder } from '@models/order.dto';
+import { IProduct, IProductShort } from '@models/products.dto';
 import { IUserLogin, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
 import { IVenue, IVenueShort } from '@models/venue.dto';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
@@ -65,6 +67,20 @@ export const apiSlice = createApi({
     }),
     verifyOneTimeCode: builder.mutation<IUserToken | IMessage, IUserLogin>({
       query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
+    }),
+    // Product items
+    getActiveProducts: builder.query<IProductShort[], string | number>({
+      query: (venueId) => ({ url: `product/active-products?venueId=${venueId}` })
+    }),
+    getProduct: builder.query<IProduct | IMessage, string | number>({
+      query: (id) => ({ url: `product?productId=${id}` })
+    }),
+    // Modifier items
+    getActiveModifiers: builder.query<IModifier[], string | number>({
+      query: (venueId) => ({ url: `modifier/active-modifiers?venueId=${venueId}` })
+    }),
+    getModifier: builder.query<IModifier | IMessage, string | number>({
+      query: (id) => ({ url: `modifier?modifierId=${id}` })
     }),
     // Checkout items
     getActiveCheckouts: builder.query<ICheckoutShort[], string | number>({
@@ -131,6 +147,10 @@ export const {
   useGetVenueFullMutation,
   useLazyLoginExistingUserQuery,
   useVerifyOneTimeCodeMutation,
+  useGetActiveProductsQuery,
+  useGetProductQuery,
+  useGetActiveModifiersQuery,
+  useGetModifierQuery,
   useGetActiveCheckoutsQuery,
   useGetCheckoutQuery,
   useUpdateOrderStatusMutation,

@@ -1,6 +1,6 @@
 import { CMessage } from '@base/message.class';
 import { ModifierService } from '@controllers/modifier/modifier.service';
-import { IProduct } from '@models/products.dto';
+import { IProduct, IProductShort } from '@models/products.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -29,6 +29,18 @@ export class ProductService {
     return products.map((product) => this.mapProductToIProduct(product));
   }
 
+  async findByVenueIdShort(venueId: number): Promise<IProductShort[] | null> {
+    const products = await this.productRepository.find({
+      where: { venue: { id: venueId }, isActive: true },
+      relations: ['venue']
+    });
+
+    if (!products || products.length === 0) {
+      return null;
+    }
+    return products.map((product) => this.mapProductToIProductShort(product));
+  }
+
   async createProduct(productData: IProduct): Promise<IProduct | CMessage> {
     const existingProduct = await this.productRepository.findOne({ where: { name: productData.name } });
     if (existingProduct) {
@@ -47,15 +59,20 @@ export class ProductService {
     }
   }
 
-  mapProductToIProduct(product: Product): IProduct {
+  mapProductToIProductShort(product: Product): IProductShort {
     return {
       id: product.id,
       name: product.name,
       description: product.description,
+      productType: product.productType
+    };
+  }
+
+  mapProductToIProduct(product: Product): IProduct {
+    return {
+      ...this.mapProductToIProductShort(product),
       baseCost: Number(product.baseCost),
       imageUrl: product.imageUrl,
-      isActive: product.isActive,
-      productType: product.productType,
       modifiers: product.modifiers.map((modifier) => this.modifierService.mapModifierToIModifier(modifier))
     };
   }

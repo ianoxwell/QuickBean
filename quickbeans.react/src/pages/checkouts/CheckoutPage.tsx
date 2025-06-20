@@ -1,18 +1,15 @@
 import { useGetCheckoutQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { useVenueNavigate } from '@app/useVenueNavigate';
-import { ActionIcon, Flex } from '@mantine/core';
+import BackButton from '@components/BackButton/BackButton.component';
+import { Flex } from '@mantine/core';
 import { isMessage } from '@utils/typescriptHelpers';
-import { CornerDownLeft } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const { slug: checkoutSlug } = useParams<{ slug: string }>();
   const venueState = useSelector((store: RootState) => store.venue);
-  const venueNavigate = useVenueNavigate();
-  const iconSize = 20;
   const {
     data: checkout,
     isLoading,
@@ -38,17 +35,8 @@ const CheckoutPage = () => {
       {!isLoading && !isError && checkout && !isMessage(checkout) && (
         <div>
           <Flex gap="md" align="center" mt="sm" mb="md">
-            <ActionIcon
-              type="button"
-              variant="default"
-              radius="xl"
-              size="lg"
-              aria-label="Back"
-              onClick={() => venueNavigate(CRoutes.checkouts)}
-            >
-              <CornerDownLeft size={iconSize} />
-            </ActionIcon>
-            <h2>{checkout.name}</h2>
+            <BackButton back={CRoutes.checkouts} />
+            <h1>{checkout.name}</h1>
           </Flex>
           <p>Name: {checkout.name}</p>
           <p>Description: {checkout.description}</p>

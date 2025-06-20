@@ -9,15 +9,12 @@ import Login from '@pages/account/Login';
 import VerifyEmail from '@pages/account/VerifyEmail';
 import CheckoutPage from '@pages/checkouts/CheckoutPage';
 import CheckoutsListPage from '@pages/checkouts/CheckoutsListPage';
-import CheckoutWrapper from '@pages/checkouts/CheckoutWrapper';
 import DashboardPage from '@pages/dashboard/DashboardPage';
 import KitchenPage from '@pages/kitchen/KitchenPage';
 import ModifierPage from '@pages/modifiers/ModifierPage';
 import ModifiersPage from '@pages/modifiers/ModifiersListPage';
-import ModifiersWrapper from '@pages/modifiers/ModifiersWrapper';
 import ProductPage from '@pages/products/ProductPage';
 import ProductsPage from '@pages/products/ProductsPage';
-import ProductsWrapper from '@pages/products/ProductsWrapper';
 import ProtectedRoute from '@pages/ProtectedRoute';
 import SettingsPage from '@pages/settings/SettingsPage';
 import SharedLayout from '@pages/SharedLayout';
@@ -63,15 +60,15 @@ function App() {
               >
                 <Route path={CRoutes.dashboard} element={<DashboardPage />} />
                 <Route path={CRoutes.kitchen} element={<KitchenPage />} />
-                <Route path={CRoutes.products} element={<ProductsWrapper />}>
+                <Route path={CRoutes.products} element={<Outlet />}>
                   <Route index element={<ProductsPage />} />
                   <Route path=":id" element={<ProductPage />} />
                 </Route>
-                <Route path={CRoutes.modifiers} element={<ModifiersWrapper />}>
+                <Route path={CRoutes.modifiers} element={<Outlet />}>
                   <Route index element={<ModifiersPage />} />
                   <Route path=":id" element={<ModifierPage />} />
                 </Route>
-                <Route path={CRoutes.checkouts} element={<CheckoutWrapper />}>
+                <Route path={CRoutes.checkouts} element={<Outlet />}>
                   <Route index element={<CheckoutsListPage />} />
                   <Route path=":slug" element={<CheckoutPage />} />
                 </Route>

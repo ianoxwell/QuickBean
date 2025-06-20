@@ -1,12 +1,13 @@
 import { CMessage } from '@base/message.class';
-import { IProduct } from '@models/products.dto';
-import { Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { IProduct, IProductShort } from '@models/products.dto';
+import { Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 
 @ApiTags('Product')
-// @UseGuards(AuthGuard('jwt'))
-// @ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth('JWT-auth')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -34,20 +35,35 @@ export class ProductController {
   }
 
   // , @CurrentUser() user: IUserJwtPayload
-  @Get()
-  async getProductsByVenueId(@Query('venueId') id: number): Promise<IProduct[] | CMessage> {
-    if (!id) {
+  @Get('active-products')
+  async getProductsByVenueId(@Query('venueId') venueId: number): Promise<IProductShort[] | CMessage> {
+    if (!venueId) {
       return new CMessage('Id is required.', HttpStatus.BAD_REQUEST);
     }
 
     //TODO insert security check to ensure the user has access to the venue and appropriate roles
     // console.log(`User ${user.id} is requesting venue with slug: ${slug}`);
 
-    const products = await this.productService.findByVenueId(id);
+    const products = await this.productService.findByVenueIdShort(venueId);
     if (!products) {
-      return new CMessage(`Products for venue with ID ${id} not found.`, HttpStatus.NOT_FOUND);
+      return new CMessage(`Products for venue with ID ${venueId} not found.`, HttpStatus.NOT_FOUND);
     }
 
     return products;
+  }
+
+  @Get()
+  async getProductById(@Query('productId') productId: number): Promise<IProduct | CMessage> {
+    if (!productId) {
+      return new CMessage('Id is required.', HttpStatus.BAD_REQUEST);
+    }
+
+    // Fetch the product by ID
+    const product = await this.productService.findById(productId);
+    if (!product) {
+      return new CMessage(`Product with ID ${productId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    return product;
   }
 }

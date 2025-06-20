@@ -21,6 +21,19 @@ export class ModifierService {
     return modifiers.map((modifier) => this.mapModifierToIModifier(modifier));
   }
 
+  async findById(modifierId: number): Promise<IModifier | null> {
+    const modifier = await this.modifierRepository.findOne({
+      where: { id: modifierId, isActive: true },
+      relations: ['venue', 'options']
+    });
+
+    if (!modifier) {
+      return null;
+    }
+
+    return this.mapModifierToIModifier(modifier);
+  }
+
   mapModifierToIModifier(modifier: Modifier): IModifier {
     return {
       id: modifier.id,
