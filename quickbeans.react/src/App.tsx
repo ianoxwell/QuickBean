@@ -73,7 +73,7 @@ function App() {
                 </Route>
                 <Route path={CRoutes.checkouts} element={<CheckoutWrapper />}>
                   <Route index element={<CheckoutsListPage />} />
-                  <Route path=":id" element={<CheckoutPage />} />
+                  <Route path=":slug" element={<CheckoutPage />} />
                 </Route>
                 <Route path={CRoutes.settings} element={<SettingsPage />} />
               </Route>

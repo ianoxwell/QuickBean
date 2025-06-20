@@ -1,5 +1,5 @@
 // Import the RTK Query methods from the React-specific entry point
-import { ICheckout, ICheckoutQuery } from '@models/checkout.dto';
+import { ICheckout, ICheckoutQuery, ICheckoutShort } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
 import { IKitchenOrderSubscription, IOrder } from '@models/order.dto';
 import { IUserLogin, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
@@ -67,7 +67,7 @@ export const apiSlice = createApi({
       query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
     }),
     // Checkout items
-    getActiveCheckouts: builder.query<ICheckout[], string | number>({
+    getActiveCheckouts: builder.query<ICheckoutShort[], string | number>({
       query: (venueId) => ({ url: `checkout/active-checkouts?venueId=${venueId}` })
     }),
     getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({

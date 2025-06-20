@@ -5,11 +5,11 @@ export interface ICheckoutShort {
   id: number;
   name: string;
   slug: string;
-  heroImage?: string;
   checkoutUrl: string;
 }
 
 export interface ICheckout extends ICheckoutShort {
+  heroImage?: string;
   description: string;
   heroImageTextColor: string;
   categories: ICheckoutCategoryWithProducts[];
