@@ -2,17 +2,20 @@ import { useUpdateOrderStatusMutation } from '@app/apiSlice';
 import { Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { EOrderStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
+import { fixWholeNumber } from '@utils/numberUtils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Clock } from 'lucide-react';
+import { kitchenStatusColors } from './kitchen.util';
 
 const KitchenItem = ({ order }: { order: IOrder }) => {
   dayjs.extend(relativeTime);
   const date = dayjs(order.orderDate);
   const iconSize = 20;
   const [updateOrderStatus, { isLoading }] = useUpdateOrderStatusMutation();
-  let trafficLight = 'grey';
-  let nextStatus = EOrderStatus.PREPARING;
+  // eslint-disable-next-line prefer-const
+  let { trafficLight = 'grey', nextStatus = EOrderStatus.PREPARING } = kitchenStatusColors(order.bookingStatus);
+  const nextColor = kitchenStatusColors(nextStatus).trafficLight;
 
   const changeStatus = () => {
     // Dispatch an action to change the order status
@@ -23,22 +26,6 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
     return <Text>No items in this order.</Text>;
   }
 
-  switch (order.bookingStatus) {
-    case EOrderStatus.PREPARING:
-      trafficLight = 'yellow';
-      nextStatus = EOrderStatus.READY;
-      break;
-    case EOrderStatus.READY:
-      nextStatus = EOrderStatus.COMPLETED;
-      trafficLight = 'green';
-      break;
-    case EOrderStatus.COMPLETED:
-      trafficLight = 'blue';
-      break;
-    default:
-      trafficLight = 'grey';
-      break;
-  }
   // if the order was pending more than 10 minutes, set the traffic light to red
   if (order.bookingStatus === EOrderStatus.PENDING && date.isBefore(dayjs().subtract(10, 'minute'))) {
     trafficLight = 'red';
@@ -61,20 +48,32 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
           </Stack>
         </Flex>
       </Card.Section>
-      <h3>Order #{order.receiptNumber}</h3>
       <p>Status: {order.bookingStatus}</p>
-      <ul>
-        {order.items.map((item) => (
-          <li key={item.id}>
-            {item.product.name} - {item.quantity}
-          </li>
-        ))}
-      </ul>
-      {/* <Flex justify="space-between" align="center">
-        <Text>Grand Total: ${order.grandTotal}</Text>
-        <Text>Next Status: {nextStatus}</Text>
-      </Flex> */}
-      <Button type="button" onClick={changeStatus} fullWidth loading={isLoading}>
+      {order.items.map((item) => (
+        <Flex justify="space-between" mb="md" className="order-item__text" key={`${item.id}-${item.uniqueId}`}>
+          <Stack gap={0}>
+            <Text fw={700} className="order-item__title">{item.product.name}</Text>
+            <Flex gap="xs" pl="sm" className="order-item__modifier">
+              {item.selectedModifiers?.map((modifier, index) => (
+                <Text fs="italic" key={`${item.id}-${item.uniqueId}-${index}`}>
+                  {modifier.label}
+                </Text>
+              ))}
+            </Flex>
+          </Stack>
+
+          <div className="order-item__price">
+            <Text size='sm'>${fixWholeNumber(item.price, 2)}</Text>
+          </div>
+        </Flex>
+      ))}
+      <Button
+        type="button"
+        onClick={changeStatus}
+        fullWidth
+        loading={isLoading}
+        className={`order-item__button ${nextColor}`}
+      >
         Change Status to {nextStatus}
       </Button>
     </Card>

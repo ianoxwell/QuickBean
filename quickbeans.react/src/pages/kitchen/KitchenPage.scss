@@ -3,17 +3,22 @@
     background-color: var(--card);
     &__header {
       padding: 1rem;
+    }
+    &__header,
+    &__button {
       &.grey {
         background-color: var(--mantine-color-gray-4);
       }
       &.yellow {
         background-color: var(--mantine-color-yellow-4);
+        color: var(--mantine-color-black);
       }
       &.green {
         background-color: var(--mantine-color-green-4);
+        color: var(--mantine-color-black);
       }
       &.blue {
-        background-color: var(--mantine-color-blue-4);
+        background-color: var(--mantine-color-blue-8);
       }
       &.red {
         background-color: var(--mantine-color-red-8);

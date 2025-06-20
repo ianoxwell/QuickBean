@@ -52,24 +52,28 @@ export const apiSlice = createApi({
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
     getVenueShort: builder.query<IVenueShort, string>({
+      // Venue items
       query: (slug) => ({ url: `/venue/short?slug=${slug}`, method: 'GET' }),
       keepUnusedDataFor: Number.MAX_VALUE // Keeps data "forever"
     }),
     getVenueFull: builder.mutation<IVenue, { venueId: number; userId: number }>({
       query: (ids) => ({ url: `/venue`, method: 'POST', body: ids })
     }),
+    // User Login items
     loginExistingUser: builder.query<IVerifyOneTimeCode | IMessage, string>({
       query: (email) => ({ url: `/user/existing?email=${email}`, method: 'GET' })
     }),
     verifyOneTimeCode: builder.mutation<IUserToken | IMessage, IUserLogin>({
       query: (emailToken) => ({ url: '/user/verify-otc', method: 'POST', body: emailToken })
     }),
-    getActiveCheckouts: builder.query<ICheckout[], void>({
-      query: () => ({ url: 'checkout/active-checkouts' })
+    // Checkout items
+    getActiveCheckouts: builder.query<ICheckout[], string | number>({
+      query: (venueId) => ({ url: `checkout/active-checkouts?venueId=${venueId}` })
     }),
     getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({
       query: (slugs) => ({ url: `checkout?slug=${slugs.slug}&venueSlug=${slugs.venueSlug}` })
     }),
+    // Order items
     updateOrderStatus: builder.mutation<IOrder | IMessage, { receiptNumber: string; status: string }>({
       query: (orderData) => ({
         url: 'order/update-order',
@@ -127,6 +131,7 @@ export const {
   useGetVenueFullMutation,
   useLazyLoginExistingUserQuery,
   useVerifyOneTimeCodeMutation,
+  useGetActiveCheckoutsQuery,
   useGetCheckoutQuery,
   useUpdateOrderStatusMutation,
   useGetOrderStatusEventsQuery

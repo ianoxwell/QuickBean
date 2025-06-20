@@ -131,7 +131,7 @@ export class UserService {
   }
 
   async findById(id: number): Promise<IUserSummary | undefined> {
-    const user = await this.repository.findOne({ where: { id } });
+    const user = await this.repository.findOne({ where: { id }, relations: ['venues'] });
     if (!user || !user.isActive) {
       return undefined;
     }

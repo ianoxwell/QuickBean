@@ -7,6 +7,7 @@ export const CRoutes = {
   dashboard: 'home', // include the historical orders for today
   kitchen: 'kitchen', // active orders
   products: 'products', // list of products
+  modifiers: 'modifiers', // list of modifiers
   checkouts: 'checkouts', // checkout design and management
   settings: 'settings', // user settings
 };

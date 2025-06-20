@@ -39,16 +39,22 @@ export class CheckoutService {
     console.time('findActiveByVenueId');
     const user: IUserSummary = await this.userService.findById(userId);
     if (!user) {
+      console.timeEnd('findActiveByVenueId');
       return new CMessage(`User with ID ${userId} not found.`, HttpStatus.NOT_FOUND);
     }
 
     //if user does not have access to the venue, return an error
     const venue = await this.venueService.findById(venueId);
     if (!venue) {
+      console.timeEnd('findActiveByVenueId');
+
       return new CMessage(`Venue with ID ${venueId} not found.`, HttpStatus.NOT_FOUND);
     }
 
     if (!this.venueService.userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
+      console.log(`User with ID ${userId} does not have access to venue with ID ${venueId}.`, user.roles, user.venues);
+      console.timeEnd('findActiveByVenueId');
+
       return new CMessage(`User with ID ${userId} does not have access to venue with ID ${venueId}.`, HttpStatus.FORBIDDEN);
     }
 

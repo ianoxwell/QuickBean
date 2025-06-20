@@ -3,7 +3,17 @@ import { CRoutes } from '@app/routes.const';
 import { Divider, Flex, Menu, Stack, Text, Title, useMantineColorScheme } from '@mantine/core';
 import { ERole } from '@models/base.dto';
 import { logoutUser } from '@pages/account/userSlice';
-import { CircleUser, CookingPot, LayoutDashboard, LogOut, Moon, Settings, SquareMenu, Sun } from 'lucide-react';
+import {
+  CircleUser,
+  Command,
+  CookingPot,
+  LayoutDashboard,
+  LogOut,
+  Moon,
+  Settings,
+  SquareMenu,
+  Sun
+} from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import './Navbar.scss';
 
@@ -31,6 +41,12 @@ const Navbar = () => {
       label: 'Products',
       icon: <LayoutDashboard size={iconSize} />,
       path: CRoutes.products,
+      isAllowed: user?.user.roles.includes(ERole.ADMIN) || user?.user.roles.includes(ERole.FRONT_OF_HOUSE)
+    },
+    {
+      label: 'Modifiers',
+      icon: <Command size={iconSize} />,
+      path: CRoutes.modifiers,
       isAllowed: user?.user.roles.includes(ERole.ADMIN) || user?.user.roles.includes(ERole.FRONT_OF_HOUSE)
     },
     {

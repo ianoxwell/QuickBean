@@ -31,7 +31,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!venueState.venue && venue?.id) {
+    if (!venueState.venue && !!venue?.id) {
       console.log('Venue not loaded, fetching full venue details', venueState, venue);
 
       (async () => {
@@ -54,6 +54,10 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     getFullVenue,
     navigate
   ]);
+
+  if (isVenueLoading || isFullVenueLoading || !venueState.venue) {
+    return null;
+  }
 
   return children;
 };

@@ -7,8 +7,19 @@ import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import Login from '@pages/account/Login';
 import VerifyEmail from '@pages/account/VerifyEmail';
+import CheckoutPage from '@pages/checkouts/CheckoutPage';
+import CheckoutsListPage from '@pages/checkouts/CheckoutsListPage';
+import CheckoutWrapper from '@pages/checkouts/CheckoutWrapper';
+import DashboardPage from '@pages/dashboard/DashboardPage';
 import KitchenPage from '@pages/kitchen/KitchenPage';
+import ModifierPage from '@pages/modifiers/ModifierPage';
+import ModifiersPage from '@pages/modifiers/ModifiersListPage';
+import ModifiersWrapper from '@pages/modifiers/ModifiersWrapper';
+import ProductPage from '@pages/products/ProductPage';
+import ProductsPage from '@pages/products/ProductsPage';
+import ProductsWrapper from '@pages/products/ProductsWrapper';
 import ProtectedRoute from '@pages/ProtectedRoute';
+import SettingsPage from '@pages/settings/SettingsPage';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import './App.scss';
@@ -37,6 +48,10 @@ function App() {
           <Routes>
             {/* Redirect '/' to a default venueSlug */}
             <Route path={base} element={<Navigate to={`${base}${defaultVenue}/${CRoutes.login}`} replace />} />
+            <Route
+              path={`${base}undefined/:anything`}
+              element={<Navigate to={`${base}${defaultVenue}/${CRoutes.login}`} replace />}
+            />
             <Route path={`${base}:venueSlug`} element={<Outlet />}>
               <Route
                 path={`${base}:venueSlug`}
@@ -46,11 +61,21 @@ function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route path={CRoutes.dashboard} element={<div>Dashboard Page</div>} />
+                <Route path={CRoutes.dashboard} element={<DashboardPage />} />
                 <Route path={CRoutes.kitchen} element={<KitchenPage />} />
-                <Route path={CRoutes.products} element={<div>Products Page</div>} />
-                <Route path={CRoutes.checkouts} element={<div>Checkouts Page</div>} />
-                <Route path={CRoutes.settings} element={<div>Settings Page</div>} />
+                <Route path={CRoutes.products} element={<ProductsWrapper />}>
+                  <Route index element={<ProductsPage />} />
+                  <Route path=":id" element={<ProductPage />} />
+                </Route>
+                <Route path={CRoutes.modifiers} element={<ModifiersWrapper />}>
+                  <Route index element={<ModifiersPage />} />
+                  <Route path=":id" element={<ModifierPage />} />
+                </Route>
+                <Route path={CRoutes.checkouts} element={<CheckoutWrapper />}>
+                  <Route index element={<CheckoutsListPage />} />
+                  <Route path=":id" element={<CheckoutPage />} />
+                </Route>
+                <Route path={CRoutes.settings} element={<SettingsPage />} />
               </Route>
               <Route path={CRoutes.login} element={<Login />} />
               <Route path={CRoutes.verify} element={<VerifyEmail />} />
