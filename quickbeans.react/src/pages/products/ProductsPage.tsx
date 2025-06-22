@@ -1,6 +1,7 @@
 import { useGetActiveProductsQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { convertProductType } from '@utils/stringUtils';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -24,7 +25,9 @@ const ProductsPage = () => {
         <ul>
           {products.map((product) => (
             <li key={product.id}>
-              <Link to={`${base}${venueState.slug}/${CRoutes.products}/${product.id}`}>{product.name}</Link>
+              <Link to={`${base}${venueState.slug}/${CRoutes.products}/${product.id}`}>
+                {product.name} {convertProductType(product.productType)}
+              </Link>
             </li>
           ))}
         </ul>
@@ -34,4 +37,3 @@ const ProductsPage = () => {
 };
 
 export default ProductsPage;
-

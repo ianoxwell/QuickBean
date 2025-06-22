@@ -13,3 +13,8 @@ export const generateRandomUniqueString = (length: number, isUpperCaseOnly = tru
     : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length }, () => characters.charAt(Math.floor(Math.random() * characters.length))).join('');
 };
+
+// EProductType is like 'hot_drinks' this returns 'Hot drinks'
+export const convertProductType = (productType: string): string => {
+  return productType.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+};

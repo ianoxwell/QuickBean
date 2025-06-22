@@ -1,6 +1,9 @@
-import { CLocalStorageKeys } from '@app/appGlobal.const';
+import { IOrder } from '@models/order.dto';
 import { IUserToken } from '@models/user.dto';
 
+export const CLocalStorageKeys = { user: 'qb-user', order: 'qb-order' };
+
+// User methods
 export const addUserToLocalStorage = (userToken: IUserToken) => {
   localStorage.setItem(CLocalStorageKeys.user, JSON.stringify(userToken));
 };
@@ -17,6 +20,21 @@ export const getUserFromLocalStorage = (): IUserToken | undefined => {
   }
 
   return user;
+};
+
+// Order storage
+
+export const addOrderToLocalStorage = (order: IOrder) => {
+  localStorage.setItem(CLocalStorageKeys.order, JSON.stringify(order));
+};
+export const removeOrderFromLocalStorage = () => {
+  localStorage.removeItem(CLocalStorageKeys.order);
+};
+
+export const getOrderFromLocalStorage = (): IOrder | undefined => {
+  const result = localStorage.getItem(CLocalStorageKeys.order);
+  const order = typeof result === 'string' && result.includes('{') ? (JSON.parse(result) as IOrder) : undefined;
+  return order;
 };
 
 /** Decodes the token, parses and attempts to cast to T. */

@@ -11,7 +11,7 @@
       "@app/*": ["src/app/*"],
       "@components/*": ["src/components/*"],
       "@pages/*": ["src/pages/*"],
-      "@utils/*": ["src/utils/*"],
+      "@utils/*": ["../utils/*"],
       "@models/*": ["../api.quickbeans/Models/*"]
     },
 
@@ -31,5 +31,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "../utils"]
 }

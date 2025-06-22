@@ -10,7 +10,7 @@
       "@app/*": ["src/app/*"],
       "@components/*": ["src/components/*"],
       "@pages/*": ["src/pages/*"],
-      "@utils/*": ["src/utils/*"],
+      "@utils/*": ["../utils/*"],
       "@domain/*": ["../api.quickbeans/Models/*"]
     },
 

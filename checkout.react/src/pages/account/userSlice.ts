@@ -1,8 +1,8 @@
-import { IUserToken } from '@models/user.dto';
-import { IOrder } from '@models/order.dto';
-import { addUserToLocalStorage, getUserFromLocalStorage, removeUserFromLocalStorage } from '@utils/localStorage';
-import { createSlice } from '@reduxjs/toolkit';
 import { notifications } from '@mantine/notifications';
+import { IOrder } from '@models/order.dto';
+import { IUserToken } from '@models/user.dto';
+import { createSlice } from '@reduxjs/toolkit';
+import { addUserToLocalStorage, getUserFromLocalStorage, removeUserFromLocalStorage } from '@utils/localStorage';
 
 export interface IUserState {
   user: IUserToken | undefined;
