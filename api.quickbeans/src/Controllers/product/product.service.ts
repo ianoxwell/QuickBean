@@ -13,8 +13,21 @@ export class ProductService {
     private modifierService: ModifierService
   ) {}
 
-  async findById(id: number): Promise<Product | null> {
+  async findEntityById(id: number): Promise<Product | null> {
     return this.productRepository.findOne({ where: { id, isActive: true } });
+  }
+
+  async findByByIdFullProduct(id: number, venueId: number): Promise<IProduct | null> {
+    const product = await this.productRepository.findOne({
+      where: { id, isActive: true, venue: { id: venueId } },
+      relations: ['venue', 'modifiers', 'modifiers.options']
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    return this.mapProductToIProduct(product);
   }
 
   async findByVenueId(venueId: number): Promise<IProduct[] | null> {

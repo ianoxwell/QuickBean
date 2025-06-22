@@ -72,8 +72,8 @@ export const apiSlice = createApi({
     getActiveProducts: builder.query<IProductShort[], string | number>({
       query: (venueId) => ({ url: `product/active-products?venueId=${venueId}` })
     }),
-    getProduct: builder.query<IProduct | IMessage, string | number>({
-      query: (id) => ({ url: `product?productId=${id}` })
+    getProduct: builder.query<IProduct | IMessage, { venueId: number, productId: number | string }>({
+      query: (id) => ({ url: `product?productId=${id.productId}&venueId=${id.venueId}` })
     }),
     // Modifier items
     getActiveModifiers: builder.query<IModifier[], string | number>({

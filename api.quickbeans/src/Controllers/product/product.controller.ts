@@ -21,7 +21,7 @@ export class ProductController {
     //TODO insert security check to ensure the user has access to create products
     // console.log(`User ${user.id} is creating product: ${productData.name}`);
 
-    const existingProduct = await this.productService.findById(productData.id);
+    const existingProduct = await this.productService.findEntityById(productData.id);
     if (existingProduct) {
       return new CMessage(`Product with ID ${productData.id} already exists.`, HttpStatus.CONFLICT);
     }
@@ -53,13 +53,13 @@ export class ProductController {
   }
 
   @Get()
-  async getProductById(@Query('productId') productId: number): Promise<IProduct | CMessage> {
+  async getProductById(@Query('productId') productId: number, @Query('venueId') venueId: number): Promise<IProduct | CMessage> {
     if (!productId) {
       return new CMessage('Id is required.', HttpStatus.BAD_REQUEST);
     }
 
     // Fetch the product by ID
-    const product = await this.productService.findById(productId);
+    const product = await this.productService.findByByIdFullProduct(productId, venueId);
     if (!product) {
       return new CMessage(`Product with ID ${productId} not found.`, HttpStatus.NOT_FOUND);
     }
