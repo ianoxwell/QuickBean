@@ -64,7 +64,8 @@ export class ProductService {
       id: product.id,
       name: product.name,
       description: product.description,
-      productType: product.productType
+      productType: product.productType,
+      imageUrl: product.imageUrl
     };
   }
 
@@ -72,7 +73,6 @@ export class ProductService {
     return {
       ...this.mapProductToIProductShort(product),
       baseCost: Number(product.baseCost),
-      imageUrl: product.imageUrl,
       modifiers: product.modifiers.map((modifier) => this.modifierService.mapModifierToIModifier(modifier))
     };
   }

@@ -5,7 +5,7 @@
   --light-card-background: #f5f5f5;
   --light-card-border: #e5e5e5;
   --light-text: #131a2e;
-  --light-muted-text: #494949;
+  --light-muted-text: #707070;
   --light-accent: #986e2f;
   --light-primary: #55433c;
   --light-secondary: #7a5b4c;
@@ -16,7 +16,7 @@
   --dark-card-background: #272220;
   --dark-card-border: #37302d;
   --dark-text: #f5f5f5;
-  --dark-muted-text: #c9c9c9;
+  --dark-muted-text: #969696;
   --dark-accent: #986e2f;
   --dark-primary: #55433c;
   --dark-primary-text: #ffffff;
@@ -52,6 +52,7 @@
     --shadow-color: rgba(255, 255, 255, 0.1);
     --card: var(--dark-card-background);
     --muted-text: var(--dark-muted-text);
+    --mantine-color-dimmed: var(--dark-muted-text);
   }
   &[data-mantine-color-scheme='light'] {
     --mantine-color-body: var(--light-background);
@@ -64,6 +65,7 @@
     --shadow-color: rgba(0, 0, 0, 0.1);
     --card: var(--light-card-background);
     --muted-text: var(--light-muted-text);
+    --mantine-color-dimmed: var(--light-muted-text);
   }
 }
 h1,

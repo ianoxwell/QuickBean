@@ -1,12 +1,10 @@
 import { useGetActiveProductsQuery } from '@app/apiSlice';
-import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { convertProductType } from '@utils/stringUtils';
+import { Grid } from '@mantine/core';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import ProductItem from './ProductItem';
 
-const ProductsPage = () => {
-  const base = import.meta.env.VITE_BASE_URL;
+const ProductsListPage = () => {
   const venueState = useSelector((store: RootState) => store.venue);
   const {
     data: products,
@@ -22,18 +20,16 @@ const ProductsPage = () => {
       {isLoading && <p>Loading...</p>}
       {isError && <p>Error loading products.</p>}
       {products && (
-        <ul>
+        <Grid>
           {products.map((product) => (
-            <li key={product.id}>
-              <Link to={`${base}${venueState.slug}/${CRoutes.products}/${product.id}`}>
-                {product.name} {convertProductType(product.productType)}
-              </Link>
-            </li>
+            <Grid.Col span={{ base: 12, md: 6, lg: 3 }} key={product.id}>
+              <ProductItem product={product} />
+            </Grid.Col>
           ))}
-        </ul>
+        </Grid>
       )}
     </div>
   );
 };
 
-export default ProductsPage;
+export default ProductsListPage;

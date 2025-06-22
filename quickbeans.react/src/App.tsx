@@ -14,7 +14,7 @@ import KitchenPage from '@pages/kitchen/KitchenPage';
 import ModifierPage from '@pages/modifiers/ModifierPage';
 import ModifiersPage from '@pages/modifiers/ModifiersListPage';
 import ProductPage from '@pages/products/ProductPage';
-import ProductsPage from '@pages/products/ProductsPage';
+import ProductsListPage from '@pages/products/ProductsListPage';
 import ProtectedRoute from '@pages/ProtectedRoute';
 import SettingsPage from '@pages/settings/SettingsPage';
 import SharedLayout from '@pages/SharedLayout';
@@ -61,7 +61,7 @@ function App() {
                 <Route path={CRoutes.dashboard} element={<DashboardPage />} />
                 <Route path={CRoutes.kitchen} element={<KitchenPage />} />
                 <Route path={CRoutes.products} element={<Outlet />}>
-                  <Route index element={<ProductsPage />} />
+                  <Route index element={<ProductsListPage />} />
                   <Route path=":id" element={<ProductPage />} />
                 </Route>
                 <Route path={CRoutes.modifiers} element={<Outlet />}>
