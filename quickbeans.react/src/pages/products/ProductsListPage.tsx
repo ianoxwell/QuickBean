@@ -1,6 +1,6 @@
 import { useGetActiveProductsQuery } from '@app/apiSlice';
 import { RootState } from '@app/store';
-import { Grid } from '@mantine/core';
+import { Divider, Grid } from '@mantine/core';
 import { useSelector } from 'react-redux';
 import ProductItem from './ProductItem';
 
@@ -14,11 +14,22 @@ const ProductsListPage = () => {
     skip: !venueState.id
   });
 
+  if (isLoading) {
+    return <div>Loading products...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading products</div>;
+  }
+
+  if (!venueState.id) {
+    return <div>Venue possibly not loaded when the component initialised. {JSON.stringify(venueState)}</div>;
+  }
+
   return (
     <div>
       <h1>List of Products</h1>
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Error loading products.</p>}
+      <Divider my="md" />
       {products && (
         <Grid>
           {products.map((product) => (
