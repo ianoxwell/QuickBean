@@ -28,10 +28,11 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     }
 
     if (isVenueLoading || isFullVenueLoading) {
+      console.log('Venue is loading, waiting for full venue');
       return;
     }
 
-    if (!venueState.venue && !!venue?.id) {
+    if ((!venueState.venue || !venueState.id) && !!venue?.id) {
       console.log('Venue not loaded, fetching full venue details', venueState, venue);
 
       (async () => {
@@ -45,6 +46,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   }, [
     base,
     defaultVenue,
+    venueSlug,
     isFullVenueLoading,
     isVenueLoading,
     userToken,
