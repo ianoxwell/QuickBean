@@ -46,6 +46,8 @@ const ProductPage = () => {
   const handleEdit = () => {
     setIsEditing(true);
     setEditedProduct(product);
+    form.setValues(product as IProduct);
+    form.clearErrors();
   };
 
   const handleCancel = () => {
