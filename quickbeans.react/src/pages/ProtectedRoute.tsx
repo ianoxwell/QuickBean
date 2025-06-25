@@ -4,6 +4,7 @@ import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { setFullVenue } from '@app/venueSlice';
 import { IUserToken } from '@models/user.dto';
+import { isMessage } from '@utils/typescriptHelpers';
 import { ReactNode, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +22,19 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const defaultVenue: string = venue?.slug || venueSlug || import.meta.env.VITE_DEFAULT_VENUE;
 
   useEffect(() => {
+    async function fetchFullVenue() {
+      const fullVenue = await getFullVenue({
+        venueId: venue?.id || venueState.id,
+        userId: userToken?.user.id || 0
+      }).unwrap();
+      if (isMessage(fullVenue)) {
+        console.error('Error fetching full venue:', fullVenue);
+        navigate(`${base}${CRoutes.error}`);
+        return;
+      }
+      dispatch(setFullVenue(fullVenue));
+    }
+
     if (!userToken || !userToken.token) {
       console.log('User is not authenticated, redirecting to login');
       navigate(`${base}${defaultVenue}/${CRoutes.login}`);
@@ -34,14 +48,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
     if ((!venueState.venue || !venueState.id) && !!venue?.id) {
       console.log('Venue not loaded, fetching full venue details', venueState, venue);
-
-      (async () => {
-        const fullVenue = await getFullVenue({
-          venueId: venue.id,
-          userId: userToken?.user.id || 0
-        }).unwrap();
-        dispatch(setFullVenue(fullVenue));
-      })();
+      fetchFullVenue();
     }
   }, [
     base,

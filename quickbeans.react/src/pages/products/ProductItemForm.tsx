@@ -1,13 +1,30 @@
-import { Flex, NumberInput, Select, Stack, Textarea, TextInput } from '@mantine/core';
+import { Flex, Image, InputLabel, NumberInput, Select, Stack, Text, Textarea, TextInput } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { EProductType } from '@models/base.dto';
+import { IMessage } from '@models/message.dto';
 import { IProduct } from '@models/products.dto';
 import { convertProductType } from '@utils/stringUtils';
+import { isMessage } from '@utils/typescriptHelpers';
 import { DollarSign } from 'lucide-react';
+import ProductItemModifierForm from './ProductItemModifierForm';
 
-const ProductItemForm = ({ form }: { form: UseFormReturnType<IProduct> }) => {
+const ProductItemForm = ({
+  form,
+  product
+}: {
+  form: UseFormReturnType<IProduct>;
+  product: IProduct | IMessage | undefined;
+}) => {
   const iconSize = 16;
   const productTypeOptions = Object.values(EProductType) as EProductType[];
+
+  if (!product || isMessage(product)) {
+    return (
+      <Text color="red" size="sm">
+        {isMessage(product) ? product.message : 'Product not found'}
+      </Text>
+    );
+  }
 
   return (
     <form className="form product-form">
@@ -35,7 +52,16 @@ const ProductItemForm = ({ form }: { form: UseFormReturnType<IProduct> }) => {
             {...form.getInputProps('baseCost')}
           />
         </Stack>
-        <Stack gap="md" flex={1}></Stack>
+        <Stack gap="md" flex={1}>
+          <Image src={product.imageUrl} alt={product.name} radius="md" mb="md" />
+
+          {product.modifiers && product.modifiers.length > 0 && (
+            <>
+              <InputLabel>Modifiers:</InputLabel>
+              <ProductItemModifierForm productModifiers={product.modifiers} />
+            </>
+          )}
+        </Stack>
       </Flex>
     </form>
   );

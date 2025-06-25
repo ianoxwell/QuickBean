@@ -100,7 +100,7 @@ const ProductPage = () => {
           />
 
           {isEditing ? (
-            <ProductItemForm form={form} />
+            <ProductItemForm form={form} product={editedProduct} />
           ) : (
             <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
               <Stack gap="md" flex={1}>
@@ -129,7 +129,7 @@ const ProductPage = () => {
                   <>
                     <InputLabel>Modifiers:</InputLabel>
                     {product.modifiers.map((modifier) => (
-                      <ModifierItem key={modifier.id} modifier={modifier} />
+                      <ModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
                     ))}
                   </>
                 )}

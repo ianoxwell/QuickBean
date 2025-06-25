@@ -20,6 +20,7 @@ import SettingsPage from '@pages/settings/SettingsPage';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import './App.scss';
+import ErrorPage from '@pages/errorPage/errorPage';
 
 const theme = createTheme({
   fontFamily: 'Lato, Quicksand, sans-serif',
@@ -49,6 +50,7 @@ function App() {
               path={`${base}undefined/:anything`}
               element={<Navigate to={`${base}${defaultVenue}/${CRoutes.login}`} replace />}
             />
+            <Route path={`${base}${CRoutes.error}`} element={<ErrorPage />} />
             <Route path={`${base}:venueSlug`} element={<Outlet />}>
               <Route
                 path={`${base}:venueSlug`}
