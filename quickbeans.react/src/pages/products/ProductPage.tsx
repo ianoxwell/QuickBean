@@ -127,7 +127,7 @@ const ProductPage = () => {
 
                 {product.modifiers && product.modifiers.length > 0 && (
                   <>
-                    <h3>Modifiers:</h3>
+                    <InputLabel>Modifiers:</InputLabel>
                     {product.modifiers.map((modifier) => (
                       <ModifierItem key={modifier.id} modifier={modifier} />
                     ))}

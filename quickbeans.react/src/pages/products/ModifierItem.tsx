@@ -1,4 +1,4 @@
-import { Button, Flex, Stack, Badge } from '@mantine/core';
+import { Button, Flex, Stack, Badge, Text } from '@mantine/core';
 import { IModifier } from '@models/modifier.dto';
 import { Edit } from 'lucide-react';
 
@@ -12,7 +12,7 @@ const ModifierItem = ({ modifier }: { modifier: IModifier }) => {
   return (
     <Stack gap={0} mb="xs" className="modifier-item">
       <Flex justify="space-between" align="center">
-        <strong>{modifier.name}</strong>
+        <Text fw={700} size="md">{modifier.name}</Text>
         <Button size="sm" variant="subtle" type="button" leftSection={<Edit size={iconSize} />}>
           Edit
         </Button>
