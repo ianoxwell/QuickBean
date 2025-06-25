@@ -2,7 +2,7 @@ import { useGetProductQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
-import { Badge, Flex, Image, InputLabel, Stack, Text } from '@mantine/core';
+import { Flex, Image, InputLabel, Stack, Text } from '@mantine/core';
 import { hasLength, isNotEmpty, useForm } from '@mantine/form';
 import { EProductType } from '@models/base.dto';
 import { IProduct } from '@models/products.dto';
@@ -11,6 +11,7 @@ import { isMessage } from '@utils/typescriptHelpers';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import ModifierItem from './ModifierItem';
 import ProductItemForm from './ProductItemForm';
 
 const ProductPage = () => {
@@ -122,25 +123,14 @@ const ProductPage = () => {
                 </div>
               </Stack>
               <Stack gap="md" flex={1}>
-                <Image src={product.imageUrl} alt={product.name} radius="md" />
+                <Image src={product.imageUrl} alt={product.name} radius="md" mb="md" />
 
                 {product.modifiers && product.modifiers.length > 0 && (
                   <>
                     <h3>Modifiers:</h3>
-                    <ul>
-                      {product.modifiers.map((modifierGroup) => (
-                        <li key={modifierGroup.id}>
-                          <strong>{modifierGroup.name}</strong>
-                          <Flex gap="xs">
-                            {modifierGroup.options.map((modifier) => (
-                              <Badge key={modifier.id}>
-                                {modifier.label} (+${modifier.priceAdjustment?.toFixed(2)})
-                              </Badge>
-                            ))}
-                          </Flex>
-                        </li>
-                      ))}
-                    </ul>
+                    {product.modifiers.map((modifier) => (
+                      <ModifierItem key={modifier.id} modifier={modifier} />
+                    ))}
                   </>
                 )}
               </Stack>
