@@ -1,7 +1,7 @@
 import { EOrderStatus } from '@models/base.dto';
 import { ICheckoutShort } from './checkout.dto';
 import { ISelectedModifierOption } from './modifier.dto';
-import { IProduct } from './products.dto';
+import { IProductShort } from './products.dto';
 import { IUserProfile } from './user.dto';
 import { IVenueShort } from './venue.dto';
 
@@ -31,7 +31,7 @@ export interface IOrderItem {
   // This can be used for tracking or referencing the item in a more user-friendly way
   uniqueId?: string; // Optional unique identifier for the order item
   productId: number;
-  product: IProduct;
+  product: IProductShort;
   quantity: number;
   price: number;
   selectedModifiers?: ISelectedModifierOption[];

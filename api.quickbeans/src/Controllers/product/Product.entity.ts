@@ -1,7 +1,7 @@
-import { Modifier } from '@controllers/modifier/Modifier.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { EProductType } from '@models/base.dto';
-import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductModifier } from './ProductModifierJoin.entity';
 
 @Entity()
 export class Product {
@@ -31,7 +31,6 @@ export class Product {
   @Index()
   venue!: Venue;
 
-  @ManyToMany(() => Modifier, { cascade: true })
-  @JoinTable()
-  modifiers: Modifier[];
+  @OneToMany(() => ProductModifier, (pm) => pm.product, { cascade: true, eager: true })
+  productModifiers: ProductModifier[];
 }

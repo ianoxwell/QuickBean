@@ -15,6 +15,8 @@ import products from './data/products.const';
 import users from './data/users.const';
 import venues from './data/venues.const';
 import { SeederModule } from './seeder.module';
+import { ProductModifier } from '@controllers/product/ProductModifierJoin.entity';
+import productModifiers from './data/productModifiers.const';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(SeederModule);
@@ -87,10 +89,10 @@ async function bootstrap() {
       return await modifierRepo.save(modifier);
     })
   );
+  console.log('Modifiers seeded');
 
   // Seed Products
   const productRepo = dataSource.getRepository(Product);
-  const modifiersList = await modifierRepo.find();
   await Promise.all(
     products.map(async (product) => {
       const existingProduct = await productRepo.findOneBy({ name: product.name, venue: { name: product.venue?.name } });
@@ -101,15 +103,15 @@ async function bootstrap() {
 
       // Assign the found venue to the product
       product.venue = venue;
-      product.modifiers =
-        product.modifiers?.map((mod) => {
-          const modifier = modifiersList.find((m) => m.name === mod.name);
-          if (!modifier) {
-            throw new Error(`Modifier not found: ${mod.name}`);
-          }
+      // product.modifiers =
+      //   product.modifiers?.map((mod) => {
+      //     const modifier = modifiersList.find((m) => m.name === mod.name);
+      //     if (!modifier) {
+      //       throw new Error(`Modifier not found: ${mod.name}`);
+      //     }
 
-          return modifier;
-        }) || [];
+      //     return modifier;
+      //   }) || [];
 
       // Save the product
       return await productRepo.save(product);
@@ -117,11 +119,41 @@ async function bootstrap() {
   );
   console.log('Products seeded');
 
+  // Seed Product Modifiers
+  const productModifierRepo = dataSource.getRepository(ProductModifier);
+  const modifiersList = await modifierRepo.find();
+  const productsList = await productRepo.findBy({ venue: { id: venue.id }, isActive: true });
+  await Promise.all(
+    productModifiers.map(async (pm) => {
+      const existingProductModifier = await productModifierRepo.findOneBy({
+        product: { name: pm.product.name },
+        modifier: { name: pm.modifier.name }
+      });
+      if (existingProductModifier) {
+        if (pm.order === existingProductModifier.order) {
+          console.log(`Product Modifier for product ${pm.product.name} and modifier ${pm.modifier.name} already exists, skipping...`);
+          return existingProductModifier;
+        }
+
+        existingProductModifier.order = pm.order; // Update the order if it differs
+        console.log(`Updating order for Product Modifier: ${pm.product.name} - ${pm.modifier.name}`);
+        return await productModifierRepo.save(existingProductModifier);
+      }
+
+      pm.product = productsList.find((p) => p.name === pm.product.name);
+      pm.modifier = modifiersList.find((m) => m.name === pm.modifier.name);
+      if (!pm.product || !pm.modifier) {
+        throw new Error(`Product or Modifier not found for Product Modifier: ${JSON.stringify(pm)}`);
+      }
+
+      // If the product modifier does not exist, create a new one
+      const newProductModifier = productModifierRepo.create(pm);
+      return await productModifierRepo.save(newProductModifier);
+    })
+  );
+
   // Seed checkouts
   const checkoutRepo = dataSource.getRepository(Checkout);
-  const productsList = await productRepo.findBy({ venue: { id: venue.id }, isActive: true });
-  console.log('Products list fetched for checkouts', productsList);
-
   const checkoutCategoryRepo = dataSource.getRepository(CheckoutCategory);
   const checkoutCategoriesList = await checkoutCategoryRepo.find();
   await Promise.all(

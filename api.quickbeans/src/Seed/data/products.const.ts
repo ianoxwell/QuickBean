@@ -1,9 +1,7 @@
+import { Product } from '@controllers/product/Product.entity';
+import { Venue } from '@controllers/venue/Venue.entity';
 import { EProductType } from '@models/base.dto';
 import venues from './venues.const';
-import modifiers from './modifiers.const';
-import { Product } from '@controllers/product/Product.entity';
-import { Modifier } from '@controllers/modifier/Modifier.entity';
-import { Venue } from '@controllers/venue/Venue.entity';
 
 const products: Product[] = [
   {
@@ -13,8 +11,8 @@ const products: Product[] = [
     isActive: true,
     imageUrl: 'https://raw.githubusercontent.com/ianoxwell/QuickBean/main/assets/flat-white.jpg',
     productType: EProductType.HOT_DRINK,
-    modifiers: [modifiers[0], modifiers[1]] as Modifier[],
-    venue: venues[0] as Venue
+    venue: venues[0] as Venue,
+    productModifiers: []
   },
   {
     name: 'Cold Brew',
@@ -23,7 +21,7 @@ const products: Product[] = [
     isActive: true,
     imageUrl: 'https://raw.githubusercontent.com/ianoxwell/QuickBean/main/assets/cold-brew.jpg',
     productType: EProductType.COLD_DRINK,
-    modifiers: [modifiers[0], modifiers[1]] as Modifier[],
+    productModifiers: [],
     venue: venues[0] as Venue
   },
   {
@@ -33,7 +31,7 @@ const products: Product[] = [
     isActive: true,
     imageUrl: 'https://raw.githubusercontent.com/ianoxwell/QuickBean/main/assets/long-black.jpg',
     productType: EProductType.HOT_DRINK,
-    modifiers: [modifiers[0]] as Modifier[],
+    productModifiers: [],
     venue: venues[0] as Venue
   },
   {
@@ -43,7 +41,7 @@ const products: Product[] = [
     isActive: true,
     imageUrl: 'https://raw.githubusercontent.com/ianoxwell/QuickBean/main/assets/iced-latte.jpg',
     productType: EProductType.COLD_DRINK,
-    modifiers: [modifiers[0], modifiers[1], modifiers[2]] as Modifier[],
+    productModifiers: [],
     venue: venues[0] as Venue
   }
 ];

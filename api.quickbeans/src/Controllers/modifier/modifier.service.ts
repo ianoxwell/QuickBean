@@ -1,8 +1,9 @@
+import { IModifier } from '@models/modifier.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Modifier, ModifierOption } from './Modifier.entity';
-import { IModifier, IModifierOption } from '@models/modifier.dto';
+import { Modifier } from './Modifier.entity';
+import { mapModifierToIModifier, mapModifierToIProductModifier } from './modifierMaps.util';
 
 @Injectable()
 export class ModifierService {
@@ -11,44 +12,26 @@ export class ModifierService {
   async findByVenueId(venueId: number): Promise<IModifier[] | null> {
     const modifiers = await this.modifierRepository.find({
       where: { venue: { id: venueId }, isActive: true },
-      relations: ['venue', 'options']
+      relations: ['venue', 'options', 'productModifiers', 'productModifiers.product']
     });
 
     if (!modifiers || modifiers.length === 0) {
       return null;
     }
 
-    return modifiers.map((modifier) => this.mapModifierToIModifier(modifier));
+    return modifiers.map((modifier) => mapModifierToIModifier(modifier));
   }
 
+  /** Find an individual modifier along with associated products */
   async findById(modifierId: number): Promise<IModifier | null> {
     const modifier = await this.modifierRepository.findOne({
       where: { id: modifierId, isActive: true },
-      relations: ['venue', 'options']
+      relations: ['venue', 'options', 'productModifiers', 'productModifiers.product']
     });
 
     if (!modifier) {
       return null;
     }
-
-    return this.mapModifierToIModifier(modifier);
-  }
-
-  mapModifierToIModifier(modifier: Modifier): IModifier {
-    return {
-      id: modifier.id,
-      name: modifier.name,
-      options: modifier.options.map((option) => this.mapModifierOptionsToIProduct(option))
-    };
-  }
-
-  mapModifierOptionsToIProduct(modifierOption: ModifierOption): IModifierOption {
-    return {
-      id: modifierOption.id,
-      label: modifierOption.label,
-      description: modifierOption.description,
-      priceAdjustment: Number(modifierOption.priceAdjustment),
-      percentAdjustment: Number(modifierOption.percentAdjustment)
-    };
+    return mapModifierToIProductModifier(modifier);
   }
 }

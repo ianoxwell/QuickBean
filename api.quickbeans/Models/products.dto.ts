@@ -1,5 +1,5 @@
 import { EProductType } from '@models/base.dto';
-import { IModifier } from './modifier.dto';
+import { IProductModifier } from './modifier.dto';
 
 export interface IProductShort {
   id?: number;
@@ -11,5 +11,5 @@ export interface IProductShort {
 
 export interface IProduct extends IProductShort {
   baseCost: number;
-  modifiers: IModifier[];
+  modifiers: IProductModifier[];
 }

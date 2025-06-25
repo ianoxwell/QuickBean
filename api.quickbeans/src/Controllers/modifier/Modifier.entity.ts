@@ -1,3 +1,4 @@
+import { ProductModifier } from '@controllers/product/ProductModifierJoin.entity';
 import { Venue } from '@controllers/venue/Venue.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -12,8 +13,14 @@ export class Modifier {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ default: false })
+  isRequired: boolean; // indicates if this modifier must be selected for the product
+
   @OneToMany(() => ModifierOption, (option) => option.modifier, { cascade: true })
   options: ModifierOption[];
+
+  @OneToMany(() => ProductModifier, (pm) => pm.modifier)
+  productModifiers: ProductModifier[];
 
   @ManyToOne(() => Venue, { nullable: false })
   venue!: Venue;
@@ -23,6 +30,9 @@ export class Modifier {
 export class ModifierOption {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @Column()
   label: string;
@@ -34,7 +44,10 @@ export class ModifierOption {
   priceAdjustment?: number; // can be positive or negative
 
   @Column({ type: 'decimal', nullable: true })
-  percentAdjustment?: number;
+  percentAdjustment?: number; // relates directly to the base cost of the product
+
+  @Column({ default: false })
+  isDefault: boolean;
 
   @ManyToOne(() => Modifier, (modifier) => modifier.options)
   modifier: Modifier;

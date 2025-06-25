@@ -1,23 +1,22 @@
+import { CMessage } from '@base/message.class';
+import { mapProductToIProduct } from '@controllers/product/productMaps.util';
+import { UserService } from '@controllers/user/user.service';
+import { VenueService } from '@controllers/venue/venue.service';
+import { ERole } from '@models/base.dto';
+import { ICheckoutCategory, ICheckoutCategoryWithProducts } from '@models/checkout-category.dto';
+import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
+import { IUserSummary } from '@models/user.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Checkout } from './Checkout.entity';
 import { CheckoutCategory } from './CheckoutCategory.entity';
-import { CMessage } from '@base/message.class';
-import { ICheckoutCategory, ICheckoutCategoryWithProducts } from '@models/checkout-category.dto';
-import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
-import { ProductService } from '@controllers/product/product.service';
-import { VenueService } from '@controllers/venue/venue.service';
-import { UserService } from '@controllers/user/user.service';
-import { IUserSummary } from '@models/user.dto';
-import { ERole } from '@models/base.dto';
 
 @Injectable()
 export class CheckoutService {
   constructor(
     @InjectRepository(Checkout) private readonly checkoutRepository: Repository<Checkout>,
     @InjectRepository(CheckoutCategory) private readonly checkoutCategoryRepository: Repository<CheckoutCategory>,
-    private productService: ProductService,
     private venueService: VenueService,
     private userService: UserService
   ) {}
@@ -148,7 +147,7 @@ export class CheckoutService {
       name: category.name,
       order: category.order,
       productType: category.productType,
-      products: category.products.map((product) => this.productService.mapProductToIProduct(product))
+      products: category.products.map((product) => mapProductToIProduct(product))
     };
   }
 

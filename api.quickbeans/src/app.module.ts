@@ -9,6 +9,7 @@ import { OrderModule } from '@controllers/order/order.module';
 import { OrderItem } from '@controllers/order/OrderItem.entity';
 import { Product } from '@controllers/product/Product.entity';
 import { ProductModule } from '@controllers/product/product.module';
+import { ProductModifier } from '@controllers/product/ProductModifierJoin.entity';
 import { StatusModule } from '@controllers/status/status.module';
 import { User } from '@controllers/user/User.entity';
 import { UserModule } from '@controllers/user/user.module';
@@ -29,7 +30,7 @@ import { AuthModule } from '@services/auth/auth.module';
       type: 'postgres',
       database: 'api_quickbeans',
       url: process.env.DATABASE_URL || process.env.PG_URL,
-      entities: [Checkout, CheckoutCategory, Modifier, ModifierOption, Order, OrderItem, Product, User, Venue],
+      entities: [Checkout, CheckoutCategory, Modifier, ModifierOption, ProductModifier, Order, OrderItem, Product, User, Venue],
       logging: ['error', 'warn'],
       poolSize: 5,
       maxQueryExecutionTime: 5000,
