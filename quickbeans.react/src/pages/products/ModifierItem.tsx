@@ -1,9 +1,17 @@
-import { Badge, Button, Card, Flex, Stack, Text } from '@mantine/core';
+import { Badge, Button, Card, Flex, Stack, Text, ActionIcon } from '@mantine/core';
 import { IModifier } from '@models/modifier.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
-import { Check, Edit, GripVertical } from 'lucide-react';
+import { Check, Edit, GripVertical, Trash } from 'lucide-react';
 
-const ModifierItem = ({ modifier, isEditVisible }: { modifier: IModifier; isEditVisible: boolean }) => {
+const ModifierItem = ({
+  modifier,
+  isEditVisible,
+  removeModifier
+}: {
+  modifier: IModifier;
+  isEditVisible: boolean;
+  removeModifier?: () => void;
+}) => {
   const iconSize = 16;
   const smallIconSize = 14;
 
@@ -22,15 +30,26 @@ const ModifierItem = ({ modifier, isEditVisible }: { modifier: IModifier; isEdit
                 {modifier.name}
               </Text>
               {modifier.isRequired && (
-                <Badge color="red" variant="light" size="xs">
+                <Badge color="orange" variant="light" size="xs">
                   Required
                 </Badge>
               )}
             </Flex>
-            {isEditVisible && (
+            {isEditVisible ? (
               <Button size="sm" variant="subtle" type="button" leftSection={<Edit size={iconSize} />}>
                 Edit
               </Button>
+            ) : (
+              <ActionIcon
+                variant="outline"
+                title="Remove this modifier from this product"
+                radius="xl"
+                type="button"
+                color="red"
+                onClick={removeModifier}
+              >
+                <Trash size={iconSize} />
+              </ActionIcon>
             )}
           </Flex>
           <Flex gap="xs" wrap="wrap">

@@ -28,6 +28,13 @@ const ProductItemModifierForm = ({ productModifiers }: { productModifiers: IProd
     });
   };
 
+  const onRemoveModifier = (modifierId: number) => {
+    // Handle the removal of a modifier
+    console.log('Remove modifier with ID:', modifierId);
+    // Implement the logic to remove the modifier from the productModifiers array
+    productModifiers = productModifiers.filter((modifier) => modifier.id !== modifierId);
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
@@ -37,8 +44,16 @@ const ProductItemModifierForm = ({ productModifiers }: { productModifiers: IProd
             {productModifiers.map((modifier, index) => (
               <Draggable key={modifier.id} draggableId={String(modifier.id)} index={index}>
                 {(draggableProvided) => (
-                  <div ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}>
-                    <ModifierItem modifier={modifier} isEditVisible={false} />
+                  <div
+                    ref={draggableProvided.innerRef}
+                    {...draggableProvided.draggableProps}
+                    {...draggableProvided.dragHandleProps}
+                  >
+                    <ModifierItem
+                      modifier={modifier}
+                      isEditVisible={false}
+                      removeModifier={() => onRemoveModifier(modifier.id)}
+                    />
                   </div>
                 )}
               </Draggable>

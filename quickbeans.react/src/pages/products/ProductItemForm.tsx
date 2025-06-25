@@ -19,12 +19,10 @@ const ProductItemForm = ({
   const productTypeOptions = Object.values(EProductType) as EProductType[];
 
   if (!product || isMessage(product)) {
-    return (
-      <Text color="red" size="sm">
-        {isMessage(product) ? product.message : 'Product not found'}
-      </Text>
-    );
+    return <Text size="sm">{isMessage(product) ? product.message : 'Product not found'}</Text>;
   }
+
+  console.log('form and product', form.getValues(), product);
 
   return (
     <form className="form product-form">
