@@ -4,7 +4,7 @@ import { useVenueNavigate } from '@app/useVenueNavigate';
 import { ActionIcon, Badge, Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { IModifier } from '@models/modifier.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
-import { Check, Edit, GripVertical, Trash } from 'lucide-react';
+import { Check, GripVertical, Trash, View } from 'lucide-react';
 
 const ModifierItem = ({
   modifier,
@@ -45,9 +45,9 @@ const ModifierItem = ({
                 onClick={() => {
                   navigate(`${CRoutes.modifiers}/${modifier.id}`);
                 }}
-                leftSection={<Edit size={CIconSizes.medium} />}
+                leftSection={<View size={CIconSizes.medium} />}
               >
-                Edit
+                View
               </Button>
             ) : (
               <ActionIcon
