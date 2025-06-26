@@ -1,38 +1,47 @@
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { IProductModifier } from '@models/modifier.dto';
 import ModifierItem from './ModifierItem';
+import { useProductFormContext } from './productFormContext';
 interface ReorderParams {
   list: IProductModifier[];
   startIndex: number;
   endIndex: number;
 }
 
-const ProductItemModifierForm = ({ productModifiers }: { productModifiers: IProductModifier[] }) => {
-  // a little function to help us with reordering the result
+const ProductItemModifierForm = () => {
+  const form = useProductFormContext();
+  const productModifiers = form.getValues().modifiers || [];
 
   const reorder = ({ list, startIndex, endIndex }: ReorderParams): IProductModifier[] => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
 
-    return result;
+    return result.map((modifier, index) => ({
+      ...modifier,
+      order: index // Update the order based on the new index
+    }));
   };
 
   const onDragEnd = (result: DropResult<string>) => {
     // Handle the drag end event
-    console.log('Drag ended:', result);
-    productModifiers = reorder({
+    const newModifiers = reorder({
       list: productModifiers,
       startIndex: result.source.index,
       endIndex: result.destination ? result.destination.index : result.source.index
     });
+    form.setFieldValue('modifiers', newModifiers);
   };
 
   const onRemoveModifier = (modifierId: number) => {
     // Handle the removal of a modifier
-    console.log('Remove modifier with ID:', modifierId);
-    // Implement the logic to remove the modifier from the productModifiers array
-    productModifiers = productModifiers.filter((modifier) => modifier.id !== modifierId);
+    const updatedModifiers = productModifiers
+      .filter((modifier) => modifier.id !== modifierId)
+      .map((modifier, index) => ({
+        ...modifier,
+        order: index // Update the order based on the new index
+      }));
+    form.setFieldValue('modifiers', updatedModifiers);
   };
 
   return (

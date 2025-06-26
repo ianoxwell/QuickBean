@@ -3,7 +3,7 @@ import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
 import { Flex, Image, InputLabel, Stack, Text } from '@mantine/core';
-import { hasLength, isNotEmpty, useForm } from '@mantine/form';
+import { hasLength, isNotEmpty } from '@mantine/form';
 import { EProductType } from '@models/base.dto';
 import { IProduct } from '@models/products.dto';
 import { convertProductType } from '@utils/stringUtils';
@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import ModifierItem from './ModifierItem';
 import ProductItemForm from './ProductItemForm';
+import { ProductFormProvider, useProductForm } from './productFormContext';
 
 const ProductPage = () => {
   const { id: productId } = useParams<{ id: string }>();
@@ -59,7 +60,7 @@ const ProductPage = () => {
     setIsEditing(false);
   };
 
-  const form = useForm({
+  const form = useProductForm({
     mode: 'uncontrolled',
     initialValues: {
       ...(editedProduct as IProduct)
@@ -84,7 +85,7 @@ const ProductPage = () => {
     return <div>Loading product...</div>;
   }
 
-  if (isError && isMessage(product)) {
+  if (isError || isMessage(product)) {
     return <div>Error loading product</div>;
   }
 
@@ -101,8 +102,10 @@ const ProductPage = () => {
             handleSave={handleSave}
           />
 
-          {isEditing ? (
-            <ProductItemForm form={form} product={editedProduct} />
+          {isEditing && editedProduct && !isMessage(editedProduct) ? (
+            <ProductFormProvider form={form}>
+              <ProductItemForm />
+            </ProductFormProvider>
           ) : (
             <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
               <Stack gap="md" flex={1}>

@@ -1,28 +1,16 @@
-import { Flex, Image, InputLabel, NumberInput, Select, Stack, Text, Textarea, TextInput } from '@mantine/core';
-import { UseFormReturnType } from '@mantine/form';
+import { Flex, Image, InputLabel, NumberInput, Select, Stack, Textarea, TextInput } from '@mantine/core';
 import { EProductType } from '@models/base.dto';
-import { IMessage } from '@models/message.dto';
-import { IProduct } from '@models/products.dto';
 import { convertProductType } from '@utils/stringUtils';
-import { isMessage } from '@utils/typescriptHelpers';
 import { DollarSign } from 'lucide-react';
+import ProductAddModifier from './ProductAddModifier';
 import ProductItemModifierForm from './ProductItemModifierForm';
+import { useProductFormContext } from './productFormContext';
+import { CIconSizes } from '@app/appGlobal.const';
 
-const ProductItemForm = ({
-  form,
-  product
-}: {
-  form: UseFormReturnType<IProduct>;
-  product: IProduct | IMessage | undefined;
-}) => {
-  const iconSize = 16;
+const ProductItemForm = () => {
+  const form = useProductFormContext();
+  const formValues = form.getValues();
   const productTypeOptions = Object.values(EProductType) as EProductType[];
-
-  if (!product || isMessage(product)) {
-    return <Text size="sm">{isMessage(product) ? product.message : 'Product not found'}</Text>;
-  }
-
-  console.log('form and product', form.getValues(), product);
 
   return (
     <form className="form product-form">
@@ -46,19 +34,20 @@ const ProductItemForm = ({
             defaultValue={0}
             label="Base cost"
             key={form.key('baseCost')}
-            leftSection={<DollarSign size={iconSize} />}
+            leftSection={<DollarSign size={CIconSizes.medium} />}
             {...form.getInputProps('baseCost')}
           />
         </Stack>
         <Stack gap="md" flex={1}>
-          <Image src={product.imageUrl} alt={product.name} radius="md" mb="md" />
+          <Image src={formValues.imageUrl} alt={formValues.name} radius="md" mb="md" />
 
-          {product.modifiers && product.modifiers.length > 0 && (
+          {formValues.modifiers && formValues.modifiers.length > 0 && (
             <>
               <InputLabel>Modifiers:</InputLabel>
-              <ProductItemModifierForm productModifiers={product.modifiers} />
+              <ProductItemModifierForm />
             </>
           )}
+          <ProductAddModifier />
         </Stack>
       </Flex>
     </form>
