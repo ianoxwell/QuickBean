@@ -6,7 +6,7 @@ import { IModifier } from '@models/modifier.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
 import { Check, GripVertical, Trash, View } from 'lucide-react';
 
-const ModifierItem = ({
+const ProductModifierItem = ({
   modifier,
   isEditVisible,
   removeModifier
@@ -75,4 +75,4 @@ const ModifierItem = ({
   );
 };
 
-export default ModifierItem;
+export default ProductModifierItem;

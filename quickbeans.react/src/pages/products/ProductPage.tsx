@@ -11,7 +11,7 @@ import { isMessage } from '@utils/typescriptHelpers';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import ModifierItem from './ModifierItem';
+import ProductModifierItem from './ProductModifierItem';
 import ProductItemForm from './ProductItemForm';
 import { ProductFormProvider, useProductForm } from './productFormContext';
 
@@ -134,7 +134,7 @@ const ProductPage = () => {
                   <>
                     <InputLabel>Modifiers:</InputLabel>
                     {product.modifiers.map((modifier) => (
-                      <ModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
+                      <ProductModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
                     ))}
                   </>
                 )}

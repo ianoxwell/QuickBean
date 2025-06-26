@@ -1,6 +1,6 @@
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { IProductModifier } from '@models/modifier.dto';
-import ModifierItem from './ModifierItem';
+import ProductModifierItem from './ProductModifierItem';
 import { useProductFormContext } from './productFormContext';
 interface ReorderParams {
   list: IProductModifier[];
@@ -58,7 +58,7 @@ const ProductItemModifierForm = () => {
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
-                    <ModifierItem
+                    <ProductModifierItem
                       modifier={modifier}
                       isEditVisible={false}
                       removeModifier={() => onRemoveModifier(modifier.id)}
