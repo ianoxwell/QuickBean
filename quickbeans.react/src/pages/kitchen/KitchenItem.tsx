@@ -1,4 +1,5 @@
 import { useUpdateOrderStatusMutation } from '@app/apiSlice';
+import { CIconSizes } from '@app/appGlobal.const';
 import { Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { EOrderStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
@@ -11,7 +12,6 @@ import { kitchenStatusColors } from './kitchen.util';
 const KitchenItem = ({ order }: { order: IOrder }) => {
   dayjs.extend(relativeTime);
   const date = dayjs(order.orderDate);
-  const iconSize = 20;
   const [updateOrderStatus, { isLoading }] = useUpdateOrderStatusMutation();
   // eslint-disable-next-line prefer-const
   let { trafficLight = 'grey', nextStatus = EOrderStatus.PREPARING } = kitchenStatusColors(order.bookingStatus);
@@ -37,7 +37,7 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
         <Flex justify="space-between">
           <Stack gap={0} align="flex-start">
             <Flex gap="xs" align="center">
-              <Clock size={iconSize} />
+              <Clock size={CIconSizes.large} />
               <Text size="md">{date.format('h:mm A')}</Text>
             </Flex>
             <Text>{date.fromNow()}</Text>
@@ -52,7 +52,9 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
       {order.items.map((item) => (
         <Flex justify="space-between" mb="md" className="order-item__text" key={`${item.id}-${item.uniqueId}`}>
           <Stack gap={0}>
-            <Text fw={700} className="order-item__title">{item.product.name}</Text>
+            <Text fw={700} className="order-item__title">
+              {item.product.name}
+            </Text>
             <Flex gap="xs" pl="sm" className="order-item__modifier">
               {item.selectedModifiers?.map((modifier, index) => (
                 <Text fs="italic" key={`${item.id}-${item.uniqueId}-${index}`}>
@@ -63,7 +65,7 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
           </Stack>
 
           <div className="order-item__price">
-            <Text size='sm'>${fixWholeNumber(item.price, 2)}</Text>
+            <Text size="sm">${fixWholeNumber(item.price, 2)}</Text>
           </div>
         </Flex>
       ))}

@@ -29,4 +29,5 @@ export interface IProductModifierOption extends IModifierOption {
 export interface ISelectedModifierOption {
   modifierId: number;
   optionId: number;
+  label: string;
 }

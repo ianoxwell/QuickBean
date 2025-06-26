@@ -1,3 +1,4 @@
+import { CIconSizes } from '@app/appGlobal.const';
 import BackButton from '@components/BackButton/BackButton.component';
 import { Button, Divider, Flex } from '@mantine/core';
 import { Edit, Save, X } from 'lucide-react';
@@ -17,7 +18,6 @@ const PageTitleForm = ({
   handleCancel: () => void;
   handleEdit: () => void;
 }) => {
-  const iconSize = 16;
   return (
     <>
       <Flex justify="space-between" align="center">
@@ -27,15 +27,15 @@ const PageTitleForm = ({
         </Flex>
         {isEditing ? (
           <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
-            <Button type="button" color="green.9" onClick={handleSave} leftSection={<Save size={iconSize} />}>
+            <Button type="button" color="green.9" onClick={handleSave} leftSection={<Save size={CIconSizes.medium} />}>
               Save
             </Button>
-            <Button type="button" color="gray.6" onClick={handleCancel} leftSection={<X size={iconSize} />}>
+            <Button type="button" color="gray.6" onClick={handleCancel} leftSection={<X size={CIconSizes.medium} />}>
               Cancel
             </Button>
           </Flex>
         ) : (
-          <Button type="button" onClick={handleEdit} leftSection={<Edit size={iconSize} />}>
+          <Button type="button" onClick={handleEdit} leftSection={<Edit size={CIconSizes.medium} />}>
             Edit
           </Button>
         )}

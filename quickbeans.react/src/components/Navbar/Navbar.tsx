@@ -16,48 +16,48 @@ import {
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import './Navbar.scss';
+import { CIconSizes } from '@app/appGlobal.const';
 
 const Navbar = () => {
   const { user } = useAppSelector((state) => state.user);
   const { venue } = useAppSelector((state) => state.venue);
-  const iconSize = 20;
   const dispatch = useAppDispatch();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const navItems = [
     {
       label: 'Dashboard',
-      icon: <LayoutDashboard size={iconSize} />,
+      icon: <LayoutDashboard size={CIconSizes.large} />,
       path: CRoutes.dashboard,
       isAllowed: user?.user.roles.includes(ERole.ADMIN) || user?.user.roles.includes(ERole.FRONT_OF_HOUSE)
     },
     {
       label: 'Kitchen',
-      icon: <CookingPot size={iconSize} />,
+      icon: <CookingPot size={CIconSizes.large} />,
       path: CRoutes.kitchen,
       isAllowed: true // Kitchen is always allowed
     },
     {
       label: 'Products',
-      icon: <LayoutDashboard size={iconSize} />,
+      icon: <LayoutDashboard size={CIconSizes.large} />,
       path: CRoutes.products,
       isAllowed: user?.user.roles.includes(ERole.ADMIN) || user?.user.roles.includes(ERole.FRONT_OF_HOUSE)
     },
     {
       label: 'Modifiers',
-      icon: <Command size={iconSize} />,
+      icon: <Command size={CIconSizes.large} />,
       path: CRoutes.modifiers,
       isAllowed: user?.user.roles.includes(ERole.ADMIN) || user?.user.roles.includes(ERole.FRONT_OF_HOUSE)
     },
     {
       label: 'Checkouts',
-      icon: <SquareMenu size={iconSize} />,
+      icon: <SquareMenu size={CIconSizes.large} />,
       path: CRoutes.checkouts,
       isAllowed: user?.user.roles.includes(ERole.ADMIN)
     },
     {
       label: 'Settings',
-      icon: <Settings size={iconSize} />,
+      icon: <Settings size={CIconSizes.large} />,
       path: CRoutes.settings,
       isAllowed: user?.user.roles.includes(ERole.ADMIN)
     }
@@ -87,14 +87,14 @@ const Navbar = () => {
         <Menu shadow="md" width={200}>
           <Menu.Target>
             <NavLink to="#" aria-label="Profile" className="nav-user-menu">
-              <CircleUser size={iconSize} />
+              <CircleUser size={CIconSizes.large} />
               <Text visibleFrom="md">{user?.user?.name}</Text>
             </NavLink>
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item
               onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
-              leftSection={colorScheme === 'dark' ? <Sun size={iconSize} /> : <Moon size={iconSize} />}
+              leftSection={colorScheme === 'dark' ? <Sun size={CIconSizes.large} /> : <Moon size={CIconSizes.large} />}
             >
               Toggle color scheme
             </Menu.Item>
