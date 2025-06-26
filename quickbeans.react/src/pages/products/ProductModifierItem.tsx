@@ -8,11 +8,11 @@ import { Check, GripVertical, Trash, View } from 'lucide-react';
 
 const ProductModifierItem = ({
   modifier,
-  isEditVisible,
+  isViewVisible,
   removeModifier
 }: {
   modifier: IModifier;
-  isEditVisible: boolean;
+  isViewVisible: boolean;
   removeModifier?: () => void;
 }) => {
   const navigate = useVenueNavigate();
@@ -24,7 +24,7 @@ const ProductModifierItem = ({
   return (
     <Card shadow="sm" mb="md" padding="sm" radius="md" withBorder className="modifier-item-card">
       <Flex gap="xs" align="center">
-        {!isEditVisible && <GripVertical size={CIconSizes.medium} className="modifier-drag-handle" />}
+        {!isViewVisible && <GripVertical size={CIconSizes.medium} className="modifier-drag-handle" />}
         <Stack gap={0} mb="xs" className="modifier-item" flex={1}>
           <Flex justify="space-between" align="center">
             <Flex gap="xs" align="center">
@@ -37,7 +37,7 @@ const ProductModifierItem = ({
                 </Badge>
               )}
             </Flex>
-            {isEditVisible ? (
+            {isViewVisible ? (
               <Button
                 size="sm"
                 variant="subtle"

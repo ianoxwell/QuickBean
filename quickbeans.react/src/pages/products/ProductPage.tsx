@@ -55,7 +55,6 @@ const ProductPage = () => {
     parseInt(productId, 10) === 0 &&
     (!editedProduct || (!isMessage(editedProduct) && editedProduct.id !== 0))
   ) {
-    console.log('Creating a new product', productId);
     const newItem = {
       id: 0,
       name: '',
@@ -156,7 +155,7 @@ const ProductPage = () => {
                       <>
                         <InputLabel>Modifiers:</InputLabel>
                         {product.modifiers.map((modifier) => (
-                          <ProductModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
+                          <ProductModifierItem key={modifier.id} modifier={modifier} isViewVisible={!isEditing} />
                         ))}
                       </>
                     )}

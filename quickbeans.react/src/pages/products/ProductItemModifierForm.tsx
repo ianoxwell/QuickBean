@@ -60,7 +60,7 @@ const ProductItemModifierForm = () => {
                   >
                     <ProductModifierItem
                       modifier={modifier}
-                      isEditVisible={false}
+                      isViewVisible={false}
                       removeModifier={() => onRemoveModifier(modifier.id)}
                     />
                   </div>
