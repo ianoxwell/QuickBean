@@ -7,6 +7,7 @@ const PageTitleForm = ({
   isEditing,
   pageTitle,
   backRoute,
+  isFormValid = true,
   handleSave,
   handleCancel,
   handleEdit
@@ -14,6 +15,7 @@ const PageTitleForm = ({
   isEditing: boolean;
   pageTitle: string;
   backRoute: string;
+  isFormValid?: boolean;
   handleSave: () => void;
   handleCancel: () => void;
   handleEdit: () => void;
@@ -27,7 +29,7 @@ const PageTitleForm = ({
         </Flex>
         {isEditing ? (
           <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
-            <Button type="button" color="green.9" onClick={handleSave} leftSection={<Save size={CIconSizes.medium} />}>
+            <Button type="button" color="green.9" onClick={handleSave} disabled={!isFormValid} leftSection={<Save size={CIconSizes.medium} />}>
               Save
             </Button>
             <Button type="button" color="gray.6" onClick={handleCancel} leftSection={<X size={CIconSizes.medium} />}>

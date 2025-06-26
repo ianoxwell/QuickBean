@@ -39,14 +39,10 @@ const ProductItemForm = () => {
           />
         </Stack>
         <Stack gap="md" flex={1}>
-          <Image src={formValues.imageUrl} alt={formValues.name} radius="md" mb="md" />
+          {formValues.imageUrl && <Image src={formValues.imageUrl} alt={formValues.name} radius="md" mb="md" />}
 
-          {formValues.modifiers && formValues.modifiers.length > 0 && (
-            <>
-              <InputLabel>Modifiers:</InputLabel>
-              <ProductItemModifierForm />
-            </>
-          )}
+          <InputLabel>Modifiers:</InputLabel>
+          {formValues.modifiers && formValues.modifiers.length > 0 && <ProductItemModifierForm />}
           <ProductAddModifier />
         </Stack>
       </Flex>

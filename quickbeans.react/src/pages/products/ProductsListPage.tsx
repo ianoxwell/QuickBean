@@ -1,8 +1,12 @@
 import { useGetActiveProductsQuery } from '@app/apiSlice';
+import { CIconSizes } from '@app/appGlobal.const';
 import { RootState } from '@app/store';
-import { Divider, Grid } from '@mantine/core';
+import { Button, Divider, Flex, Grid } from '@mantine/core';
+import { Plus } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import ProductItem from './ProductItem';
+import { useVenueNavigate } from '@app/useVenueNavigate';
+import { CRoutes } from '@app/routes.const';
 
 const ProductsListPage = () => {
   const venueState = useSelector((store: RootState) => store.venue);
@@ -13,6 +17,11 @@ const ProductsListPage = () => {
   } = useGetActiveProductsQuery(venueState.id, {
     skip: !venueState.id
   });
+  const navigate = useVenueNavigate();
+
+  const handleNew = () => {
+    navigate(`/${CRoutes.products}/0`);
+  };
 
   if (isLoading) {
     return <div>Loading products...</div>;
@@ -28,7 +37,12 @@ const ProductsListPage = () => {
 
   return (
     <div>
-      <h1>List of Products</h1>
+      <Flex justify="space-between" align="center">
+        <h1>List of Products</h1>
+        <Button type="button" onClick={handleNew} leftSection={<Plus size={CIconSizes.medium} />}>
+          New
+        </Button>
+      </Flex>
       <Divider my="md" />
       {products && (
         <Grid>

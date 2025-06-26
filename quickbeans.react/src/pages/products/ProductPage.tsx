@@ -1,6 +1,7 @@
 import { useGetProductQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useVenueNavigate } from '@app/useVenueNavigate';
 import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
 import { Flex, Image, InputLabel, Stack, Text } from '@mantine/core';
 import { hasLength, isNotEmpty } from '@mantine/form';
@@ -11,13 +12,14 @@ import { isMessage } from '@utils/typescriptHelpers';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import ProductModifierItem from './ProductModifierItem';
 import ProductItemForm from './ProductItemForm';
+import ProductModifierItem from './ProductModifierItem';
 import { ProductFormProvider, useProductForm } from './productFormContext';
 
 const ProductPage = () => {
   const { id: productId } = useParams<{ id: string }>();
   const venueState = useSelector((store: RootState) => store.venue);
+  const navigate = useVenueNavigate();
   const {
     data: product,
     isLoading,
@@ -25,40 +27,11 @@ const ProductPage = () => {
   } = useGetProductQuery(
     { productId: productId!, venueId: venueState.id! },
     {
-      skip: !productId || !venueState.id
+      skip: !productId || !venueState.id || parseInt(productId, 10) === 0
     }
   );
   const [isEditing, setIsEditing] = useState(false);
   const [editedProduct, setEditedProduct] = useState(product);
-
-  if (productId && parseInt(productId, 10) === 0) {
-    setIsEditing(true);
-    setEditedProduct({
-      id: 0,
-      name: '',
-      productType: EProductType.HOT_DRINK,
-      description: '',
-      imageUrl: '',
-      baseCost: 0,
-      modifiers: []
-    });
-  }
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditedProduct(product);
-    form.setValues(product as IProduct);
-    form.clearErrors();
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditedProduct(product);
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
-  };
 
   const form = useProductForm({
     mode: 'uncontrolled',
@@ -77,6 +50,53 @@ const ProductPage = () => {
     }
   });
 
+  if (
+    productId &&
+    parseInt(productId, 10) === 0 &&
+    (!editedProduct || (!isMessage(editedProduct) && editedProduct.id !== 0))
+  ) {
+    console.log('Creating a new product', productId);
+    const newItem = {
+      id: 0,
+      name: '',
+      productType: EProductType.HOT_DRINK,
+      description: '',
+      imageUrl: '',
+      baseCost: 0,
+      modifiers: []
+    };
+    setEditedProduct(newItem);
+    form.setValues(newItem);
+    setIsEditing(true);
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedProduct(product);
+    form.setValues(product as IProduct);
+    form.clearErrors();
+  };
+
+  const handleCancel = () => {
+    if (editedProduct && (editedProduct as IProduct).id === 0) {
+      navigate(`/${CRoutes.products}`);
+      return;
+    }
+
+    setIsEditing(false);
+    setEditedProduct(product);
+  };
+
+  const handleSave = () => {
+    form.validate();
+    if (!form.isValid()) {
+      console.error('Form validation failed', form.errors);
+      return;
+    }
+
+    setIsEditing(false);
+  };
+
   if (!productId) {
     return null; // Handle the case where productId is not provided
   }
@@ -91,7 +111,7 @@ const ProductPage = () => {
 
   return (
     <>
-      {!isLoading && !isError && product && !isMessage(product) && (
+      {!isLoading && !isError && (product || editedProduct) && !isMessage(product) && (
         <div className="form">
           <PageTitleForm
             isEditing={isEditing}
@@ -107,39 +127,43 @@ const ProductPage = () => {
               <ProductItemForm />
             </ProductFormProvider>
           ) : (
-            <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
-              <Stack gap="md" flex={1}>
-                <div>
-                  <InputLabel>Product Name</InputLabel>
-                  <Text>{product.name}</Text>
-                </div>
-                <div>
-                  <InputLabel>Product Type</InputLabel>
-                  <Text>{convertProductType(product.productType)}</Text>
-                </div>
+            <>
+              {product && (
+                <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
+                  <Stack gap="md" flex={1}>
+                    <div>
+                      <InputLabel>Product Name</InputLabel>
+                      <Text>{product.name}</Text>
+                    </div>
+                    <div>
+                      <InputLabel>Product Type</InputLabel>
+                      <Text>{convertProductType(product.productType)}</Text>
+                    </div>
 
-                <div>
-                  <InputLabel>Description</InputLabel>
-                  <Text>{product.description}</Text>
-                </div>
-                <div>
-                  <InputLabel>Base cost</InputLabel>
-                  <Text>${product.baseCost}</Text>
-                </div>
-              </Stack>
-              <Stack gap="md" flex={1}>
-                <Image src={product.imageUrl} alt={product.name} radius="md" mb="md" />
+                    <div>
+                      <InputLabel>Description</InputLabel>
+                      <Text>{product.description}</Text>
+                    </div>
+                    <div>
+                      <InputLabel>Base cost</InputLabel>
+                      <Text>${product.baseCost}</Text>
+                    </div>
+                  </Stack>
+                  <Stack gap="md" flex={1}>
+                    <Image src={product.imageUrl} alt={product.name} radius="md" mb="md" />
 
-                {product.modifiers && product.modifiers.length > 0 && (
-                  <>
-                    <InputLabel>Modifiers:</InputLabel>
-                    {product.modifiers.map((modifier) => (
-                      <ProductModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
-                    ))}
-                  </>
-                )}
-              </Stack>
-            </Flex>
+                    {product.modifiers && product.modifiers.length > 0 && (
+                      <>
+                        <InputLabel>Modifiers:</InputLabel>
+                        {product.modifiers.map((modifier) => (
+                          <ProductModifierItem key={modifier.id} modifier={modifier} isEditVisible={!isEditing} />
+                        ))}
+                      </>
+                    )}
+                  </Stack>
+                </Flex>
+              )}
+            </>
           )}
         </div>
       )}
