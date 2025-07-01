@@ -14,13 +14,14 @@
  * @returns {(path: string, options?: Parameters<typeof navigate>[1]) => void}
  *   A function to navigate to a path within the current venue context.
  */
-import { useNavigate, NavigateOptions } from 'react-router-dom';
+import { useNavigate, NavigateOptions, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '@app/store';
 
 export function useVenueNavigate() {
   const navigate = useNavigate();
-  const venueSlug = useSelector((state: RootState) => state.venue.slug);
+  const venueSlugParam: string | undefined = useParams<{ venueSlug: string }>().venueSlug;
+  const venueSlug: string | undefined = useSelector((state: RootState) => state.venue.slug) || venueSlugParam;
   const base = import.meta.env.VITE_BASE_URL || '';
   const defaultVenue = import.meta.env.VITE_DEFAULT_VENUE || '';
 

@@ -8,17 +8,17 @@ import { notifications } from '@mantine/notifications';
 import { ERole } from '@models/base.dto';
 import { isMessage } from '@utils/typescriptHelpers';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './register.scss';
+import { useVenueNavigate } from '@app/useVenueNavigate';
 
 const initialState = {
   email: 'front@coffee.com'
 };
 
 const Login = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const { user, defaultRoute } = useAppSelector((store: RootState) => store.user);
-  const navigate = useNavigate();
+  const navigate = useVenueNavigate();
   const [loginExistingUser, { isLoading }] = useLazyLoginExistingUserQuery();
   const { venueSlug } = useParams<{ venueSlug: string }>();
   const { data: venue, isLoading: isLoadingVenue } = useGetVenueShortQuery(venueSlug || '');
@@ -43,7 +43,7 @@ const Login = () => {
       const credential = await loginExistingUser(email).unwrap();
       if (!isMessage(credential)) {
         const { oneTimeCode, expires } = credential;
-        navigate(`${base}${venueSlug}/${CRoutes.verify}`, { state: { email, oneTimeCode, expires } });
+        navigate(`${CRoutes.verify}`, { state: { email, oneTimeCode, expires } });
       }
       // navigate to the one time code verification page
     } catch (error) {
@@ -70,11 +70,10 @@ const Login = () => {
       }
 
       // If the user is already logged in, redirect them to the payment or the previous page
-      venueUrl = `${base}${venueSlug}/${venueUrl}`;
       console.log('Redirecting to:', venueUrl);
       navigate(venueUrl, { replace: true });
     }
-  }, [user, defaultRoute, base, venueSlug, navigate]);
+  }, [user, defaultRoute, navigate]);
 
   if (user) {
     return null;

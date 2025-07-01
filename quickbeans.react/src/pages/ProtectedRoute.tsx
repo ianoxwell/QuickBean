@@ -32,6 +32,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
         navigate(`${base}${CRoutes.error}`);
         return;
       }
+
       dispatch(setFullVenue(fullVenue));
     }
 

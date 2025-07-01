@@ -2,6 +2,7 @@ import { useGetVenueFullMutation, useGetVenueShortQuery, useVerifyOneTimeCodeMut
 import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useVenueNavigate } from '@app/useVenueNavigate';
 import { setFullVenue } from '@app/venueSlice';
 import CountdownTimer from '@components/CountdownTimer/CountdownTime';
 import { ActionIcon, Button, Card, Group, PinInput, Space, Title } from '@mantine/core';
@@ -14,18 +15,17 @@ import { isMessage } from '@utils/typescriptHelpers';
 import { CornerDownLeft } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import './register.scss';
 import { setUser } from './userSlice';
 
 const VerifyEmail = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const [verifyUserEmail, { data: user, isLoading: isEmailLoading }] = useVerifyOneTimeCodeMutation();
   const [getFullVenue, { isLoading: isVenueLoading }] = useGetVenueFullMutation();
   const venueState = useSelector((store: RootState) => store.venue);
   const isLoading = useMemo(() => isEmailLoading || isVenueLoading, [isEmailLoading, isVenueLoading]);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const navigate = useVenueNavigate();
   const location = useLocation();
   const { email, oneTimeCode, expires } = location.state || {};
   const { venueSlug } = useParams<{ venueSlug: string }>();
@@ -62,9 +62,7 @@ const VerifyEmail = () => {
             userId: userToken.user.id || 0
           }).unwrap();
           dispatch(setFullVenue(venue));
-          const checkoutUrl = userToken.user.roles.includes(ERole.KITCHEN)
-            ? `${base}${venue.slug}/${CRoutes.kitchen}`
-            : `${base}${venue.slug}/${CRoutes.dashboard}`;
+          const checkoutUrl = userToken.user.roles.includes(ERole.KITCHEN) ? CRoutes.kitchen : CRoutes.dashboard;
           navigate(checkoutUrl);
         }
       } catch (error) {
@@ -86,7 +84,14 @@ const VerifyEmail = () => {
             <main className="account-wrapper">
               <section className="login-section">
                 <Group gap="md" align="center">
-                  <ActionIcon type="button" radius="xl" variant="default" size="lg" onClick={() => navigate(`${base}${venueSlug}/${CRoutes.login}`)}>
+                  <ActionIcon
+                    type="button"
+                    radius="xl"
+                    variant="default"
+                    size="lg"
+                    onClick={() => navigate(CRoutes.login)}
+                    title="Back to login"
+                  >
                     <CornerDownLeft size={16} />
                   </ActionIcon>
                   <Title order={1} className="login-title">
@@ -99,10 +104,7 @@ const VerifyEmail = () => {
                   <Space h="md" />
                   {expires && (
                     <div style={{ marginBottom: 16 }}>
-                      <CountdownTimer
-                        expires={expires}
-                        onExpired={() => navigate(`${base}${venueSlug}/${CRoutes.login}`)}
-                      />
+                      <CountdownTimer expires={expires} onExpired={() => navigate(CRoutes.login)} />
                     </div>
                   )}
                   <form>
