@@ -2,7 +2,7 @@ import { useLazyLoginExistingUserQuery } from '@app/apiSlice';
 import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
-import { Button, Card, Checkbox, Group, Space, Stack, TextInput } from '@mantine/core';
+import { Button, Card, Checkbox, Group, Stack, TextInput } from '@mantine/core';
 import { isEmail, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IOrder } from '@models/order.dto';
