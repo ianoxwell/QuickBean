@@ -1,15 +1,16 @@
 import { useGetModifierQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
-import BackButton from '@components/BackButton/BackButton.component';
-import { Flex } from '@mantine/core';
+import { useVenueNavigate } from '@app/useVenueNavigate';
+import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
+import { Checkbox, Flex, InputLabel, Stack, Text } from '@mantine/core';
+import { formRootRule, hasLength, isNotEmpty } from '@mantine/form';
+import { IModifier } from '@models/modifier.dto';
 import { isMessage } from '@utils/typescriptHelpers';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useModifierForm } from './modifierFormContext';
-import { IModifier } from '@models/modifier.dto';
-import { formRootRule, hasLength, isNotEmpty } from '@mantine/form';
-import { useVenueNavigate } from '@app/useVenueNavigate';
-import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
+import { ModifierFormProvider, useModifierForm } from './modifierFormContext';
+import ModifierItemForm from './ModifierItemForm';
+import VenueNavLink from '@components/VenueNavLink/VenueNavLink.component';
 
 const ModifierPage = () => {
   const { id: modifierId } = useParams<{ id: string }>();
@@ -108,8 +109,42 @@ const ModifierPage = () => {
             handleCancel={handleCancel}
             handleSave={handleSave}
           />
-          <p>Name: {modifier.name}</p>
-          {/* Add more details as needed */}
+          {isEditing && editedModifier && !isMessage(editedModifier) ? (
+            <ModifierFormProvider form={form}>
+              <ModifierItemForm />
+            </ModifierFormProvider>
+          ) : (
+            <>
+              {modifier && (
+                <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
+                  <Stack gap="md" flex={1}>
+                    <div>
+                      <InputLabel>Modifier name</InputLabel>
+                      <Text>{modifier.name}</Text>
+                    </div>
+                    <Checkbox
+                      label="Is required"
+                      description="Patron will have to select an option to add to cart"
+                      checked={modifier.isRequired}
+                      disabled
+                    />
+                    {modifier.products?.length && (
+                      <>
+                        <InputLabel>Products this modifier is applied to</InputLabel>
+                        {modifier.products.map((product) => (
+                          <VenueNavLink
+                            path={`${CRoutes.products}/${product.id}`}
+                            label={product.name}
+                            key={product.id}
+                          />
+                        ))}
+                      </>
+                    )}
+                  </Stack>
+                </Flex>
+              )}
+            </>
+          )}
         </div>
       )}
     </>
