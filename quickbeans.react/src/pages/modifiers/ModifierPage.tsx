@@ -1,16 +1,18 @@
 import { useGetModifierQuery } from '@app/apiSlice';
+import { CIconSizes } from '@app/appGlobal.const';
 import { CRoutes } from '@app/routes.const';
 import { useVenueNavigate } from '@app/useVenueNavigate';
 import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
-import { Checkbox, Flex, InputLabel, Stack, Text } from '@mantine/core';
+import VenueNavLink from '@components/VenueNavLink/VenueNavLink.component';
+import { Card, Flex, HoverCard, InputLabel, Stack, Text } from '@mantine/core';
 import { formRootRule, hasLength, isNotEmpty } from '@mantine/form';
 import { IModifier } from '@models/modifier.dto';
 import { isMessage } from '@utils/typescriptHelpers';
+import { Check, Square } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ModifierFormProvider, useModifierForm } from './modifierFormContext';
 import ModifierItemForm from './ModifierItemForm';
-import VenueNavLink from '@components/VenueNavLink/VenueNavLink.component';
 
 const ModifierPage = () => {
   const { id: modifierId } = useParams<{ id: string }>();
@@ -122,12 +124,24 @@ const ModifierPage = () => {
                       <InputLabel>Modifier name</InputLabel>
                       <Text>{modifier.name}</Text>
                     </div>
-                    <Checkbox
-                      label="Is required"
-                      description="Patron will have to select an option to add to cart"
-                      checked={modifier.isRequired}
-                      disabled
-                    />
+                    <Flex gap="md" align="flex-start">
+                      <Stack mt={4}>
+                        {modifier.isRequired ? (
+                          <Check className="fake-checkbox" size={CIconSizes.large} />
+                        ) : (
+                          <Square className="fake-checkbox__off" color="white" size={CIconSizes.large} />
+                        )}
+                      </Stack>
+                      <Stack gap={0} mb="xs" className="modifier-item" flex={1}>
+                        <Text fw={600} size="md">
+                          Is required
+                        </Text>
+                        <Text size="sm" color="dimmed">
+                          Patron will have to select an option to add product to cart
+                        </Text>
+                      </Stack>
+                    </Flex>
+
                     {modifier.products?.length && (
                       <>
                         <InputLabel>Products this modifier is applied to</InputLabel>
@@ -135,8 +149,52 @@ const ModifierPage = () => {
                           <VenueNavLink
                             path={`${CRoutes.products}/${product.id}`}
                             label={product.name}
+                            description={product.description}
                             key={product.id}
                           />
+                        ))}
+                      </>
+                    )}
+                  </Stack>
+                  <Stack gap="md" flex={1}>
+                    {modifier.options && modifier.options.length > 0 && (
+                      <>
+                        <InputLabel>Options:</InputLabel>
+                        {modifier.options.map((option) => (
+                          <Card key={option.id} shadow="sm" padding="md" radius="md" withBorder>
+                            <Flex justify="space-between" align="center">
+                              <Text fw={600}>{option.label}</Text>
+                              {option.isDefault && (
+                                <HoverCard shadow="md" width={200} position="top" withArrow>
+                                  <HoverCard.Target>
+                                    <Check
+                                      className="fake-checkbox"
+                                      aria-label="Default option"
+                                      size={CIconSizes.medium}
+                                    />
+                                  </HoverCard.Target>
+                                  <HoverCard.Dropdown>
+                                    <Text size="sm">This option is selected by default</Text>
+                                  </HoverCard.Dropdown>
+                                </HoverCard>
+                              )}
+                            </Flex>
+                            {option.description && (
+                              <Text size="sm" c="dimmed" mt="xs">
+                                {option.description}
+                              </Text>
+                            )}
+                            <Flex gap="xs" mt="xs" align="center">
+                              <Text>
+                                {option.percentAdjustment ? (
+                                  <>{option.percentAdjustment}%</>
+                                ) : (
+                                  <>${option.priceAdjustment}</>
+                                )}
+                              </Text>
+                              <Text size="sm">base cost increase</Text>
+                            </Flex>
+                          </Card>
                         ))}
                       </>
                     )}
