@@ -42,7 +42,6 @@ const ProductModifierItem = ({
                 size="sm"
                 variant="subtle"
                 color="accent"
-                autoContrast
                 type="button"
                 onClick={() => {
                   navigate(`${CRoutes.modifiers}/${modifier.id}`);

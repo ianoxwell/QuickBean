@@ -28,7 +28,7 @@ const ModifierItemForm = () => {
           <TextInput label="Modifier Name" key={form.key('name')} withAsterisk {...form.getInputProps('name')} />
           <Checkbox
             label="Is required"
-            description="Patron will have to select an option to add to cart"
+            description="Patron will have to select an option to add product to cart"
             key={form.key('isRequired')}
             {...form.getInputProps('isRequired', { type: 'checkbox' })}
           />
@@ -46,17 +46,25 @@ const ModifierItemForm = () => {
             <>
               <InputLabel>Options:</InputLabel>
               {formValues.options.map((option, index) => (
-                <div key={option.id}>
+                <div key={option.id || index}>
                   <ModifierItemOptionForm option={option} index={index} />
                 </div>
               ))}
             </>
           )}
+          {form.errors?.options && (
+            <Text c="red.8" size="sm" ta="right">
+              {form.errors.options}
+            </Text>
+          )}
           <Flex justify="flex-end" mt="md">
             <Button
               title="Add option"
               leftSection={<Plus size={16} />}
-              onClick={() => form.insertListItem('options', blankOption)}
+              onClick={() => {
+                form.insertListItem('options', blankOption);
+                form.clearFieldError('options');
+              }}
             >
               Add option
             </Button>

@@ -7,6 +7,7 @@ import VenueNavLink from '@components/VenueNavLink/VenueNavLink.component';
 import { Card, Flex, HoverCard, InputLabel, Stack, Text } from '@mantine/core';
 import { formRootRule, hasLength, isNotEmpty } from '@mantine/form';
 import { IModifier } from '@models/modifier.dto';
+import { delay } from '@utils/numberUtils';
 import { isMessage } from '@utils/typescriptHelpers';
 import { Check, Square } from 'lucide-react';
 import { useState } from 'react';
@@ -30,11 +31,12 @@ const ModifierPage = () => {
     initialValues: {
       ...(editedModifier as IModifier)
     },
+    validateInputOnChange: true,
     validate: {
       name: hasLength({ min: 2, max: 30 }, 'Modifier name must be between 2 and 30 characters long'),
       options: {
         [formRootRule]: isNotEmpty('At least one option is required'),
-        label: hasLength({ min: 2, max: 30 }, 'Option label must be between 2 and 30 characters long')
+        label: hasLength({ min: 2, max: 30 }, 'All option label must be between 2 and 30 characters long')
       }
     },
     enhanceGetInputProps() {
@@ -55,6 +57,7 @@ const ModifierPage = () => {
       options: [],
       isRequired: false
     };
+    console.log('Creating new modifier item', newItem);
     setEditedModifier(newItem);
     form.setValues(newItem);
     setIsEditing(true);
@@ -77,8 +80,9 @@ const ModifierPage = () => {
     setEditedModifier(modifier);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     form.validate();
+    await delay(100); // Allow form validation to complete
     if (!form.isValid()) {
       console.error('Form validation failed', form.errors);
       return;
@@ -101,7 +105,7 @@ const ModifierPage = () => {
 
   return (
     <>
-      {!isLoading && !isError && modifier && !isMessage(modifier) && (
+      {!isLoading && !isError && (modifier || editedModifier) && !isMessage(modifier) && (
         <div className="form">
           <PageTitleForm
             isEditing={isEditing}

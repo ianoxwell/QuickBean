@@ -45,3 +45,8 @@ export const calculateItemCount = (order: IOrder | undefined): number => {
   if (!order || !order.items) return 0;
   return order.items.reduce((count, item) => count + item.quantity, 0);
 };
+
+// Utility function to delay execution
+export const delay = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
