@@ -53,6 +53,8 @@
     --card: var(--dark-card-background);
     --muted-text: var(--dark-muted-text);
     --mantine-color-dimmed: var(--dark-muted-text);
+    --input-asterisk-color: var(--mantine-color-red-5);
+    --mantine-color-error: var(--mantine-color-red-5);
   }
   &[data-mantine-color-scheme='light'] {
     --mantine-color-body: var(--light-background);
@@ -60,12 +62,13 @@
     --mantine-color-text: var(--light-text);
     --mantine-primary-color-filled: var(--light-primary);
     --mantine-primary-color-filled-hover: var(--light-secondary);
-
     --accent: var(--light-accent);
     --shadow-color: rgba(0, 0, 0, 0.1);
     --card: var(--light-card-background);
     --muted-text: var(--light-muted-text);
     --mantine-color-dimmed: var(--light-muted-text);
+    --input-asterisk-color: var(--mantine-color-red-9);
+    --mantine-color-error: var(--mantine-color-red-9);
   }
 }
 h1,
@@ -88,6 +91,30 @@ main {
       .mantine-InputWrapper-label {
         font-size: 1rem;
         font-weight: 700;
+      }
+      .fake-checkbox {
+        background-color: var(--mantine-color-blue-filled);
+        color: white;
+        border: 1px solid var(--mantine-color-blue-filled);
+        border-radius: 0.25rem;
+        &__off {
+          background-color: transparent;
+          border: 1px solid var(--mantine-color-gray-4);
+          color: var(--mantine-color-gray-6);
+          border-radius: 0.25rem;
+        }
+      }
+    }
+    .navigation-item {
+      text-decoration: none;
+      color: var(--mantine-color-text);
+      display: flex;
+      flex-direction: column;
+      &:hover {
+        color: var(--mantine-primary-color-filled-hover);
+      }
+      &.visited {
+        color: var(--mantine-color-text);
       }
     }
   }

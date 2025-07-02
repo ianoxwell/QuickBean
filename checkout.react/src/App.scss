@@ -61,12 +61,13 @@
     --mantine-color-text: var(--light-text);
     --mantine-primary-color-filled: var(--light-primary);
     --mantine-primary-color-filled-hover: var(--light-secondary);
-
     --accent: var(--light-accent);
     --shadow-color: rgba(0, 0, 0, 0.1);
     --card: var(--light-card-background);
     --muted-text: var(--light-muted-text);
     --mantine-color-dimmed: var(--light-muted-text);
+    --input-asterisk-color: var(--mantine-color-red-9);
+    --mantine-color-error: var(--mantine-color-red-9);
   }
 }
 h1,
