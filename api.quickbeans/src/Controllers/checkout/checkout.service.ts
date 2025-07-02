@@ -59,7 +59,7 @@ export class CheckoutService {
 
     const checkouts = await this.checkoutRepository.find({
       where: { venue: { id: venueId }, isActive: true },
-      relations: ['categories', 'categories.products', 'categories.products.modifiers', 'venue']
+      relations: ['categories', 'venue']
     });
 
     if (!checkouts || checkouts.length === 0) {
@@ -78,8 +78,9 @@ export class CheckoutService {
       .leftJoinAndSelect('checkout.venue', 'venue')
       .leftJoinAndSelect('checkout.categories', 'categories')
       .leftJoinAndSelect('categories.products', 'products')
-      .leftJoinAndSelect('products.modifiers', 'modifiers')
-      .leftJoinAndSelect('modifiers.options', 'options')
+      .leftJoinAndSelect('products.productModifiers', 'productModifiers')
+      .leftJoinAndSelect('productModifiers.modifier', 'modifier')
+      .leftJoinAndSelect('modifier.options', 'options')
       .where('checkout.slug = :slug', { slug })
       .andWhere('checkout.isActive = true')
       .andWhere('venue.slug = :venueSlug', { venueSlug })

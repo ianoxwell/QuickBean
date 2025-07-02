@@ -89,7 +89,6 @@ const ProductPage = () => {
   const handleSave = () => {
     form.validate();
     if (!form.isValid()) {
-      console.error('Form validation failed', form.errors);
       return;
     }
 
