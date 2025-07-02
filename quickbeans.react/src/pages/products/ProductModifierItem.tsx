@@ -32,7 +32,7 @@ const ProductModifierItem = ({
                 {modifier.name}
               </Text>
               {modifier.isRequired && (
-                <Badge color="orange" variant="light" size="xs">
+                <Badge color="grape.8"  size="sm">
                   Required
                 </Badge>
               )}
@@ -41,6 +41,8 @@ const ProductModifierItem = ({
               <Button
                 size="sm"
                 variant="subtle"
+                color="accent"
+                autoContrast
                 type="button"
                 onClick={() => {
                   navigate(`${CRoutes.modifiers}/${modifier.id}`);
@@ -55,7 +57,7 @@ const ProductModifierItem = ({
                 title="Remove this modifier from this product"
                 radius="xl"
                 type="button"
-                color="red"
+                color="red.9"
                 onClick={removeModifier}
               >
                 <Trash size={CIconSizes.medium} />

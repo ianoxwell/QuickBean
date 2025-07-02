@@ -1,6 +1,6 @@
 import { useGetActiveModifiersQuery } from '@app/apiSlice';
 import { RootState } from '@app/store';
-import { Combobox, Input, InputBase, useCombobox } from '@mantine/core';
+import { Combobox, InputBase, Text, useCombobox } from '@mantine/core';
 import { IModifier, IProductModifier } from '@models/modifier.dto';
 import { useSelector } from 'react-redux';
 import { useProductFormContext } from './productFormContext';
@@ -52,25 +52,27 @@ const ProductAddModifier = () => {
     ));
 
   return (
-    <Combobox store={combobox} withinPortal={false} onOptionSubmit={onAddModifier}>
-      <Combobox.Target>
-        <InputBase
-          component="button"
-          type="button"
-          pointer
-          rightSection={<Combobox.Chevron />}
-          onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents="none"
-        >
-          <Input.Placeholder>Add existing modifier</Input.Placeholder>
-        </InputBase>
-      </Combobox.Target>
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          {options.length === 0 ? <Combobox.Empty>All options selected</Combobox.Empty> : options}
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <div>
+      <Text mb={0}>Add existing modifier</Text>
+      <Combobox store={combobox} withinPortal={false} onOptionSubmit={onAddModifier}>
+        <Combobox.Target>
+          <InputBase
+            component="button"
+            type="button"
+            title="Add existing modifier"
+            pointer
+            rightSection={<Combobox.Chevron />}
+            onClick={() => combobox.toggleDropdown()}
+            rightSectionPointerEvents="none"
+          ></InputBase>
+        </Combobox.Target>
+        <Combobox.Dropdown>
+          <Combobox.Options>
+            {options.length === 0 ? <Combobox.Empty>All options selected</Combobox.Empty> : options}
+          </Combobox.Options>
+        </Combobox.Dropdown>
+      </Combobox>
+    </div>
   );
 };
 
