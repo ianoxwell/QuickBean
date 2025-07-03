@@ -6,10 +6,10 @@ export interface ICheckoutShort {
   name: string;
   slug: string;
   checkoutUrl: string;
+  heroImage?: string;
 }
 
 export interface ICheckout extends ICheckoutShort {
-  heroImage?: string;
   description: string;
   heroImageTextColor: string;
   categories: ICheckoutCategoryWithProducts[];

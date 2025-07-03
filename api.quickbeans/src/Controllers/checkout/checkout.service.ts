@@ -168,7 +168,8 @@ export class CheckoutService {
       id: checkout.id,
       name: checkout.name,
       slug: checkout.slug,
-      checkoutUrl: `${checkout.venue.slug}/${checkout.slug}`
+      checkoutUrl: `${checkout.venue.slug}/${checkout.slug}`,
+      heroImage: checkout.heroImage
     };
   }
 
@@ -176,7 +177,6 @@ export class CheckoutService {
   mapCheckoutToICheckout(checkout: Checkout, checkoutCategories?: CheckoutCategory[]): ICheckout {
     return {
       ...this.mapCheckoutToICheckoutShort(checkout),
-      heroImage: checkout.heroImage,
       heroImageTextColor: checkout.heroImageTextColor,
       description: checkout.description,
       categories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
