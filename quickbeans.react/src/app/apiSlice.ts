@@ -49,6 +49,7 @@ export interface Message {
 export const apiSlice = createApi({
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',
+  tagTypes: ['Product', 'Venue', 'Modifier', 'Checkout', 'Order'],
   // All of our requests will check if token is available and attach (baseQuery) and all responses will be checked for 401 not authorized
   baseQuery: baseQueryWithReauth,
   // The "endpoints" represent operations and requests for this server
@@ -59,7 +60,8 @@ export const apiSlice = createApi({
       keepUnusedDataFor: Number.MAX_VALUE // Keeps data "forever"
     }),
     getVenueFull: builder.mutation<IVenue, { venueId: number; userId: number }>({
-      query: (ids) => ({ url: `/venue`, method: 'POST', body: ids })
+      query: (ids) => ({ url: `/venue`, method: 'POST', body: ids }),
+      invalidatesTags: (_result, _error, arg) => [{ type: 'Venue', id: arg.venueId }]
     }),
     // User Login items
     loginExistingUser: builder.query<IVerifyOneTimeCode | IMessage, string>({
