@@ -46,6 +46,16 @@ const SettingsForm = ({ selectedImageFile, setSelectedImageFile }: SettingsFormP
           placeholder="Upload new logo"
           onChange={onFileChange}
           value={selectedImageFile}
+          error={form.errors.logoImage}
+          accept="image/*"
+          // Client-side validation for file size
+          onBlur={() => {
+            if (selectedImageFile && selectedImageFile.size > 1 * 1024 * 1024) {
+              form.setFieldError('logoImage', 'File size must be less than 1MB');
+            } else {
+              form.clearFieldError('logoImage');
+            }
+          }}
         />
       </div>
       <TextInput label="Public Phone" placeholder="(123) 456-7890" {...form.getInputProps('publicPhone')} />
