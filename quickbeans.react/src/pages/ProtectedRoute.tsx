@@ -1,4 +1,4 @@
-import { useGetVenueFullMutation, useGetVenueShortQuery } from '@app/apiSlice';
+import { useGetVenueShortQuery, useLazyGetVenueFullQuery } from '@app/apiSlice';
 import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { data: venue, isLoading: isVenueLoading } = useGetVenueShortQuery(venueSlug || '');
   const venueState = useSelector((store: RootState) => store.venue);
   const { user: userToken }: { user: IUserToken | undefined } = useSelector((store: RootState) => store.user);
-  const [getFullVenue, { isLoading: isFullVenueLoading }] = useGetVenueFullMutation();
+  const [triggerGetFullVenue] = useLazyGetVenueFullQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -23,17 +23,19 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function fetchFullVenue() {
-      const fullVenue = await getFullVenue({
-        venueId: venue?.id || venueState.id,
-        userId: userToken?.user.id || 0
-      }).unwrap();
-      if (isMessage(fullVenue)) {
-        console.error('Error fetching full venue:', fullVenue);
-        navigate(`${base}${CRoutes.error}`);
-        return;
-      }
+      try {
+        const fullVenue = await triggerGetFullVenue(venue?.id || venueState.id).unwrap();
+        if (isMessage(fullVenue)) {
+          console.error('Error fetching full venue:', fullVenue);
+          navigate(`${base}${CRoutes.error}`);
+          return;
+        }
 
-      dispatch(setFullVenue(fullVenue));
+        dispatch(setFullVenue(fullVenue));
+      } catch (error) {
+        console.error('Failed to fetch full venue:', error);
+        navigate(`${base}${CRoutes.error}`);
+      }
     }
 
     if (!userToken || !userToken.token) {
@@ -42,7 +44,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (isVenueLoading || isFullVenueLoading) {
+    if (isVenueLoading) {
       console.log('Venue is loading, waiting for full venue');
       return;
     }
@@ -55,17 +57,16 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     base,
     defaultVenue,
     venueSlug,
-    isFullVenueLoading,
     isVenueLoading,
     userToken,
     venue,
     venueState,
     dispatch,
-    getFullVenue,
+    triggerGetFullVenue,
     navigate
   ]);
 
-  if (isVenueLoading || isFullVenueLoading || !venueState.venue) {
+  if (isVenueLoading || !venueState.venue) {
     return null;
   }
 

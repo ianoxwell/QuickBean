@@ -9,6 +9,7 @@ import { IVenue, IVenueShort } from '@models/venue.dto';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { getUserFromLocalStorage, isTokenFresh } from '@utils/localStorage';
 import { io, Socket } from 'socket.io-client';
+import { logoutUser } from '../pages/account/userSlice';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,
@@ -31,8 +32,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 ) => {
   const result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    // TODO - follow this pattern to reauth - https://redux-toolkit.js.org/rtk-query/usage/customizing-queries#automatic-re-authorization-by-extending-fetchbasequery
-    // api.dispatch(logoutUser('Not authorized, logging out user'));
+    api.dispatch(logoutUser());
   }
   return result;
 };
@@ -59,9 +59,9 @@ export const apiSlice = createApi({
       query: (slug) => ({ url: `/venue/short?slug=${slug}`, method: 'GET' }),
       keepUnusedDataFor: Number.MAX_VALUE // Keeps data "forever"
     }),
-    getVenueFull: builder.mutation<IVenue, { venueId: number; userId: number }>({
-      query: (ids) => ({ url: `/venue`, method: 'POST', body: ids }),
-      invalidatesTags: (_result, _error, arg) => [{ type: 'Venue', id: arg.venueId }]
+    getVenueFull: builder.query<IVenue, number>({
+      query: (venueId) => ({ url: `/venue`, method: 'POST', body: { venueId } }),
+      providesTags: (_result, _error, arg) => [{ type: 'Venue', id: arg }]
     }),
     // User Login items
     loginExistingUser: builder.query<IVerifyOneTimeCode | IMessage, string>({
@@ -146,7 +146,7 @@ export const apiSlice = createApi({
 // Export the auto-generated hook for the `getPosts` query endpoint
 export const {
   useGetVenueShortQuery,
-  useGetVenueFullMutation,
+  useLazyGetVenueFullQuery,
   useLazyLoginExistingUserQuery,
   useVerifyOneTimeCodeMutation,
   useGetActiveProductsQuery,

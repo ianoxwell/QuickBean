@@ -1,4 +1,4 @@
-import { useGetVenueFullMutation, useGetVenueShortQuery, useVerifyOneTimeCodeMutation } from '@app/apiSlice';
+import { useGetVenueShortQuery, useLazyGetVenueFullQuery, useVerifyOneTimeCodeMutation } from '@app/apiSlice';
 import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
@@ -21,7 +21,7 @@ import { setUser } from './userSlice';
 
 const VerifyEmail = () => {
   const [verifyUserEmail, { data: user, isLoading: isEmailLoading }] = useVerifyOneTimeCodeMutation();
-  const [getFullVenue, { isLoading: isVenueLoading }] = useGetVenueFullMutation();
+  const [getFullVenue, { isLoading: isVenueLoading }] = useLazyGetVenueFullQuery();
   const venueState = useSelector((store: RootState) => store.venue);
   const isLoading = useMemo(() => isEmailLoading || isVenueLoading, [isEmailLoading, isVenueLoading]);
   const dispatch = useAppDispatch();
@@ -57,10 +57,7 @@ const VerifyEmail = () => {
           // Successfully verified user
           notifications.show({ message: 'Successfully verified OTC', color: 'green' });
           dispatch(setUser(userToken)); // Assuming you have a setUser action to update the user state
-          const venue = await getFullVenue({
-            venueId: venueState.venue?.id || 0,
-            userId: userToken.user.id || 0
-          }).unwrap();
+          const venue = await getFullVenue(venueState.venue?.id || 0).unwrap();
           dispatch(setFullVenue(venue));
           const checkoutUrl = userToken.user.roles.includes(ERole.KITCHEN) ? CRoutes.kitchen : CRoutes.dashboard;
           navigate(checkoutUrl);

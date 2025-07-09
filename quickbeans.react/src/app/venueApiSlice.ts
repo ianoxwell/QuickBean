@@ -9,7 +9,7 @@ export const venueApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Venue', id: arg.id }]
+      invalidatesTags: (_result, _error, arg) => [{ type: 'Venue', id: arg.id }]
     }),
     uploadVenueImage: builder.mutation<{ url: string }, { venueId: number, file: File }>({
       query: ({ venueId, file }) => {
