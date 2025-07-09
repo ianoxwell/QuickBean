@@ -1,18 +1,22 @@
 import { CMessage } from '@base/message.class';
 import { ProductService } from '@controllers/product/product.service';
+import { User } from '@controllers/user/User.entity';
+import { mapUserToSummary } from '@controllers/user/user.utils';
 import { ERole } from '@models/base.dto';
-import { IProduct } from '@models/products.dto';
-import { IUserSummary } from '@models/user.dto';
 import { IVenue, IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { put } from '@vercel/blob';
+import type { Multer } from 'multer';
 import { Repository } from 'typeorm';
 import { Venue } from './Venue.entity';
+import { mapVenueToIVenue, mapVenueToIVenueProducts, mapVenueToIVenueShort, userHasAccessToVenue } from './venue.utils';
 
 @Injectable()
 export class VenueService {
   constructor(
     @InjectRepository(Venue) private readonly venueRepository: Repository<Venue>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private productService: ProductService
   ) {}
 
@@ -26,7 +30,7 @@ export class VenueService {
       return null;
     }
 
-    return this.mapVenueToIVenue(venue);
+    return mapVenueToIVenue(venue);
   }
 
   async findBySlug(slug: string): Promise<IVenueShort | null> {
@@ -35,17 +39,28 @@ export class VenueService {
       return null;
     }
 
-    return this.mapVenueToIVenueShort(venue);
+    return mapVenueToIVenueShort(venue);
   }
 
-  async findByIdWithProducts(id: number): Promise<IVenueWithProducts | null> {
+  async findByIdWithProducts(id: number, userId: number): Promise<IVenueWithProducts | CMessage> {
     const venue = await this.venueRepository.findOne({ where: { id, isActive: true } });
     if (!venue) {
       return null;
     }
 
+    const user: User | undefined = await this.userRepository.findOne({ where: { id: userId }, relations: ['venues'] });
+    if (!user) {
+      return new CMessage(`User with ID ${userId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (!userHasAccessToVenue(mapUserToSummary(user), venue, [ERole.ADMIN])) {
+      console.log(`User with ID ${userId} does not have access to venue with ID ${id}.`, user.roles, user.venues);
+
+      return new CMessage(`User with ID ${userId} does not have access to venue with ID ${id}.`, HttpStatus.FORBIDDEN);
+    }
+
     const products = await this.productService.findByVenueId(venue.id);
-    return this.mapVenueToIVenueProducts(venue, products);
+    return mapVenueToIVenueProducts(venue, products);
   }
 
   async createVenue(venueData: IVenue): Promise<IVenue | CMessage> {
@@ -60,7 +75,7 @@ export class VenueService {
     try {
       // save the new venue to the database
       const savedVenue = await this.venueRepository.save(newVenue);
-      return this.mapVenueToIVenue(savedVenue);
+      return mapVenueToIVenue(savedVenue);
     } catch (error: unknown) {
       return new CMessage(
         `Error creating venue: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
@@ -69,7 +84,7 @@ export class VenueService {
     }
   }
 
-  async updateVenue(id: number, venueData: IVenue): Promise<IVenue | CMessage> {
+  async updateVenue(id: number, venueData: Partial<IVenue>): Promise<IVenue | CMessage> {
     // find the existing venue
     const existingVenue = await this.venueRepository.findOne({ where: { id } });
     if (!existingVenue) {
@@ -81,7 +96,7 @@ export class VenueService {
     try {
       // save the updated venue to the database
       const updatedVenue = await this.venueRepository.save(existingVenue);
-      return this.mapVenueToIVenue(updatedVenue);
+      return mapVenueToIVenue(updatedVenue);
     } catch (error: unknown) {
       return new CMessage(
         `Error updating venue: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
@@ -89,65 +104,38 @@ export class VenueService {
       );
     }
   }
+  async uploadVenueImage(venueId: number, file: Multer.File): Promise<string> {
+    // TODO: User needs to install @vercel/blob and configure BLOB_READ_WRITE_TOKEN environment variable
+    // npm install @vercel/blob
 
-  userHasAccessToVenue(user: IUserSummary, venue: IVenue, roles: ERole[]): boolean {
-    if (!user || !venue) {
-      return false;
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error('BLOB_READ_WRITE_TOKEN environment variable is not set.');
     }
 
-    if (!user.venues.map((v) => v.id).includes(venue.id)) {
-      return false; // User does not have access to this venue
+    if (!file || typeof file !== 'object' || !('buffer' in file) || !('originalname' in file)) {
+      throw new Error('Invalid file object provided.');
     }
+    const fileName = `venue-logos/${venueId}-${Date.now()}-${file.originalname}`;
 
-    // If the user has no roles, they do not have access
-    if (!user.roles || user.roles.length === 0) {
-      return false;
+    try {
+      const { url } = await put(fileName, (file as Multer.File).buffer, {
+        access: 'public',
+        token: process.env.BLOB_READ_WRITE_TOKEN
+      });
+
+      // Update the venue's logoImage in the database with the Vercel Blob URL
+      const venue = await this.venueRepository.findOne({ where: { id: venueId } });
+      if (venue) {
+        venue.logoImage = url;
+        await this.venueRepository.save(venue);
+      }
+
+      return url;
+    } catch (error) {
+      console.error('Error uploading to Vercel Blob:', error);
+      throw new Error('Failed to upload image to Vercel Blob.');
     }
-
-    // Check if the user is an admin
-    if (user.roles.includes(ERole.ADMIN)) {
-      return true;
-    }
-
-    // If the user has any of the specified roles, they have access
-    return roles.find((role) => user.roles.includes(role)) ? true : false;
   }
 
-  /** Map the Venue entity to IVenue */
-  mapVenueToIVenue(venue: Venue): IVenue {
-    return {
-      ...this.mapVenueToIVenueShort(venue),
-      isActive: venue.isActive,
-      countryId: venue.countryId,
-      openingHours: venue.openingHours,
-      address: venue.address,
-      city: venue.city,
-      state: venue.state,
-      postcode: venue.postcode,
-      legalBusinessName: venue.legalBusinessName,
-      legalBusinessNumber: venue.legalBusinessNumber,
-      timezone: venue.timezone,
-      privacyPolicy: venue.privacyPolicy,
-      websiteUrl: venue.websiteUrl
-    };
-  }
-
-  /** Map the Venue to IVenueShort */
-  mapVenueToIVenueShort(venue: Venue): IVenueShort {
-    return {
-      id: venue.id,
-      name: venue.name,
-      slug: venue.slug,
-      logoImage: venue.logoImage,
-      publicPhone: venue.publicPhone
-    };
-  }
-
-  mapVenueToIVenueProducts(venue: Venue, products: IProduct[]): IVenueWithProducts {
-    return {
-      ...this.mapVenueToIVenue(venue),
-      products,
-      checkoutCategories: [] // Assuming this will be populated elsewhere
-    };
-  }
+ 
 }

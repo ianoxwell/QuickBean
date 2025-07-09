@@ -10,6 +10,7 @@ import { CustomLogger } from '@services/logger.service';
 import { createDigitPin, getCurrentTimePlusMinutes } from '@services/utils';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
+import { mapUserToSummary } from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -136,7 +137,7 @@ export class UserService {
       return undefined;
     }
 
-    return this.mapUserToSummary(user);
+    return mapUserToSummary(user);
   }
 
   /** Only to be used by the auth service */
@@ -236,23 +237,7 @@ export class UserService {
       return { message: 'Something went pear shaped updating the DB.', status: HttpStatus.INTERNAL_SERVER_ERROR };
     }
 
-    return { token: this.createToken(user), user: this.mapUserToSummary(user) };
-  }
-
-  mapUserToSummary(user: User): IUserSummary {
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      isActive: user.isActive,
-      failedLoginAttempt: user.failedLoginAttempt,
-      lastFailedLoginAttempt: user.lastFailedLoginAttempt,
-      timesLoggedIn: user.timesLoggedIn,
-      firstLogin: user.firstLogin,
-      lastLogin: user.lastLogin,
-      roles: user.roles,
-      venues: user.venues?.map((venue) => this.venuesService.mapVenueToIVenueShort(venue)) || []
-    };
+    return { token: this.createToken(user), user: mapUserToSummary(user) };
   }
 
   private createToken(user: User): string {

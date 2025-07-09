@@ -2,6 +2,7 @@ import { CMessage } from '@base/message.class';
 import { mapProductToIProduct } from '@controllers/product/productMaps.util';
 import { UserService } from '@controllers/user/user.service';
 import { VenueService } from '@controllers/venue/venue.service';
+import { mapVenueToIVenue, userHasAccessToVenue } from '@controllers/venue/venue.utils';
 import { ERole } from '@models/base.dto';
 import { ICheckoutCategory, ICheckoutCategoryWithProducts } from '@models/checkout-category.dto';
 import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
@@ -50,7 +51,7 @@ export class CheckoutService {
       return new CMessage(`Venue with ID ${venueId} not found.`, HttpStatus.NOT_FOUND);
     }
 
-    if (!this.venueService.userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
+    if (!userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
       console.log(`User with ID ${userId} does not have access to venue with ID ${venueId}.`, user.roles, user.venues);
       console.timeEnd('findActiveByVenueId');
 
@@ -180,7 +181,7 @@ export class CheckoutService {
       heroImageTextColor: checkout.heroImageTextColor,
       description: checkout.description,
       categories: checkoutCategories?.map((category) => this.mapCheckoutCategoryToICheckoutCategoryWithProducts(category)),
-      venue: checkout.venue ? this.venueService.mapVenueToIVenue(checkout.venue) : undefined
+      venue: checkout.venue ? mapVenueToIVenue(checkout.venue) : undefined
     };
   }
 }
