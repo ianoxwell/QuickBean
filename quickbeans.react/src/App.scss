@@ -55,6 +55,7 @@
     --mantine-color-dimmed: var(--dark-muted-text);
     --input-asterisk-color: var(--mantine-color-red-5);
     --mantine-color-error: var(--mantine-color-red-5);
+    --mantine-color-placeholder: var(--dark-muted-text);
   }
   &[data-mantine-color-scheme='light'] {
     --mantine-color-body: var(--light-background);
@@ -69,6 +70,7 @@
     --mantine-color-dimmed: var(--light-muted-text);
     --input-asterisk-color: var(--mantine-color-red-9);
     --mantine-color-error: var(--mantine-color-red-9);
+    --mantine-color-placeholder: var(--light-muted-text);
   }
 }
 h1,

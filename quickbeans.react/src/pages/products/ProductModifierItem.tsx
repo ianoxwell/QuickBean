@@ -1,6 +1,7 @@
 import { CIconSizes } from '@app/appGlobal.const';
 import { CRoutes } from '@app/routes.const';
 import { useVenueNavigate } from '@app/useVenueNavigate';
+import { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { ActionIcon, Badge, Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { IModifier } from '@models/modifier.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
@@ -9,22 +10,28 @@ import { Check, GripVertical, Trash, View } from 'lucide-react';
 const ProductModifierItem = ({
   modifier,
   isViewVisible,
-  removeModifier
+  removeModifier,
+  dragHandleProps
 }: {
   modifier: IModifier;
   isViewVisible: boolean;
   removeModifier?: () => void;
+  dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
 }) => {
   const navigate = useVenueNavigate();
 
   if (!modifier) {
-    return null;
+    return <div {...dragHandleProps}></div>;
   }
 
   return (
     <Card shadow="sm" mb="md" padding="sm" radius="md" withBorder className="modifier-item-card">
       <Flex gap="xs" align="center">
-        {!isViewVisible && <GripVertical size={CIconSizes.medium} className="modifier-drag-handle" />}
+        {!isViewVisible && (
+          <div {...dragHandleProps} aria-label="Drag to reorder modifier">
+            <GripVertical size={CIconSizes.medium} className="modifier-drag-handle" />
+          </div>
+        )}
         <Stack gap={0} mb="xs" className="modifier-item" flex={1}>
           <Flex justify="space-between" align="center">
             <Flex gap="xs" align="center">
@@ -32,7 +39,7 @@ const ProductModifierItem = ({
                 {modifier.name}
               </Text>
               {modifier.isRequired && (
-                <Badge color="grape.8"  size="sm">
+                <Badge color="grape.8" size="sm">
                   Required
                 </Badge>
               )}
