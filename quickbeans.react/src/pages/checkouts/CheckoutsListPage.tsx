@@ -1,13 +1,17 @@
-import { useGetActiveCheckoutsQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { useGetActiveCheckoutsQuery } from './checkoutApiSlice';
 
 const CheckoutsListPage = () => {
   const base = import.meta.env.VITE_BASE_URL;
   const venueState = useSelector((store: RootState) => store.venue);
-  const { data: checkouts, isLoading, isError } = useGetActiveCheckoutsQuery(venueState.id, {
+  const {
+    data: checkouts,
+    isLoading,
+    isError
+  } = useGetActiveCheckoutsQuery(venueState.id, {
     skip: !venueState.id
   });
 

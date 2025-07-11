@@ -1,14 +1,15 @@
-import { useGetCheckoutQuery } from '@app/apiSlice';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { useVenueNavigate } from '@app/useVenueNavigate';
 import PageTitleForm from '@components/PageTitleForm/PageTitleForm.component';
 import { matches } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import { ICheckout } from '@models/checkout.dto';
 import { isMessage } from '@utils/typescriptHelpers';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { useGetCheckoutQuery, useUpdateCheckoutMutation } from './checkoutApiSlice';
 import CheckoutForm from './CheckoutForm';
 import { CheckoutFormProvider, useCheckoutForm } from './checkoutFormContext';
 import CheckoutView from './CheckoutView';
@@ -32,6 +33,7 @@ const CheckoutPage = () => {
   );
   const [isEditing, setIsEditing] = useState(false);
   const [editedCheckout, setEditedCheckout] = useState(checkout);
+  const [updateCheckout] = useUpdateCheckoutMutation();
 
   const form = useCheckoutForm({
     mode: 'uncontrolled',
@@ -91,13 +93,25 @@ const CheckoutPage = () => {
     setEditedCheckout(checkout);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     form.validate();
     if (!form.isValid()) {
       return;
     }
 
-    setIsEditing(false);
+    try {
+      const result = await updateCheckout(form.getValues()).unwrap();
+      if (isMessage(result)) {
+        console.error('Error saving checkout:', result.message);
+        notifications.show({ message: `Error saving checkout: ${result.message}`, color: 'red' });
+      } else {
+        setIsEditing(false);
+        notifications.show({ message: 'Checkout saved successfully!', color: 'green' });
+      }
+    } catch (error) {
+      console.error('Failed to save checkout:', error);
+      notifications.show({ message: 'Failed to save checkout.', color: 'red' });
+    }
   };
 
   if (!checkoutSlug) {
