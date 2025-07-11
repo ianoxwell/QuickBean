@@ -2,7 +2,7 @@ import { CMessage } from '@base/message.class';
 import { CurrentUser } from '@controllers/user/current-user.decorator';
 import { ERole } from '@models/base.dto';
 import { IUserJwtPayload } from '@models/user.dto';
-import { IVenue, IVenueShort } from '@models/venue.dto';
+import { IVenue, IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import {
   Body,
   Controller,
@@ -20,7 +20,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Multer } from 'multer';
 import { VenueService } from './venue.service';
 
 @ApiTags('Venue')
@@ -46,7 +45,7 @@ export class VenueController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
-  async getVenueById(@Body() userVenue: { venueId: number }, @CurrentUser() user: IUserJwtPayload): Promise<IVenue | CMessage> {
+  async getVenueById(@Body() userVenue: { venueId: number }, @CurrentUser() user: IUserJwtPayload): Promise<IVenueWithProducts | CMessage> {
     if (!userVenue.venueId) {
       return new CMessage('Venue ID is required.', HttpStatus.BAD_REQUEST);
     }
@@ -79,7 +78,7 @@ export class VenueController {
   )
   async uploadVenueImage(
     @Param('venueId') venueId: number,
-    @UploadedFile() file: Multer.File,
+    @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: IUserJwtPayload
   ): Promise<{ url: string } | CMessage> {
     if (isNaN(venueId) || venueId <= 0) {

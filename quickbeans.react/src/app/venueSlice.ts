@@ -1,8 +1,8 @@
-import { IVenue, IVenueShort } from '@models/venue.dto';
+import { IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface IVenueState extends IVenueShort {
-  venue?: IVenue;
+  venue?: IVenueWithProducts;
 }
 
 const initialState = {
@@ -17,7 +17,7 @@ const venueSlice = createSlice({
   name: 'venue',
   initialState,
   reducers: {
-    setFullVenue: (state, { payload }: { payload: IVenue }) => {
+    setFullVenue: (state, { payload }: { payload: IVenueWithProducts }) => {
       state.id = payload.id;
       state.name = payload.name;
       state.slug = payload.slug;

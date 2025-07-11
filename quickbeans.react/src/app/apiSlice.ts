@@ -1,11 +1,10 @@
 // Import the RTK Query methods from the React-specific entry point
-import { ICheckout, ICheckoutQuery, ICheckoutShort } from '@models/checkout.dto';
 import { IMessage } from '@models/message.dto';
 import { IModifier } from '@models/modifier.dto';
 import { IKitchenOrderSubscription, IOrder } from '@models/order.dto';
 import { IProduct, IProductShort } from '@models/products.dto';
 import { IUserLogin, IUserToken, IVerifyOneTimeCode } from '@models/user.dto';
-import { IVenue, IVenueShort } from '@models/venue.dto';
+import { IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { getUserFromLocalStorage, isTokenFresh } from '@utils/localStorage';
 import { io, Socket } from 'socket.io-client';
@@ -59,7 +58,7 @@ export const apiSlice = createApi({
       query: (slug) => ({ url: `/venue/short?slug=${slug}`, method: 'GET' }),
       keepUnusedDataFor: Number.MAX_VALUE // Keeps data "forever"
     }),
-    getVenueFull: builder.query<IVenue, number>({
+    getVenueFull: builder.query<IVenueWithProducts, number>({
       query: (venueId) => ({ url: `/venue`, method: 'POST', body: { venueId } }),
       providesTags: (_result, _error, arg) => [{ type: 'Venue', id: arg }]
     }),
@@ -74,7 +73,7 @@ export const apiSlice = createApi({
     getActiveProducts: builder.query<IProductShort[], string | number>({
       query: (venueId) => ({ url: `product/active-products?venueId=${venueId}` })
     }),
-    getProduct: builder.query<IProduct | IMessage, { venueId: number, productId: number | string }>({
+    getProduct: builder.query<IProduct | IMessage, { venueId: number; productId: number | string }>({
       query: (id) => ({ url: `product?productId=${id.productId}&venueId=${id.venueId}` })
     }),
     // Modifier items
@@ -83,13 +82,6 @@ export const apiSlice = createApi({
     }),
     getModifier: builder.query<IModifier | IMessage, string | number>({
       query: (id) => ({ url: `modifier?modifierId=${id}` })
-    }),
-    // Checkout items
-    getActiveCheckouts: builder.query<ICheckoutShort[], string | number>({
-      query: (venueId) => ({ url: `checkout/active-checkouts?venueId=${venueId}` })
-    }),
-    getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({
-      query: (slugs) => ({ url: `checkout?slug=${slugs.slug}&venueSlug=${slugs.venueSlug}` })
     }),
     // Order items
     updateOrderStatus: builder.mutation<IOrder | IMessage, { receiptNumber: string; status: string }>({
@@ -153,8 +145,6 @@ export const {
   useGetProductQuery,
   useGetActiveModifiersQuery,
   useGetModifierQuery,
-  useGetActiveCheckoutsQuery,
-  useGetCheckoutQuery,
   useUpdateOrderStatusMutation,
   useGetOrderStatusEventsQuery
 } = apiSlice;
