@@ -76,7 +76,7 @@ const Navbar = () => {
         {navItems
           .filter((item) => item.isAllowed)
           .map((item) => (
-            <NavLink key={item.label} aria-label={item.label} to={item.path} className="nav-link">
+            <NavLink key={item.label} title={item.label} to={item.path} className="nav-link">
               {item.icon}
               <Text visibleFrom="md">{item.label}</Text>
             </NavLink>
