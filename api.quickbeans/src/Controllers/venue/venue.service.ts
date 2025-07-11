@@ -7,7 +7,6 @@ import { IVenue, IVenueShort, IVenueWithProducts } from '@models/venue.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { put } from '@vercel/blob';
-import type { Multer } from 'multer';
 import { Repository } from 'typeorm';
 import { Venue } from './Venue.entity';
 import { mapVenueToIVenue, mapVenueToIVenueProducts, mapVenueToIVenueShort, userHasAccessToVenue } from './venue.utils';
@@ -104,7 +103,7 @@ export class VenueService {
       );
     }
   }
-  async uploadVenueImage(venueId: number, file: Multer.File): Promise<string> {
+  async uploadVenueImage(venueId: number, file: Express.Multer.File): Promise<string> {
     // TODO: User needs to install @vercel/blob and configure BLOB_READ_WRITE_TOKEN environment variable
     // npm install @vercel/blob
 
@@ -112,13 +111,21 @@ export class VenueService {
       throw new Error('BLOB_READ_WRITE_TOKEN environment variable is not set.');
     }
 
-    if (!file || typeof file !== 'object' || !('buffer' in file) || !('originalname' in file)) {
+    if (
+      !file ||
+      typeof file !== 'object' ||
+      file instanceof Error ||
+      !Object.prototype.hasOwnProperty.call(file, 'buffer') ||
+      !Object.prototype.hasOwnProperty.call(file, 'originalname')
+    ) {
       throw new Error('Invalid file object provided.');
     }
+
+    // Type guard: file is not an Error here
     const fileName = `venue-logos/${venueId}-${Date.now()}-${file.originalname}`;
 
     try {
-      const { url } = await put(fileName, (file as Multer.File).buffer, {
+      const { url } = await put(fileName, file.buffer, {
         access: 'public',
         token: process.env.BLOB_READ_WRITE_TOKEN
       });
@@ -136,6 +143,4 @@ export class VenueService {
       throw new Error('Failed to upload image to Vercel Blob.');
     }
   }
-
- 
 }
