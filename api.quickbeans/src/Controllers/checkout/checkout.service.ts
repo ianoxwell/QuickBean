@@ -22,6 +22,88 @@ export class CheckoutService {
     private userService: UserService
   ) {}
 
+  async create(checkoutData: ICheckout, userId: number): Promise<ICheckout | CMessage> {
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      return new CMessage(`User with ID ${userId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    const venue = await this.venueService.findById(checkoutData.venue.id);
+    if (!venue) {
+      return new CMessage(`Venue with ID ${checkoutData.venue.id} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (!userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
+      return new CMessage(`User with ID ${userId} does not have access to venue with ID ${checkoutData.venue.id}.`, HttpStatus.FORBIDDEN);
+    }
+
+    const newCheckout = this.checkoutRepository.create(checkoutData);
+    const savedCheckout = await this.checkoutRepository.save(newCheckout);
+    return this.mapCheckoutToICheckout(savedCheckout);
+  }
+
+  async update(id: number, checkoutData: ICheckout, userId: number): Promise<ICheckout | CMessage> {
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      return new CMessage(`User with ID ${userId} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    const venue = await this.venueService.findById(checkoutData.venue.id);
+    if (!venue) {
+      return new CMessage(`Venue with ID ${checkoutData.venue.id} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    if (!userHasAccessToVenue(user, venue, [ERole.ADMIN])) {
+      return new CMessage(`User with ID ${userId} does not have access to venue with ID ${checkoutData.venue.id}.`, HttpStatus.FORBIDDEN);
+    }
+
+    const existingCheckout = await this.checkoutRepository.findOne({
+      where: { id },
+      relations: ['categories']
+    });
+
+    if (!existingCheckout) {
+      return new CMessage(`Checkout with ID ${id} not found.`, HttpStatus.NOT_FOUND);
+    }
+
+    // Update simple properties
+    this.checkoutRepository.merge(existingCheckout, checkoutData);
+
+    // Handle categories many-to-many relationship and update their properties
+    if (checkoutData.categories) {
+      const updatedCategoryEntities: CheckoutCategory[] = [];
+      for (const categoryData of checkoutData.categories) {
+        let categoryEntity: CheckoutCategory | null = null;
+        if (categoryData.id) {
+          categoryEntity = await this.checkoutCategoryRepository.findOne({ where: { id: categoryData.id } });
+        }
+
+        if (categoryEntity) {
+          // Update existing category
+          this.checkoutCategoryRepository.merge(categoryEntity, categoryData);
+          await this.checkoutCategoryRepository.save(categoryEntity);
+          updatedCategoryEntities.push(categoryEntity);
+        } else {
+          // Create new category (if ID is 0 or undefined)
+          const newCategory = this.checkoutCategoryRepository.create(categoryData);
+          await this.checkoutCategoryRepository.save(newCategory);
+          updatedCategoryEntities.push(newCategory);
+        }
+      }
+      existingCheckout.categories = updatedCategoryEntities;
+    }
+
+    try {
+      const savedCheckout = await this.checkoutRepository.save(existingCheckout);
+      return this.mapCheckoutToICheckout(savedCheckout);
+    } catch (error: unknown) {
+      return new CMessage(
+        `Error updating checkout: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async findByVenueId(id: number): Promise<ICheckoutShort[] | null> {
     const checkouts = await this.checkoutRepository.find({
       where: { venue: { id }, isActive: true },

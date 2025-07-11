@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CheckoutService } from './checkout.service';
 import { ICheckout, ICheckoutShort } from '@models/checkout.dto';
@@ -11,6 +11,19 @@ import { IUserJwtPayload } from '@models/user.dto';
 @Controller('checkout')
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
+
+  @Post()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('JWT-auth')
+  async createOrUpdateCheckout(@Body() checkoutData: ICheckout, @CurrentUser() user: IUserJwtPayload): Promise<ICheckout | CMessage> {
+    if (checkoutData.id && checkoutData.id > 0) {
+      // Update existing checkout
+      return this.checkoutService.update(checkoutData.id, checkoutData, user.id);
+    } else {
+      // Create new checkout
+      return this.checkoutService.create(checkoutData, user.id);
+    }
+  }
 
   @Get('active-checkouts')
   @UseGuards(AuthGuard('jwt'))
