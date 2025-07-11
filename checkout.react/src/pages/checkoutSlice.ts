@@ -12,9 +12,12 @@ const checkoutSlice = createSlice({
     setCheckout: (state, { payload }: { payload: ICheckout }) => {
       console.log('set the checkout state', payload);
       state.checkout = payload;
-    }
-  }
+    },
+    setPreviewCheckoutData: (state, { payload }: { payload: ICheckout }) => {
+      state.checkout = payload;
+    },
+  },
 });
 
-export const { setCheckout } = checkoutSlice.actions;
+export const { setCheckout, setPreviewCheckoutData } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

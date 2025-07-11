@@ -2,11 +2,13 @@ import { useGetCheckoutQuery } from '@app/apiSlice';
 import { GlobalNavigation } from '@components/GlobalNavigation/GlobalNavigation.component';
 import HeroImage from '@components/HeroImage/HeroImage';
 import { isMessage } from '@utils/typescriptHelpers';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, useLocation } from 'react-router-dom';
 
 const SharedLayout = () => {
   const { venueSlug, checkoutSlug } = useParams<{ venueSlug: string; checkoutSlug: string }>();
   const { data, isLoading } = useGetCheckoutQuery({ slug: checkoutSlug || '', venueSlug: venueSlug || '' });
+  const location = useLocation();
+  const isPreviewMode = new URLSearchParams(location.search).get('previewMode') === 'true';
 
   return (
     <main>
@@ -18,7 +20,7 @@ const SharedLayout = () => {
             <div>Error {data?.message}</div>
           ) : (
             <>
-              <GlobalNavigation />
+              {!isPreviewMode && <GlobalNavigation />}
               <HeroImage />
               <section className="main-content">
                 <Outlet />

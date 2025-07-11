@@ -6,7 +6,7 @@ import { matches } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { ICheckout } from '@models/checkout.dto';
 import { isMessage } from '@utils/typescriptHelpers';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { useGetCheckoutQuery, useUpdateCheckoutMutation } from './checkoutApiSlice';
@@ -32,14 +32,21 @@ const CheckoutPage = () => {
     }
   );
   const [isEditing, setIsEditing] = useState(false);
-  const [editedCheckout, setEditedCheckout] = useState(checkout);
   const [updateCheckout] = useUpdateCheckoutMutation();
+  const isFormInitialized = useRef(false);
 
   const form = useCheckoutForm({
     mode: 'uncontrolled',
     initialValues: {
-      ...(editedCheckout as ICheckout)
-    },
+      id: 0,
+      name: '',
+      slug: '',
+      description: '',
+      heroImageTextColor: '#FFFFFF',
+      heroImage: '',
+      checkoutUrl: '',
+      categories: [],
+    } as ICheckout,
     validate: {
       name: (value) => (value.length < 2 ? 'Name must be at least 2 characters long' : null),
       slug: (value) =>
@@ -49,48 +56,54 @@ const CheckoutPage = () => {
           ? 'Slug cannot be "new"'
           : null,
       description: (value) => (value.length < 5 ? 'Description must be at least 5 characters long' : null),
-      heroImageTextColor: matches(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, 'Invalid color format. Use #RRGGBB or #RGB')
+      heroImageTextColor: matches(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, 'Invalid color format. Use #RRGGBB or #RGB'),
     },
     enhanceGetInputProps() {
       if (!isEditing) {
         return { disabled: true };
       }
-    }
+    },
   });
 
-  if ((checkoutSlug === 'new' && !editedCheckout) || (!!checkout && !isMessage(checkout) && !checkout.id)) {
-    console.log('Creating new checkout item');
-    const newCheckout: ICheckout = {
-      id: 0,
-      name: '',
-      slug: '',
-      description: '',
-      heroImageTextColor: '#FFFFFF',
-      heroImage: '',
-      checkoutUrl: `${venueState.slug || ''}/`,
-      categories: []
-    };
+  useEffect(() => {
+    if (isFormInitialized.current) {
+      return; // Form already initialized, prevent re-initialization
+    }
 
-    setEditedCheckout(newCheckout);
-    form.setValues(newCheckout);
-    setIsEditing(true);
-  }
+    if (checkoutSlug === 'new') {
+      const newCheckout: ICheckout = {
+        id: 0,
+        name: '',
+        slug: '',
+        description: '',
+        heroImageTextColor: '#FFFFFF',
+        heroImage: '',
+        checkoutUrl: `${venueState.slug || ''}/`,
+        categories: [],
+      } as ICheckout;
+      form.setValues(newCheckout);
+      setIsEditing(true);
+      isFormInitialized.current = true;
+    } else if (checkout && !isMessage(checkout)) {
+      form.setValues(checkout as ICheckout);
+      setIsEditing(false);
+      isFormInitialized.current = true;
+    }
+  }, [checkout, checkoutSlug, venueState.slug, form]);
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedCheckout(checkout);
-    form.setValues(checkout as ICheckout);
     form.clearErrors();
   };
 
   const handleCancel = () => {
-    if (editedCheckout && (editedCheckout as ICheckout).id === 0) {
+    if (checkoutSlug === 'new') {
       navigate(`/${CRoutes.checkouts}`);
       return;
     }
 
     setIsEditing(false);
-    setEditedCheckout(checkout);
+    form.setValues(checkout as ICheckout); // Revert to original fetched data
   };
 
   const handleSave = async () => {
@@ -114,10 +127,6 @@ const CheckoutPage = () => {
     }
   };
 
-  if (!checkoutSlug) {
-    return null; // Handle the case where checkoutSlug is not provided
-  }
-
   if (isLoading) {
     return <div>Loading checkout...</div>;
   }
@@ -128,7 +137,7 @@ const CheckoutPage = () => {
 
   return (
     <>
-      {!isLoading && !isError && (checkout || editedCheckout) && !isMessage(checkout) && (
+      {!isLoading && !isError && Object.keys(form.values).length > 0 && (
         <div className="form">
           <PageTitleForm
             isEditing={isEditing}
@@ -138,7 +147,7 @@ const CheckoutPage = () => {
             handleCancel={handleCancel}
             handleSave={handleSave}
           />
-          {isEditing && editedCheckout && !isMessage(editedCheckout) ? (
+          {isEditing ? (
             <CheckoutFormProvider form={form}>
               <CheckoutForm />
             </CheckoutFormProvider>
