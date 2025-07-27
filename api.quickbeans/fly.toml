@@ -1,0 +1,48 @@
+# fly.toml app configuration file generated for api-quickbeans on 2025-07-27T11:59:35+10:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'api-quickbeans'
+primary_region = 'syd'
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[build]
+
+[env]
+  PORT = "8080"
+  APP_ENV = "production"
+  DB_CONNECTION = "pgsql"
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory_mb = 256
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    force_https = true
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[services.checks]]
+    type = "http"
+    interval = "10s"
+    timeout = "2s"
+    grace_period = "5s"
+    method = "GET"
+    path = "/status"
+    protocol = "http"
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
