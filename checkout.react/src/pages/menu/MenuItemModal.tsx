@@ -82,8 +82,8 @@ const MenuItemModal = () => {
       modifierId,
       optionId: option.id,
       label: option.label,
-      priceAdjustment: option.priceAdjustment ? Number(option.priceAdjustment) : 0,
-      percentAdjustment: option.percentAdjustment
+      // priceAdjustment: option.priceAdjustment ? Number(option.priceAdjustment) : 0,
+      // percentAdjustment: option.percentAdjustment
     });
     setSelectedModifiers(order.selectedModifiers.map((m) => `${m.modifierId}-${m.optionId}`));
     order.price = calcOrderItemPrice(order, product);

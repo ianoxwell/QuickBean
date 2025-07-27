@@ -68,7 +68,7 @@ export const apiSlice = createApi({
     getCheckout: builder.query<ICheckout | IMessage, ICheckoutQuery>({
       query: (slugs) => ({ url: `checkout?slug=${slugs.slug}&venueSlug=${slugs.venueSlug}` }),
       keepUnusedDataFor: 0,
-      async onQueryStarted(queryArgument, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           // Only dispatch if data is a valid ICheckout (not an error message)

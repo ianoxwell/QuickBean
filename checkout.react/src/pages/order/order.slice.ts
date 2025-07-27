@@ -27,41 +27,39 @@ const orderSlice = createSlice({
         state.order = createBlankOrder(payload.checkout);
       }
 
-      const orderItem = payload.orderItem;
-      // Ensure the orderItem has a uniqueId
-      if (!orderItem.uniqueId) {
-        orderItem.uniqueId = generateRandomUniqueString(10, false);
-      }
+      const { orderItem, checkout } = payload;
 
-      // Check if the item already exists in the order and that the modifiers are the same
+      // Check if the item already exists in the order by comparing product and modifiers
       const existingItemIndex = state.order.items.findIndex(
         (item) =>
-          (item.id === orderItem.id &&
-            item.productId === orderItem.productId &&
-            JSON.stringify(item.selectedModifiers) === JSON.stringify(orderItem.selectedModifiers)) ||
-          item.uniqueId === orderItem.uniqueId
+          item.productId === orderItem.productId &&
+          JSON.stringify(item.selectedModifiers) === JSON.stringify(orderItem.selectedModifiers)
       );
+
+      const product = checkout.categories.flatMap((c) => c.products).find((p) => p.id === orderItem.productId);
+
       if (existingItemIndex > -1) {
         // If it exists, just increase the quantity
-        state.order.items[existingItemIndex].quantity += orderItem.quantity;
-        state.order.items[existingItemIndex].price = calcOrderItemPrice(
-          state.order.items[existingItemIndex],
-          state.order.items[existingItemIndex].product
-        );
+        const existingItem = state.order.items[existingItemIndex];
+        existingItem.quantity += orderItem.quantity;
+        existingItem.price = calcOrderItemPrice(existingItem, product);
       } else {
-        // If it doesn't exist, add the new item
+        // If it doesn't exist, add the new item with a uniqueId
         const newItem: IOrderItem = {
           ...orderItem,
-          price: calcOrderItemPrice(orderItem, orderItem.product)
+          uniqueId: generateRandomUniqueString(10, false),
+          price: 0 // Initialize price
         };
+        newItem.price = calcOrderItemPrice(newItem, product);
         state.order.items.push(newItem);
       }
 
       // Recalculate the grand total
       state.order.grandTotal = calcOrderTotal(
         state.order.items,
-        state.order.items.map((item) => item.product)
+        checkout.categories.flatMap((c) => c.products)
       );
+
       // Set the order date to now if it's a new order
       if (!state.order.id) {
         state.order.orderDate = new Date().toISOString();
@@ -90,7 +88,7 @@ const orderSlice = createSlice({
         // Recalculate the grand total
         state.order.grandTotal = calcOrderTotal(
           state.order.items,
-          state.order.items.map((item) => item.product)
+          payload.checkout.categories.flatMap((c) => c.products)
         );
 
         // If no items left, reset the order
@@ -104,26 +102,41 @@ const orderSlice = createSlice({
       }
     },
     modifyCheckoutItem: (state, { payload }: { payload: IOrderItem }) => {
-      if (!state.order || !payload.uniqueId) return;
+      // Guard against missing order or payload
+      if (!state.order || !payload || !payload.uniqueId) {
+        return;
+      }
 
-      // Find the index of the item to modify
-      const itemIndex = state.order.items.findIndex((item) => item.uniqueId && item.uniqueId === payload.uniqueId);
+      // The checkout object on IOrder is typed as ICheckoutShort, but we store the full ICheckout object at runtime.
+      const checkout = state.order.checkout as unknown as ICheckout;
+      if (!checkout || !checkout.categories) {
+        // Cannot proceed without the full product list
+        return;
+      }
+
+      const itemIndex = state.order.items.findIndex((item) => item.uniqueId === payload.uniqueId);
+
       if (itemIndex > -1) {
+        const allProducts = checkout.categories.flatMap((c) => c.products);
+        const existingItem = state.order.items[itemIndex];
+        const product = allProducts.find((p) => p.id === existingItem.productId);
+
+        if (!product) {
+          console.error(`Product with ID ${existingItem.productId} not found in checkout data.`);
+          return;
+        }
+
         if (payload.quantity <= 0) {
           // If quantity is 0 or less, remove the item
           state.order.items.splice(itemIndex, 1);
         } else {
           // Update the item with new values
-          const existingItem = state.order.items[itemIndex];
           existingItem.quantity = payload.quantity;
           existingItem.selectedModifiers = payload.selectedModifiers;
-          existingItem.price = calcOrderItemPrice(existingItem, existingItem.product);
+          existingItem.price = calcOrderItemPrice(existingItem, product);
         }
         // Recalculate the grand total
-        state.order.grandTotal = calcOrderTotal(
-          state.order.items,
-          state.order.items.map((item) => item.product)
-        );
+        state.order.grandTotal = calcOrderTotal(state.order.items, allProducts);
 
         // Update the item count
         state.itemCount = calculateItemCount(state.order);

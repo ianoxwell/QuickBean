@@ -6,12 +6,17 @@ export const calcOrderItemPrice = (orderItem: IOrderItem, product: IProduct | un
 
   const modifiersTotal =
     orderItem.selectedModifiers?.reduce((acc, modifier) => {
-      if (modifier.priceAdjustment != null) {
-        return acc + Number(modifier.priceAdjustment);
+      const selectedModifier = product.modifiers.find((m) => m.id === modifier.modifierId);
+      if (!selectedModifier) {
+        console.warn(`Modifier with id ${modifier.modifierId} not found in product modifiers.`);
+        return acc; // Skip this modifier if not found
       }
-      if (modifier.percentAdjustment) {
-        return acc + product.baseCost * modifier.percentAdjustment;
+
+      const selectedOption = selectedModifier.options.find((o) => o.id === modifier.optionId);
+      if (selectedOption?.priceAdjustment != null) {
+        return acc + Number(selectedOption.priceAdjustment);
       }
+
       return acc;
     }, 0) ?? 0;
 
