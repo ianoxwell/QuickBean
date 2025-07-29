@@ -154,7 +154,7 @@ const ProductPage = () => {
                       <>
                         <InputLabel>Modifiers:</InputLabel>
                         {product.modifiers.map((modifier) => (
-                          <ProductModifierItem key={modifier.id} modifier={modifier} isViewVisible={!isEditing} />
+                          <ProductModifierItem dragHandleProps={undefined} key={modifier.id} modifier={modifier} isViewVisible={!isEditing} />
                         ))}
                       </>
                     )}

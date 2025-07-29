@@ -39,7 +39,7 @@ const ModifiersPage = () => {
           <Divider my="md" />
 
           {modifiers.map((modifier) => (
-            <ProductModifierItem key={modifier.id} modifier={modifier} isViewVisible={true} />
+            <ProductModifierItem dragHandleProps={undefined} key={modifier.id} modifier={modifier} isViewVisible={true} />
           ))}
         </div>
       )}

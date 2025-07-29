@@ -10,6 +10,7 @@ import VerifyEmail from '@pages/account/VerifyEmail';
 import CheckoutPage from '@pages/checkouts/CheckoutPage';
 import CheckoutsListPage from '@pages/checkouts/CheckoutsListPage';
 import DashboardPage from '@pages/dashboard/DashboardPage';
+import ErrorPage from '@pages/errorPage/ErrorPage';
 import KitchenPage from '@pages/kitchen/KitchenPage';
 import ModifierPage from '@pages/modifiers/ModifierPage';
 import ModifiersPage from '@pages/modifiers/ModifiersListPage';
@@ -20,7 +21,6 @@ import SettingsPage from '@pages/settings/SettingsPage';
 import SharedLayout from '@pages/SharedLayout';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import './App.scss';
-import ErrorPage from '@pages/errorPage/errorPage';
 
 const theme = createTheme({
   fontFamily: 'Lato, Quicksand, sans-serif',
