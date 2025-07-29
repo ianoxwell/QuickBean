@@ -8,11 +8,17 @@ export interface IVenueShort {
   logoImage?: string;
 }
 
+export interface IVenueOpeningHours {
+  day: number;
+  open: number;
+  close: number;
+}
+
 export interface IVenue extends IVenueShort {
   websiteUrl: string;
   isActive: boolean;
   countryId: string;
-  openingHours: { day: number; open: number; close: number }[];
+  openingHours: IVenueOpeningHours[];
   address: string;
   city: string;
   state: string;
