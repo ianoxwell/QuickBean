@@ -19,6 +19,7 @@ const CheckoutForm = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const isLargeScreen = useMediaQuery('(min-width: 1200px)'); // Mantine's lg breakpoint
   const [iframeError, setIframeError] = useState(false);
+  const checkoutUrl = import.meta.env.VITE_CHECKOUT_URL || 'http://localhost:5173';
 
   const onFormChangeHandler = async () => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
@@ -26,7 +27,7 @@ const CheckoutForm = () => {
       console.log('Posting message to iframe:', form.getValues().heroImageTextColor, form.values.heroImageTextColor);
       iframeRef.current.contentWindow.postMessage(
         { type: 'UPDATE_CHECKOUT_PREVIEW', payload: form.getValues() },
-        'http://localhost:5173' // Target origin of the checkout.react app
+        checkoutUrl // Target origin of the checkout.react app
       );
     }
   };
@@ -48,7 +49,6 @@ const CheckoutForm = () => {
     const newUrl = `${venueState.slug}/${e.target.value}`;
     form.setFieldValue('checkoutUrl', newUrl);
   };
-
 
   if (!form || !Object.keys(formValue).length) {
     return <Text>Loading...</Text>;
@@ -140,7 +140,7 @@ const CheckoutForm = () => {
               )}
               <iframe
                 ref={iframeRef}
-                src={`http://localhost:5173/${formValue.checkoutUrl}/menu?previewMode=true`}
+                src={`${checkoutUrl}/${formValue.checkoutUrl}/menu?previewMode=true`}
                 style={{ width: '100%', height: '80vh', border: 'none' }}
                 title="Checkout Preview"
                 onError={() => setIframeError(true)}
