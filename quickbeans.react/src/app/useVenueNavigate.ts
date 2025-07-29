@@ -22,7 +22,7 @@ export function useVenueNavigate() {
   const navigate = useNavigate();
   const venueSlugParam: string | undefined = useParams<{ venueSlug: string }>().venueSlug;
   const venueSlug: string | undefined = useSelector((state: RootState) => state.venue.slug) || venueSlugParam;
-  const base = import.meta.env.VITE_BASE_URL || '';
+  const base = import.meta.env.VITE_BASE_URL || '/';
   const defaultVenue = import.meta.env.VITE_DEFAULT_VENUE || '';
 
   // Usage: venueNavigate('/checkout')
