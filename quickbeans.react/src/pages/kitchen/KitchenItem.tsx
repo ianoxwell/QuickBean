@@ -14,8 +14,8 @@ import { kitchenStatusColors } from './kitchen.util';
 
 const KitchenItem = ({ order }: { order: IOrder }) => {
   dayjs.extend(utc);
-  dayjs.extend(relativeTime);
   dayjs.extend(timezone);
+  dayjs.extend(relativeTime);
   const { venue } = useAppSelector((state) => state.venue);
   dayjs.tz.setDefault(venue?.timezone || 'Australia/Brisbane'); // Set the timezone to the venue's timezone
   const date = dayjs(order.orderDate);

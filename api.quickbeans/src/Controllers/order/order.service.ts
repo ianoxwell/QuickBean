@@ -63,13 +63,9 @@ export class OrderService {
   }
 
   async createOrder(orderData: IOrder): Promise<IOrder | CMessage> {
-    const order: Order = this.orderRepository.create(orderData);
+    const order: Order = this.orderRepository.create(structuredClone(orderData));
     order.amountPaid = order.grandTotal || 0; // Ensure amountPaid is set to grandTotal if not provided
-    order.items = orderData.items.map((item) => {
-      const orderItem = this.orderItemRepository.create(item);
-      orderItem.order = order; // Set the order reference
-      return orderItem;
-    });
+
     // Set order date to now if not provided or invalid
     order.orderDate = orderData.orderDate ? new Date(orderData.orderDate) : new Date();
     order.orderStatus = EOrderStatus.PENDING; // Default booking status
@@ -92,11 +88,27 @@ export class OrderService {
 
     order.venue = venue;
     order.patron = patron;
+    delete order.items; // Remove items from the orderData to avoid circular reference issues
 
     try {
       const savedOrder = await this.orderRepository.save(order);
-      this.eventsGateway.notifyKitchenOrderUpdate(savedOrder, true);
-      return mapOrderToIOrder(savedOrder);
+
+      const orderItems: OrderItem[] = orderData.items.map((item) => {
+        const orderItem = this.orderItemRepository.create(item);
+        orderItem.order = savedOrder; // Set the order reference
+        return orderItem;
+      });
+      console.log('Creating order with items:', orderItems.length, orderItems);
+      // Save all items
+      await this.orderItemRepository.save(orderItems);
+
+      // Fetch the complete order with items
+      const completeOrder = await this.orderRepository.findOne({
+        where: { id: savedOrder.id },
+        relations: ['venue', 'patron', 'items', 'items.product']
+      });
+      this.eventsGateway.notifyKitchenOrderUpdate(completeOrder, true);
+      return mapOrderToIOrder(completeOrder);
     } catch (error: unknown) {
       return new CMessage(
         `Error creating order: ${error instanceof Error && 'message' in error ? error.message : JSON.stringify(error)}`,

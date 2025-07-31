@@ -32,7 +32,7 @@ export class Order {
   @Column({ type: 'enum', enum: EOrderStatus, default: EOrderStatus.PENDING })
   orderStatus: EOrderStatus;
 
-  @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
+  @OneToMany(() => OrderItem, (item) => item.order, { cascade: true, eager: false })
   items: OrderItem[];
 
   @Index()
