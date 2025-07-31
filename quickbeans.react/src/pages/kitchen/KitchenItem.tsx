@@ -18,7 +18,7 @@ const KitchenItem = ({ order }: { order: IOrder }) => {
   dayjs.extend(timezone);
   const { venue } = useAppSelector((state) => state.venue);
   dayjs.tz.setDefault(venue?.timezone || 'Australia/Brisbane'); // Set the timezone to the venue's timezone
-  const date = dayjs.tz(order.orderDate);
+  const date = dayjs(order.orderDate);
   const [updateOrderStatus, { isLoading }] = useUpdateOrderStatusMutation();
   // eslint-disable-next-line prefer-const
   let { trafficLight = 'grey', nextStatus = EOrderStatus.PREPARING } = kitchenStatusColors(order.bookingStatus);
