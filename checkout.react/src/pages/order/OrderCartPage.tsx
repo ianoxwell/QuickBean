@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Button, Divider, Flex } from '@mantine/core';
 import { MapPin, Plus, StepForward, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
 import { clearCheckout } from './order.slice';
 import './OrderCartPage.scss';
@@ -13,14 +13,12 @@ const OrderCartPage = () => {
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
   const dispatch = useAppDispatch();
   const iconSize = 16;
 
   const proceedToCheckout = () => {
-    const checkoutUrl = user
-      ? `${base}${checkout?.checkoutUrl}/${CRoutes.payment}`
-      : `${base}${checkout?.checkoutUrl}/${CRoutes.login}`;
+    const checkoutUrl = user ? CRoutes.payment : CRoutes.login;
     navigate(checkoutUrl, { state: { order } });
   };
 
@@ -33,11 +31,7 @@ const OrderCartPage = () => {
     return (
       <>
         <p>Your cart is currently empty.</p>
-        <Button
-          type="button"
-          onClick={() => navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`)}
-          leftSection={<Plus size={16} />}
-        >
+        <Button type="button" onClick={() => navigate(CRoutes.menu)} leftSection={<Plus size={16} />}>
           Add to order
         </Button>
       </>

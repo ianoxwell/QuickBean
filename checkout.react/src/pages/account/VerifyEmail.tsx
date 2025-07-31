@@ -1,25 +1,22 @@
 import { useVerifyOneTimeCodeMutation } from '@app/apiSlice';
 import { useAppDispatch } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
-import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Button, PinInput, Space } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IMessage } from '@models/message.dto';
 import { IUserToken } from '@models/user.dto';
 import { isMessage } from '@utils/typescriptHelpers';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { setUser } from './userSlice';
 
 const VerifyEmail = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const [verifyUserEmail, { data: user, isLoading }] = useVerifyOneTimeCodeMutation();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
   const { email, order, code } = location.state || {};
-  const { checkout } = useSelector((store: RootState) => store.checkout);
   const initialState = {
     oneTimeCode: code || '142142'
   };
@@ -48,9 +45,7 @@ const VerifyEmail = () => {
           notifications.show({ message: 'Successfully verified OTC', color: 'green' });
           dispatch(setUser(userToken)); // Assuming you have a setUser action to update the user state
           // You can redirect or update the state as needed
-          const checkoutUrl = order
-            ? `${base}${checkout?.checkoutUrl}/${CRoutes.payment}`
-            : `${base}${checkout?.checkoutUrl}/${CRoutes.menu}`;
+          const checkoutUrl = order ? CRoutes.payment : CRoutes.menu;
           navigate(checkoutUrl, { state: { order } });
         }
       } catch (error) {

@@ -1,18 +1,14 @@
 import { CRoutes } from '@app/routes.const';
-import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Card, Flex, Image, UnstyledButton } from '@mantine/core';
 import { IProduct } from '@models/products.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 const ProductItem = ({ product }: { product: IProduct }) => {
-  const base = import.meta.env.VITE_BASE_URL;
-  const { checkout } = useSelector((store: RootState) => store.checkout);
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
 
   const navigateToProduct = () => {
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}/${product.id}`, { state: { product } });
+    navigate(`${CRoutes.menu}/${product.id}`, { state: { product } });
   };
 
   return (

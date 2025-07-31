@@ -1,15 +1,15 @@
 import { useGetActiveProductsQuery } from '@app/apiSlice';
 import { CIconSizes } from '@app/appGlobal.const';
+import { useAppSelector } from '@app/hooks';
+import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useVenueNavigate } from '@app/useVenueNavigate';
 import { Button, Divider, Flex, Grid } from '@mantine/core';
 import { Plus } from 'lucide-react';
-import { useSelector } from 'react-redux';
 import ProductItem from './ProductItem';
-import { useVenueNavigate } from '@app/useVenueNavigate';
-import { CRoutes } from '@app/routes.const';
 
 const ProductsListPage = () => {
-  const venueState = useSelector((store: RootState) => store.venue);
+  const venueState = useAppSelector((store: RootState) => store.venue);
   const {
     data: products,
     isLoading,

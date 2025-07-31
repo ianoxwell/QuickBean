@@ -1,24 +1,23 @@
-import { useAppDispatch } from '@app/hooks';
+import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import QuantityInput from '@components/QuantityInput/QuantityInput.component';
-import { ActionIcon, Button, Chip, Group, Image, Modal, useMatches } from '@mantine/core';
+import { ActionIcon, Button, Chip, Flex, Group, Image, Modal, useMatches } from '@mantine/core';
 import { IOrderItem } from '@models/order.dto';
 import { IProduct } from '@models/products.dto';
 import { calcOrderItemPrice } from '@utils/costCalculator';
 import { fixWholeNumber } from '@utils/numberUtils';
 import { ChevronLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { addCheckoutItem } from '../order/order.slice';
 
 const MenuItemModal = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
   const dispatch = useAppDispatch();
-  const { checkout } = useSelector((store: RootState) => store.checkout);
+  const { checkout } = useAppSelector((store: RootState) => store.checkout);
   // const iconSize = 16;
   const iconPlusSize = 28;
   let { product, orderItem }: { product: IProduct | undefined; orderItem: IOrderItem | undefined } = location.state;
@@ -48,7 +47,7 @@ const MenuItemModal = () => {
   const closeModal = () => {
     product = undefined; // Clear the product state
     orderItem = undefined; // Clear the orderItem state
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`, { replace: true }); // Navigate back to the previous page
+    navigate(CRoutes.menu, { replace: true }); // Navigate back to the previous page
   };
 
   /** When any modifiers for the order item are changed */
@@ -81,7 +80,7 @@ const MenuItemModal = () => {
     order.selectedModifiers.push({
       modifierId,
       optionId: option.id,
-      label: option.label,
+      label: option.label
       // priceAdjustment: option.priceAdjustment ? Number(option.priceAdjustment) : 0,
       // percentAdjustment: option.percentAdjustment
     });
@@ -92,7 +91,7 @@ const MenuItemModal = () => {
     setTotalPrice(fixWholeNumber(order.price, 2));
   };
 
-  const addCheckoutItemToOrder = () => {
+  const addCheckoutItemToOrder = (proceedToCheckout = false) => {
     if (!checkout) {
       console.error('Checkout is not defined. Cannot add item to order.');
       return;
@@ -116,6 +115,11 @@ const MenuItemModal = () => {
     order.product = product;
     // Dispatch the action to add the item to the checkout
     dispatch(addCheckoutItem({ orderItem: order, checkout }));
+    if (proceedToCheckout) {
+      navigate(CRoutes.payment);
+      return;
+    }
+
     // Close the modal after adding the item
     closeModal();
   };
@@ -205,9 +209,14 @@ const MenuItemModal = () => {
                 setTotalPrice(fixWholeNumber(order.price, 2));
               }}
             />
-            <Button size="input-sm" onClick={addCheckoutItemToOrder} type="button">
-              Add to Order - ${totalPrice}
-            </Button>
+            <Flex gap="md">
+              <Button variant="outline" size="input-sm" onClick={() => addCheckoutItemToOrder()} type="button">
+                Add to Order - ${totalPrice}
+              </Button>
+              <Button size="input-sm" onClick={() => addCheckoutItemToOrder(true)} type="button">
+                Proceed to checkout - ${totalPrice}
+              </Button>
+            </Flex>
           </div>
         </div>
       </div>

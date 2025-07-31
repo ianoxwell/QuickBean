@@ -1,25 +1,21 @@
 import { usePayNowCreateOrderMutation } from '@app/apiSlice';
-import { useAppDispatch, useAppSelector } from '@app/hooks';
+import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Accordion, Button, Flex, Image, Space, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import CartItem from '@pages/order/CartItem';
 import { isMessage } from '@utils/typescriptHelpers';
 import { CreditCard } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import creditCard from '../../assets/visa-cards.png';
 import './PaymentPage.scss';
-import { clearCheckout } from '@pages/order/order.slice';
 
 const PaymentPage = () => {
-  const base = import.meta.env.VITE_BASE_URL;
-  const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
-  const dispatch = useAppDispatch();
   const [payNowOrder, { isLoading }] = usePayNowCreateOrderMutation();
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
   const iconSize = 16;
 
   const payNow = async () => {
@@ -40,19 +36,21 @@ const PaymentPage = () => {
       return;
     }
 
-    
     notifications.show({
       message: `Payment successful! Receipt Number: ${payResult.receiptNumber}`,
       color: 'green'
     });
     // Redirect to confirmation page or show success message
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.confirmation}/${payResult.receiptNumber}`);
-    dispatch(clearCheckout()); // Clear the checkout state after payment
+    console.log('Payment successful, navigating:', payResult);
+    navigate(`${CRoutes.confirmation}/${payResult.receiptNumber}`);
+    console.log('Clearing checkout data after payment...');
+    // dispatch(clearCheckout()); // Clear the checkout state after payment
     return;
   };
 
   if (!order || !order.items || !order.items.length) {
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.menu}`);
+    navigate(CRoutes.menu);
+    console.log('No items in the order, redirecting to menu');
     return null; // No items in the order, redirect to menu
   }
 

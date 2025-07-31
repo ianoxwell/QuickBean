@@ -2,12 +2,13 @@ import { useLazyLoginExistingUserQuery } from '@app/apiSlice';
 import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Button, Card, Checkbox, Group, Stack, TextInput } from '@mantine/core';
 import { isEmail, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IOrder } from '@models/order.dto';
 import { isMessage } from '@utils/typescriptHelpers';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const initialState = {
   email: 'patron@coffee.com',
@@ -15,10 +16,8 @@ const initialState = {
 };
 
 const Login = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const { user } = useAppSelector((store: RootState) => store.user);
-  const { checkout } = useAppSelector((store: RootState) => store.checkout);
-  const navigate = useNavigate();
+  const navigate = useCheckoutNavigate();
   const [logonUser, { isLoading }] = useLazyLoginExistingUserQuery();
 
   const location = useLocation();
@@ -42,7 +41,7 @@ const Login = () => {
       }
 
       // navigate to the one time code verification page
-      navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.verify}`, {
+      navigate(CRoutes.verify, {
         state: { email, order, code: result.oneTimeCode }
       });
     } catch (error) {
@@ -64,7 +63,7 @@ const Login = () => {
   });
 
   if (user) {
-    const checkoutUrl = order ? `${base}${checkout?.checkoutUrl}/${CRoutes.payment}` : from;
+    const checkoutUrl = order ? CRoutes.payment : from;
     // If the user is already logged in, redirect them to the payment or the previous page
     navigate(checkoutUrl, { replace: true });
     return null;

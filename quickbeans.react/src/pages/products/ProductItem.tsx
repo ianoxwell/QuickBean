@@ -1,14 +1,14 @@
+import { useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
 import { Badge, Button, Card, Group, Image, Text } from '@mantine/core';
 import { IProductShort } from '@models/products.dto';
 import { convertProductType } from '@utils/stringUtils';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const ProductItem = ({ product }: { product: IProductShort }) => {
   const base = import.meta.env.VITE_BASE_URL;
-  const venueState = useSelector((store: RootState) => store.venue);
+  const venueState = useAppSelector((store: RootState) => store.venue);
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>

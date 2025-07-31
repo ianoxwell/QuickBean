@@ -1,26 +1,24 @@
 import { useAppDispatch, useAppSelector } from '@app/hooks';
 import { CRoutes } from '@app/routes.const';
 import { RootState } from '@app/store';
+import { useCheckoutNavigate } from '@app/useCheckoutNavigate';
 import { Indicator, Menu, useMantineColorScheme } from '@mantine/core';
 import { logoutUser } from '@pages/account/userSlice';
 import { CircleUser, LayoutDashboard, LogIn, LogOut, Moon, ShoppingCart, Sun } from 'lucide-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './GlobalNavigation.component.scss';
 
 export const GlobalNavigation = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const fillColor = '#128758';
   const iconSize = 24;
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  // const { user } = useAppSelector((store: RootState) => store.user.user) as IUserToken;
-  const { checkout } = useAppSelector((store: RootState) => store.checkout);
+  const navigate = useCheckoutNavigate();
   const { itemCount } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const navigateSettings = () => {
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.orders}`);
+    navigate(CRoutes.orders);
   };
 
   const logUserOut = () => {
@@ -28,7 +26,7 @@ export const GlobalNavigation = () => {
   };
 
   const logUserIn = () => {
-    navigate(`${base}${checkout?.checkoutUrl}/${CRoutes.login}`);
+    navigate(CRoutes.login);
   };
 
   return (
