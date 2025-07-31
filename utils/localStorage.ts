@@ -34,6 +34,18 @@ export const removeOrderFromLocalStorage = () => {
 export const getOrderFromLocalStorage = (): IOrder | undefined => {
   const result = localStorage.getItem(CLocalStorageKeys.order);
   const order = typeof result === 'string' && result.includes('{') ? (JSON.parse(result) as IOrder) : undefined;
+  if (!order || !order.items || order.items.length === 0 || !order.orderDate) {
+    localStorage.removeItem(CLocalStorageKeys.order);
+    return undefined;
+  }
+
+  // check the date is within the last 24 hours
+  const orderDate = new Date(order.orderDate);
+  if (isNaN(orderDate.getTime()) || Date.now() - orderDate.getTime() > 24 * 60 * 60 * 1000) {
+    localStorage.removeItem(CLocalStorageKeys.order);
+    return undefined;
+  }
+
   return order;
 };
 
