@@ -1,17 +1,24 @@
 import { useUpdateOrderStatusMutation } from '@app/apiSlice';
 import { CIconSizes } from '@app/appGlobal.const';
+import { useAppSelector } from '@app/hooks';
 import { Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { EOrderStatus } from '@models/base.dto';
 import { IOrder } from '@models/order.dto';
 import { fixWholeNumber } from '@utils/numberUtils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { Clock } from 'lucide-react';
 import { kitchenStatusColors } from './kitchen.util';
 
 const KitchenItem = ({ order }: { order: IOrder }) => {
+  dayjs.extend(utc);
   dayjs.extend(relativeTime);
-  const date = dayjs(order.orderDate);
+  dayjs.extend(timezone);
+  const { venue } = useAppSelector((state) => state.venue);
+  dayjs.tz.setDefault(venue?.timezone || 'Australia/Brisbane'); // Set the timezone to the venue's timezone
+  const date = dayjs.tz(order.orderDate);
   const [updateOrderStatus, { isLoading }] = useUpdateOrderStatusMutation();
   // eslint-disable-next-line prefer-const
   let { trafficLight = 'grey', nextStatus = EOrderStatus.PREPARING } = kitchenStatusColors(order.bookingStatus);
