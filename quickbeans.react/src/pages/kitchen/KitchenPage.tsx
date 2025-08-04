@@ -33,7 +33,7 @@ const KitchenPage = () => {
 
   return (
     <section className="kitchen-page">
-      <h1>Kitchen page - header summary</h1>
+      <h1>Kitchen display</h1>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3, xl: 4 }} mt="xl" spacing="lg" verticalSpacing="lg">
         {orders.length > 0 ? (
           orders.map((order) => <KitchenItem key={order.receiptNumber} order={order} />)
