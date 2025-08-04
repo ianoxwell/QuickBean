@@ -18,6 +18,7 @@ const MenuItemModal = () => {
   const navigate = useCheckoutNavigate();
   const dispatch = useAppDispatch();
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
+  const { order: fullOrder } = useAppSelector((store: RootState) => store.order);
   // const iconSize = 16;
   const iconPlusSize = 28;
   let { product, orderItem }: { product: IProduct | undefined; orderItem: IOrderItem | undefined } = location.state;
@@ -209,12 +210,12 @@ const MenuItemModal = () => {
                 setTotalPrice(fixWholeNumber(order.price, 2));
               }}
             />
-            <Flex gap="md">
+            <Flex gap="xs">
               <Button variant="outline" size="input-sm" onClick={() => addCheckoutItemToOrder()} type="button">
-                Add to Order - ${totalPrice}
+                Add - ${totalPrice}
               </Button>
-              <Button size="input-sm" onClick={() => addCheckoutItemToOrder(true)} type="button">
-                Proceed to checkout - ${totalPrice}
+              <Button size="input-sm" visibleFrom="xs" onClick={() => addCheckoutItemToOrder(true)} type="button">
+                Checkout - ${fixWholeNumber((fullOrder?.grandTotal || 0) + Number(totalPrice), 2)}
               </Button>
             </Flex>
           </div>

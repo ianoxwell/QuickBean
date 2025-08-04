@@ -55,11 +55,7 @@ const OrderCartPage = () => {
               )}
             </div>
             <Flex gap="md">
-              <Button
-                type="button"
-                onClick={() => navigate(`${base}${checkout.checkoutUrl}/${CRoutes.menu}`)}
-                leftSection={<Plus size={16} />}
-              >
+              <Button type="button" onClick={() => navigate(CRoutes.menu)} leftSection={<Plus size={16} />}>
                 Add to order
               </Button>
               <Button type="button" onClick={clearCart} variant="outline" rightSection={<Trash2 size={16} />}>
