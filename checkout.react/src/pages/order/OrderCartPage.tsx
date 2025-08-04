@@ -9,7 +9,6 @@ import { clearCheckout } from './order.slice';
 import './OrderCartPage.scss';
 
 const OrderCartPage = () => {
-  const base = import.meta.env.VITE_BASE_URL;
   const { checkout } = useAppSelector((store: RootState) => store.checkout);
   const { order } = useAppSelector((store: RootState) => store.order);
   const { user } = useAppSelector((store: RootState) => store.user);
