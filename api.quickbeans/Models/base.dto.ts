@@ -34,7 +34,11 @@ export enum EProductType {
   HOT_DRINK = 'hot_drink',
   TEA_BREWED = 'tea_brewed',
   COLD_DRINK = 'cold_drink',
-  FOOD = 'food'
+  FOOD = 'food',
+  CHICKEN = 'chicken',
+  BEEF = 'beef',
+  LAMB = 'lamb',
+  PORK = 'pork'
 }
 
 export enum EOrderStatus {
